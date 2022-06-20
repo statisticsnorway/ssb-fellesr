@@ -1,6 +1,12 @@
-library(here)
-library(getPass)
 
+#' Create a dependencies file
+#'
+#' @param lines Additional lines to include in the file
+#' @param force Whether the file should forcibly overwrite if exists
+#' @param warning Whether a warning should be given for force overwrite
+#'
+#' @return None. A dependencies.R file is created
+#' @export
 create_dependencies <- function(lines = NULL, force = FALSE, warning = TRUE){
     if (file.exists("dependencies.R")){
         if (!force) {
@@ -21,7 +27,15 @@ create_dependencies <- function(lines = NULL, force = FALSE, warning = TRUE){
     } 
 
 
-snapshot <- function(ignore){
+#' Snapshot a SSB project
+#' Wrapper function for renv::snapshot
+#'
+#' @param ignore List of packages to ignore
+#'
+#' @return None. Both lock and dependencies.R files will be updated. For more
+#' details see <https://rstudio.github.io/renv/reference/snapshot.html>
+#' @export
+snapshot <- function(ignore, ...){
     nodename <- Sys.info()["nodename"]
     if (grepl("jupyter", nodename)){
         repo <- 'https://cran.uib.no'
@@ -29,7 +43,7 @@ snapshot <- function(ignore){
         repo <- 'https://nexus.ssb.no/repository/CRAN/'
         }
     if (Sys.getenv("RSTUDIO") == "1"){
-        renv::snapshot()
+        renv::snapshot(repos=repo, ...)
         } else {
         dep_lines <- read.delim("dependencies.R", header = FALSE)$V1
         h <- match("renv::init()", dep_lines)
@@ -55,6 +69,17 @@ snapshot <- function(ignore){
     }
 }
 
+
+#' Install packages in SSB from CRAN 
+#' Wrapper function for utils::install.packages
+#'
+#' @param pkgs Name of the packages to install
+#' @param lib Character vector giving library directory
+#' @param repos Character vector giving CRAN repository to use
+#' @param ... Addition parameters (see https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/install.packages)
+#'
+#' @return Invisible `NULL`
+#' @export
 install.packages <- function(pkgs, lib, repos, ...){
     nodename <- Sys.info()["nodename"]
     if (grepl("jupyter", nodename)){
@@ -68,12 +93,23 @@ install.packages <- function(pkgs, lib, repos, ...){
     utils::install.packages(pkgs, lib, repos = repo, ...)
     }
 
-restore <- function(repos, ...){
+
+#' Restore am SSB project
+#' Wrapper function for renv::restore()
+#'
+#' @param repo Character vector pointing to which repository should be used  
+#' @param ... 
+#'
+#' @return
+#' @export
+restore <- function(repo, ...){
     nodename <- Sys.info()["nodename"]
-    if (grepl("jupyter", nodename)){
-        repo <- 'https://cran.uib.no'
-        } else {
-        repo <- 'https://nexus.ssb.no/repository/CRAN/'
-        }
+    if (missing(repo)){
+        if (grepl("jupyter", nodename)){
+            repo <- 'https://cran.uib.no'
+            } else {
+            repo <- 'https://nexus.ssb.no/repository/CRAN/'
+            }
+    }    
     renv::restore(repos = repo)
     }
