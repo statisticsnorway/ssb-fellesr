@@ -94,13 +94,13 @@ install.packages <- function(pkgs, lib, repos, ...){
     }
 
 
-#' Restore am SSB project
+#' Restore a SSB project
 #' Wrapper function for renv::restore()
 #'
 #' @param repo Character vector pointing to which repository should be used  
 #' @param ... 
 #'
-#' @return
+#' @return Invisible `NULL`
 #' @export
 restore <- function(repo, ...){
     nodename <- Sys.info()["nodename"]
@@ -112,4 +112,64 @@ restore <- function(repo, ...){
             }
     }    
     renv::restore(repos = repo)
+    }
+
+
+#' library function for a difficult package
+#' Some packages are not abel to be installed by the user. In this case the package is intalled from the felles library
+#'
+#' @param package Character vector with the name of the package
+#' @param ...
+#'
+#' @return Invisible `NULL`
+#' @export
+ssb_library <- function(package, ...){
+    tryCatch(library(package, character.only = T, ...), silent = TRUE, 
+             error = try_common_library(package))
+    }
+
+
+#' Internal library function for a difficult package
+#'
+#' @param pkg Character vector with the name of the package
+#' @param
+#'
+#' @return Invisible `NULL`
+#' @keywords internal
+try_common_library <- function(pkg){
+    print("In try")
+    hm <- Sys.getenv('R_HOME')
+    home_files <- list.files(hm)
+    if ("site-library" %in% home_files) libr <- file.path(hm, "site-library")
+    if ("library" %in% home_files) libr <- c(libr, file.path(hm, "library"))
+
+    mes = "called"
+    while (length(mes) > 0){
+        while(any(grepl("called", mes))){
+            print("In while")
+            mes <- try(library(pkg, lib.loc = libr, character.only = T), silent = TRUE)
+            print(paste("message null:", is.null(mes)))
+            find_problem(pkg, libr)
+        }
+        }
+    }
+
+
+#' Internal library function for a difficult package
+#'
+#' @param pkg Character vector with the name of the package
+#' @param lib Character vector with the path to the librarys
+#'
+#' @return Invisible `NULL`
+#' @keywords internal
+find_problem <- function(pkg, lib){
+    print("In find")
+    if (length(pkg)==0) return("Done")
+    mes <- try(library(pkg, lib.loc = lib, character.only = T), silent = TRUE)
+    mes_vec <- unlist(strsplit(mes, split = " "))
+    pkg_ind <- which(mes_vec == "called") + 1
+    pkg2 <- gsub("[[:space:]]", "", mes_vec[pkg_ind], fixed = FALSE)
+    pkg2 <- gsub("[^[:alnum:]]", "", pkg2)
+    print(paste("Loading:", pkg2))
+    find_problem(pkg2, lib)
     }
