@@ -37,18 +37,18 @@ dynarev_uttrekk <- function(delregnr,
     # Sjekker hvilken plattform koden kjøres på (Windows/Jupter etc.)
     nodename <- Sys.info()["nodename"]
 
-    # Laster inn pakker
-    suppressPackageStartupMessages({
-      if (grepl("FW-XAPROD", nodename)){
-        library(dplyr)
-        library(getPass)
-        library(RODBC)
-      } else {
-        library(tidyverse)
-        library(getPass)
-        library(ROracle)
-      }
-    })
+    # # Laster inn pakker
+    # suppressPackageStartupMessages({
+    #   if (grepl("FW-XAPROD", nodename)){
+    #     library(dplyr)
+    #     library(getPass)
+    #     library(RODBC)
+    #   } else {
+    #     library(tidyverse)
+    #     library(getPass)
+    #     library(ROracle)
+    #   }
+    # })
 
     # Funksjoner for å sjekke/fikse encoding
     TestIfRenvironExist <- function() {
