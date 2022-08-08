@@ -17,10 +17,11 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' dynarev <- dynarev_uttrekk(delregnr = 2421,
 #'                           skjema = "HELSE41",
 #'                           skjema_cols = T)
-#'
+#'}
 #'@encoding UTF-8
 
 dynarev_uttrekk <- function(delregnr,
