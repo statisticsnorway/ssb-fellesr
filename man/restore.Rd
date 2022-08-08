@@ -2,7 +2,7 @@
 % Please edit documentation in R/renv_funcs.R
 \name{restore}
 \alias{restore}
-\title{Restore am SSB project
+\title{Restore a SSB project
 Wrapper function for renv::restore()}
 \usage{
 restore(repo, ...)
@@ -13,9 +13,9 @@ restore(repo, ...)
 \item{...}{}
 }
 \value{
-
+Invisible `NULL`
 }
 \description{
-Restore am SSB project
+Restore a SSB project
 Wrapper function for renv::restore()
 }

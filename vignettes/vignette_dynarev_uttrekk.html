@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Sindre Mikael Haugen" />
+
+<meta name="date" content="2022-08-03" />
+
+<title>Uttrekk fra Dynarev til R</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Uttrekk fra Dynarev til R</h1>
+<h4 class="author">Sindre Mikael Haugen</h4>
+<h4 class="date">2022-08-03</h4>
+
+
+
+<p><strong>dynarev_uttrekk</strong> er en funksjon som henter inn data
+fra Dynarev til R så lenge man oppgir delregisternummer og skjemanavn.
+Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet
+ned. Det er mulig å hente skjemadata (altså variablene i selve skjemaet)
+og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker
+og velge mellom reviderte data og rådata.</p>
+<p>Funksjonen finnes i pakken <a href="https://github.com/statisticsnorway/fellesr">fellesr</a> og
+fungerer i RStudio (Windows og Linux) og Jupyterlab i
+produksjonssonen.</p>
+<div id="parametre" class="section level2">
+<h2>Parametre</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> num,               <span class="co"># Må oppgis</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">skjema =</span> <span class="st">&quot;char&quot;</span>,             <span class="co"># Må oppgis</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">enhets_type =</span> <span class="st">&quot;char&quot;</span>,        <span class="co"># Default = c(&quot;BEDR&quot;, &quot;FRTK)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">skjema_cols =</span> boolsk<span class="sc">/</span>liste,  <span class="co"># Default = TRUE</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">sfu_cols =</span> boolsk<span class="sc">/</span>liste,     <span class="co"># Default = FALSE</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">skjema_sfu_merge =</span> boolsk,   <span class="co"># Default = FALSE</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">dublettsjekk =</span> boolsk<span class="sc">/</span>liste, <span class="co"># Default = FALSE</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                            <span class="at">con_ask =</span> boolsk<span class="sc">/</span><span class="st">&quot;con&quot;</span>,      <span class="co"># Default = TRUE</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">raadata =</span> boolsk)            <span class="co"># Default = FALSE</span></span></code></pre></div>
+<p><strong>delregnr</strong> : Velg delregisternummer <br />
+<strong>skjema</strong> : Velg skjemanavn <br />
+<strong>enhets_type</strong> : Velg enhetstype fra Dynarev (f.eks. BEDR
+og/eller FRTK) <br /> <strong>skjema_cols</strong> : Velg kolonner fra
+skjemadata. Hvis TRUE henter man alle variabler. Hvis FALSE henter man
+ikke skjemadata, kun SFU-data (hvis sfu_cols = TRUE). Det er også mulig
+å lage en vektor/liste av variabelnavn, f.eks. c(“variabel1”,
+“variabel2”), dersom man kun vil ha utvalgte skjemakolonner. <br />
+<strong>sfu_cols</strong> : Hvis TRUE blir alle variabler fra SFU for
+valgt delregister og skjema inkludert. For å kun velge én eller flere
+variabler fra SFU skrives disse i en vektor, f.eks. c(“variabel1”,
+“variabel2”). <br /> <strong>skjema_sfu_merge</strong> : Om man henter
+skjemadata og SFU samtidig blir dataene merget hvis TRUE. Dersom FALSE
+blir dataene hentet som to separate datasett i en liste; [1] skjemadata
+og [2] SFU-data. <br /> <strong>dublettsjekk</strong> : Hvis TRUE
+sjekkes det for dubletter i skjemadata etter ENHETS_ID. Dersom man
+ønsker å sjekke for dubletter etter én eller flere selvvalgte variabler
+skrives disse i en vektor, f.eks. c(“variabel1”, “variabel2”). Liste med
+to datasett returneres; [1] skjemadata og [2] dublettdata (dersom det
+finnes dubletter, hvis ikke er denne blank). <br />
+<strong>con_ask</strong> : Hvis TRUE får man opp en boks som spør etter
+Oracle-passord. Hvis FALSE spørres det ikke om passord. Ved å skrive
+dynarev_uttrekk(con_ask = “con”) får man opp en boks som spør etter
+Oracle-passord og kun passord blir returnert. Denne kan brukes dersom
+man skal lese inn flere skjema etter hverandre for å unngå å skrive inn
+passordet flere ganger. <br /> <strong>raadata</strong> : Hvis FALSE
+returneres reviderte data fra FELT_VERDI, TRUE returnerer rådata.</p>
+</div>
+<div id="eksempler" class="section level2">
+<h2>Eksempler</h2>
+<p>Under følger en rekke eksempler på hvordan man bruker funksjonen
+<strong>dynarev_uttrekk</strong>.</p>
+<div id="alle-kolonner-fra-valgt-skjema" class="section level3">
+<h3>Alle kolonner fra valgt skjema</h3>
+<p>Her får man lastet inn alle kolonnene fra valgt skjema.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> T)</span></code></pre></div>
+</div>
+<div id="utvalgte-kolonner-fra-valgt-skjema" class="section level3">
+<h3>Utvalgte kolonner fra valgt skjema</h3>
+<p>Her får man lastet ned utvalgte kolonner fra valgt skjema. Her er
+AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR valgt.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> <span class="fu">c</span>(<span class="st">&quot;AARGANG&quot;</span>, <span class="st">&quot;FORETAKETS_NAVN&quot;</span>, <span class="st">&quot;FORETAKETS_ORGNR&quot;</span>))</span></code></pre></div>
+</div>
+<div id="alle-sfu-kolonner-fra-valgt-skjema" class="section level3">
+<h3>Alle SFU-kolonner fra valgt skjema</h3>
+<p>Her får man lastet ned alle kolonnene med SFU-data fra valgt
+skjema.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> F,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sfu_cols =</span> T)</span></code></pre></div>
+</div>
+<div id="utvalgte-sfu-kolonner-fra-valgt-skjema" class="section level3">
+<h3>Utvalgte SFU-kolonner fra valgt skjema</h3>
+<p>Her får man lastet ned utvalgte kolonner med SFU-data fra valgt
+skjema. Her er kolonnene NAVN og ORGNR valgt.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> F,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sfu_cols =</span> <span class="fu">c</span>(<span class="st">&quot;NAVN&quot;</span>, <span class="st">&quot;ORGNR&quot;</span>))</span></code></pre></div>
+</div>
+<div id="alle-sfu-kolonner-fra-alle-skjemaer" class="section level3">
+<h3>Alle SFU-kolonner fra alle skjemaer</h3>
+<p>Her får man lastet ned alle kolonnene med SFU-data fra alle skjema i
+valgt delregister. Dersom man kun ønsker utvalgte variabler fra SFU-data
+erstattes sfu_cols = T med sfu_cols = c(“NAVN”, “ORGNR”).</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> T,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> F,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sfu_cols =</span> T)</span></code></pre></div>
+</div>
+<div id="alle-kolonner-fra-valgt-skjema-og-alle-sfu-kolonner" class="section level3">
+<h3>Alle kolonner fra valgt skjema og alle SFU-kolonner</h3>
+<p>Her får man lastet ned både skjemadata (alle kolonner) og SFU-data
+(alle kolonner) fra valgt delregister. Objektet dynarev inneholder her
+altså to datasett. For å få hentet ut skjemadata skriver man
+dynarev_skjema &lt;- data.frame(dynarev[1]) og for å hente ut SFU-data
+skriver man dynarev_sfu &lt;- data.frame(dynarev[2]).</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> T,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sfu_cols =</span> T)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>dynarev_skjema <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">1</span>])</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>dynarev_sfu <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">2</span>])</span></code></pre></div>
+</div>
+<div id="alle-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner" class="section level3">
+<h3>Alle kolonner fra valgt skjema og utvalgte SFU-kolonner</h3>
+<p>Her får man lastet ned både skjemadata (alle kolonner) og SFU-data
+(utvalgte kolonner, her NAVN og ORGNR) fra valgt delregister. Objektet
+dynarev inneholder her altså to datasett. For å få hentet ut skjemadata
+skriver man dynarev_skjema &lt;- data.frame(dynarev[1]) og for å hente
+ut SFU-data skriver man dynarev_sfu &lt;- data.frame(dynarev[2]).</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> T,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sfu_cols =</span> <span class="fu">c</span>(<span class="st">&quot;NAVN&quot;</span>, <span class="st">&quot;ORGNR&quot;</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>dynarev_skjema <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">1</span>])</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>dynarev_sfu <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">2</span>])</span></code></pre></div>
+</div>
+<div id="utvalgte-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner" class="section level3">
+<h3>Utvalgte kolonner fra valgt skjema og utvalgte SFU-kolonner</h3>
+<p>Her får man lastet ned både skjemadata (utvalgte kolonner, her
+AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR) og SFU-data (utvalgte
+kolonner, her NAVN og ORGNR) fra valgt delregister. Objektet dynarev
+inneholder her altså to datasett. For å få hentet ut skjemadata skriver
+man dynarev_skjema &lt;- data.frame(dynarev[1]) og for å hente ut
+SFU-data skriver man dynarev_sfu &lt;- data.frame(dynarev[2]).</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> <span class="fu">c</span>(<span class="st">&quot;AARGANG&quot;</span>, <span class="st">&quot;FORETAKETS_NAVN&quot;</span>, <span class="st">&quot;FORETAKETS_ORGNR&quot;</span>),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sfu_cols =</span> <span class="fu">c</span>(<span class="st">&quot;NAVN&quot;</span>, <span class="st">&quot;ORGNR&quot;</span>))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>dynarev_skjema <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">1</span>])</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>dynarev_sfu <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">2</span>])</span></code></pre></div>
+</div>
+<div id="alle-kolonner-fra-valgt-skjema-og-alle-sfu-kolonner-koblet-sammen" class="section level3">
+<h3>Alle kolonner fra valgt skjema og alle SFU-kolonner (koblet
+sammen)</h3>
+<p>Her får man lastet ned både skjemadata (alle kolonner) og SFU-data
+(alle kolonner) fra valgt delregister. SFU-dataene blir koblet på
+skjemadataene slik at man kun får én fil.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> T,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sfu_cols =</span> T,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_sfu_merge =</span> T)</span></code></pre></div>
+</div>
+<div id="alle-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner-koblet-sammen" class="section level3">
+<h3>Alle kolonner fra valgt skjema og utvalgte SFU-kolonner (koblet
+sammen)</h3>
+<p>Her får man lastet ned både skjemadata (alle kolonner) og SFU-data
+(utvalgte kolonner, her NAVN og ORGNR) fra valgt delregister.
+SFU-dataene blir koblet på skjemadataene slik at man kun får én fil.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> T,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sfu_cols =</span> <span class="fu">c</span>(<span class="st">&quot;NAVN&quot;</span>, <span class="st">&quot;ORGNR&quot;</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_sfu_merge =</span> T)</span></code></pre></div>
+</div>
+<div id="utvalgte-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner-koblet-sammen" class="section level3">
+<h3>Utvalgte kolonner fra valgt skjema og utvalgte SFU-kolonner (koblet
+sammen)</h3>
+<p>Her får man lastet ned både skjemadata (utvalgte kolonner, her
+AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR) og SFU-data (utvalgte
+kolonner, her NAVN og ORGNR) fra valgt delregister. SFU-dataene blir
+koblet på skjemadataene slik at man kun får én fil.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">skjema_cols =</span> <span class="fu">c</span>(<span class="st">&quot;AARGANG&quot;</span>, <span class="st">&quot;FORETAKETS_NAVN&quot;</span>, <span class="st">&quot;FORETAKETS_ORGNR&quot;</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">sfu_cols =</span> <span class="fu">c</span>(<span class="st">&quot;NAVN&quot;</span>, <span class="st">&quot;ORGNR&quot;</span>),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">skjema_sfu_merge =</span> T)</span></code></pre></div>
+</div>
+<div id="dublettsjekk-etter-enhets_id" class="section level3">
+<h3>Dublettsjekk etter ENHETS_ID</h3>
+<p>Her får man testet for dubletter (etter ENHETS_ID) i skjemadata.
+Liste med to datasett returneres; [1] skjemadata og [2] dublettdata
+(dersom det finnes dubletter, hvis ikke er denne blank).</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE39&quot;</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">dublettsjekk =</span> T)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>dynarev_skjema <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">1</span>])</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>dynarev_dubletter <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">2</span>])</span></code></pre></div>
+</div>
+<div id="dublettsjekk-etter-egenvalgte-variabler" class="section level3">
+<h3>Dublettsjekk etter egenvalgte variabler</h3>
+<p>Dersom man ønsker å sjekke for dubletter etter én eller flere
+selvvalgte variabler skrives disse i en vektor, f.eks. dublettsjekk =
+c(“variabel1”, “variabel2”).</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="st">&quot;HELSE0X&quot;</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">dublettsjekk =</span> <span class="fu">c</span>(<span class="st">&quot;FORETAKSNR&quot;</span>, <span class="st">&quot;ART_SEKTOR&quot;</span>, <span class="st">&quot;FUNKSJON_KAPITTEL&quot;</span>))</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>dynarev_skjema <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">1</span>])</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>dynarev_dubletter <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(dynarev[<span class="dv">2</span>])</span></code></pre></div>
+</div>
+<div id="laste-inn-flere-skjema-uten-å-skive-passord" class="section level3">
+<h3>Laste inn flere skjema uten å skive passord</h3>
+<p>For å slippe å oppgi passord flere ganger når man skal laste inn
+flere skjema kan man skrive con_ask = FALSE. For at dette skal fungere
+må man logge på først øverst i scriptet: con &lt;-
+dynarev_uttrekk(con_ask = “con”)</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">con_ask =</span> <span class="st">&quot;con&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>dynarev_1 <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">skjema =</span> <span class="st">&quot;HELSE41&quot;</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">skjema_cols =</span> T,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">con_ask =</span> F)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>dynarev_2 <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">skjema =</span> <span class="st">&quot;HELSE46P&quot;</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">skjema_cols =</span> T,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">con_ask =</span> F)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>dynarev_3 <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>                             <span class="at">skjema =</span> <span class="st">&quot;HELSE39&quot;</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>                             <span class="at">skjema_cols =</span> T,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                             <span class="at">con_ask =</span> F)</span></code></pre></div>
+</div>
+<div id="laste-inn-flere-skjema-fra-samme-delreg-i-samme-fil" class="section level3">
+<h3>Laste inn flere skjema fra samme delreg i samme fil</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="fu">c</span>(<span class="st">&quot;HELSE38P&quot;</span>, <span class="st">&quot;HELSE39&quot;</span>, <span class="st">&quot;HELSE44P&quot;</span>),</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> <span class="fu">c</span>(<span class="st">&quot;FORETAKETS_NAVN&quot;</span>, <span class="st">&quot;FORETAKETS_ORGNR&quot;</span>, <span class="st">&quot;HELSEREGION_EPOST&quot;</span>, <span class="st">&quot;HELSEREGION_NAVN&quot;</span>))</span></code></pre></div>
+</div>
+<div id="laste-inn-alle-skjema-fra-delreg-i-samme-fil" class="section level3">
+<h3>Laste inn alle skjema fra delreg i samme fil</h3>
+<p>For å laste inn alle skjema fra samme delregister i samme fil skriver
+man skjema = T. Under enhets_type må man samtidig skrive inn alle
+enhetstypene som finnes i det valgte delregisteret (f.eks. BEDR og
+FRTK).</p>
+<p>OBS: dette uttrekket kan føre til en veldig stor fil med mange rader
+og kolonner så det kan være lurt å spesifisere hvilke variabler man
+ønsker å hente ut.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>, </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">skjema =</span> T, </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">skjema_cols =</span> T, </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">sfu_cols =</span> F)</span></code></pre></div>
+</div>
+<div id="laste-inn-sfu-data-fra-flere-skjema-fra-delreg-i-samme-fil" class="section level3">
+<h3>Laste inn sfu-data fra flere skjema fra delreg i samme fil</h3>
+<p>Her lastes det inn SFU-data fra flere skjema (fra samme
+delregister).</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> <span class="fu">c</span>(<span class="st">&quot;HELSE38P&quot;</span>, <span class="st">&quot;HELSE39&quot;</span>, <span class="st">&quot;HELSE44P&quot;</span>),</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> F,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sfu_cols =</span> T)</span></code></pre></div>
+</div>
+<div id="laste-inn-rådata" class="section level3">
+<h3>Laste inn rådata</h3>
+<p>Her lastes det inn rådata fra de aktive enhetene i valgt
+skjema/valgte skjemaer.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>dynarev <span class="ot">&lt;-</span> <span class="fu">dynarev_uttrekk</span>(<span class="at">delregnr =</span> <span class="dv">2421</span>,</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema =</span> T,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">skjema_cols =</span> T,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">raadata =</span> T)</span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
