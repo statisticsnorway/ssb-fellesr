@@ -13,7 +13,7 @@
 #' @param con_ask TRUE = spør om passord for å koble til DB1P og laster inn data. Dersom con_ask = "con" kobles det til DB1P uten å laste inn data.
 #' @param raadata FALSE returnerer reviderte data, TRUE returnerer rådata.
 #'
-#' @returns Data frame med valgt data fra Dynarev, dersom enten skjema_cols eller sfu_cols = TRUE. Om både skjema_cols og sfu_cols = TRUE returneres en liste med to datasett [1] skjema_cols og [2] sfu_cols. Om skjema_cols, sfu_cols og skjema_sfu_merge returneres det en data frame.
+#' @returns data.frame med valgt data fra Dynarev, dersom enten skjema_cols eller sfu_cols = TRUE. Om både skjema_cols og sfu_cols = TRUE returneres en liste med to datasett [1] skjema_cols og [2] sfu_cols. Om skjema_cols, sfu_cols og skjema_sfu_merge returneres det en data frame.
 #' @export
 #'
 #' @examples
