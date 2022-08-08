@@ -18,33 +18,34 @@ dynarev_uttrekk(
 )
 }
 \arguments{
-\item{delregnr}{Numerisk vektor med delregisternummer}
+\item{delregnr}{Numerisk vektor med delregisternummer.}
 
-\item{skjema}{Karakter vektor med skjemanavn}
+\item{skjema}{Karakter vektor med skjemanavn.}
 
-\item{enhets_type}{Karakter vektor med enhetstype}
+\item{enhets_type}{Karakter vektor med enhetstype.}
 
-\item{skjema_cols}{TRUE = alle kolonner fra skjema. Karakter vektor for kun utvalgte kolonner}
+\item{skjema_cols}{TRUE = alle kolonner fra skjema. Karakter vektor for kun utvalgte kolonner.}
 
-\item{skjema_sfu_merge}{TRUE = skjemadata og SFU merges sammen til én data frame}
+\item{skjema_sfu_merge}{TRUE = skjemadata og SFU merges sammen til én data.frame.}
 
 \item{dublettsjekk}{TRUE = dublettsjekk etter ENHETS_ID. Karakter vektor for dublettsjekk etter valgte kolonner.}
 
-\item{sfu_cols}{TRUE = alle kolonner fra SFU. Karakter vektor for kun utvalgte kolonner}
+\item{sfu_cols}{TRUE = alle kolonner fra SFU. Karakter vektor for kun utvalgte kolonner.}
 
-\item{con_ask}{TRUE = spør om passord for å koble til DB1P og laster inn data. Dersom con_ask = "con" kobles det til DB1P uten å laste inn data}
+\item{con_ask}{TRUE = spør om passord for å koble til DB1P og laster inn data. Dersom con_ask = "con" kobles det til DB1P uten å laste inn data.}
 
-\item{raadata}{FALSE returnerer reviderte data, TRUE returnerer rådata}
+\item{raadata}{FALSE returnerer reviderte data, TRUE returnerer rådata.}
 }
 \value{
-Data frame med valgt data fra Dynarev, dersom enten skjema_cols eller sfu_cols = TRUE. Om både skjema_cols og sfu_cols = TRUE returneres en liste med to datasett [1] skjema_cols og [2] sfu_cols. Om skjema_cols, sfu_cols og skjema_sfu_merge returneres det en data frame.
+data.frame med valgt data fra Dynarev, dersom enten skjema_cols eller sfu_cols = TRUE. Om både skjema_cols og sfu_cols = TRUE returneres en liste med to datasett [1] skjema_cols og [2] sfu_cols. Om skjema_cols, sfu_cols og skjema_sfu_merge returneres det en data frame.
 }
 \description{
 dynarev_uttrekk er en funksjon som henter inn data fra Dynarev til R så lenge man oppgir delregisternummer og skjemanavn. Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (altså variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.
 }
 \examples{
+\dontrun{
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                           skjema = "HELSE41",
                           skjema_cols = T)
-
+}
 }
