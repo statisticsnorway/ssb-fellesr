@@ -8,7 +8,8 @@ Description: This package is for gerenal R functions which may be useful for gen
 Imports: 
     here,
     getPass,
-    dplyr
+    dplyr,
+    magrittr
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
