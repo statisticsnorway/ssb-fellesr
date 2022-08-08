@@ -64,23 +64,23 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>delregnr</dt>
-<dd><p>Numerisk vektor med delregisternummer</p></dd>
+<dd><p>Numerisk vektor med delregisternummer.</p></dd>
 
 
 <dt>skjema</dt>
-<dd><p>Karakter vektor med skjemanavn</p></dd>
+<dd><p>Karakter vektor med skjemanavn.</p></dd>
 
 
 <dt>enhets_type</dt>
-<dd><p>Karakter vektor med enhetstype</p></dd>
+<dd><p>Karakter vektor med enhetstype.</p></dd>
 
 
 <dt>skjema_cols</dt>
-<dd><p>TRUE = alle kolonner fra skjema. Karakter vektor for kun utvalgte kolonner</p></dd>
+<dd><p>TRUE = alle kolonner fra skjema. Karakter vektor for kun utvalgte kolonner.</p></dd>
 
 
 <dt>skjema_sfu_merge</dt>
-<dd><p>TRUE = skjemadata og SFU merges sammen til én data frame</p></dd>
+<dd><p>TRUE = skjemadata og SFU merges sammen til én data.frame.</p></dd>
 
 
 <dt>dublettsjekk</dt>
@@ -88,31 +88,31 @@
 
 
 <dt>sfu_cols</dt>
-<dd><p>TRUE = alle kolonner fra SFU. Karakter vektor for kun utvalgte kolonner</p></dd>
+<dd><p>TRUE = alle kolonner fra SFU. Karakter vektor for kun utvalgte kolonner.</p></dd>
 
 
 <dt>con_ask</dt>
-<dd><p>TRUE = spør om passord for å koble til DB1P og laster inn data. Dersom con_ask = "con" kobles det til DB1P uten å laste inn data</p></dd>
+<dd><p>TRUE = spør om passord for å koble til DB1P og laster inn data. Dersom con_ask = "con" kobles det til DB1P uten å laste inn data.</p></dd>
 
 
 <dt>raadata</dt>
-<dd><p>FALSE returnerer reviderte data, TRUE returnerer rådata</p></dd>
+<dd><p>FALSE returnerer reviderte data, TRUE returnerer rådata.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>Data frame med valgt data fra Dynarev, dersom enten skjema_cols eller sfu_cols = TRUE. Om både skjema_cols og sfu_cols = TRUE returneres en liste med to datasett [1] skjema_cols og [2] sfu_cols. Om skjema_cols, sfu_cols og skjema_sfu_merge returneres det en data frame.</p>
+<p>data.frame med valgt data fra Dynarev, dersom enten skjema_cols eller sfu_cols = TRUE. Om både skjema_cols og sfu_cols = TRUE returneres en liste med to datasett [1] skjema_cols og [2] sfu_cols. Om skjema_cols, sfu_cols og skjema_sfu_merge returneres det en data frame.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu">dynarev_uttrekk</span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu">dynarev_uttrekk</span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span></span>
 <span class="r-in"><span>                          skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span></span>
 <span class="r-in"><span>                          skjema_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in (function (cond) .Internal(C_tryCatchHelper(addr, 1L, cond)))(structure(list(message = "there is no package called 'ROracle'",     call = loadNamespace(x), package = "ROracle", lib.loc = NULL), class = c("packageNotFoundError", "error", "condition"))):</span> error in evaluating the argument 'drv' in selecting a method for function 'dbConnect': there is no package called 'ROracle'</span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
