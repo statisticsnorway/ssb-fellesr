@@ -16,39 +16,41 @@ knitr::opts_chunk$set(
 )
 ```
 
-**dynarev_uttrekk** er en funksjon som henter inn data fra Dynarev til R så lenge man oppgir delregisternummer og skjemanavn. Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (altså variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.
+`dynarev_uttrekk` er en funksjon som henter inn data fra Dynarev til R så lenge man oppgir delregisternummer og skjemanavn. Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.
 
-Funksjonen finnes i pakken [fellesr](https://github.com/statisticsnorway/fellesr) og fungerer i RStudio (Windows og Linux) og Jupyterlab i produksjonssonen.
+Funksjonen finnes i pakken [fellesr](https://github.com/statisticsnorway/fellesr) og er installert i RStudio (Windows og Linux) og Jupyterlab i produksjonssonen.
 
 ## Parametre
 
 ```{r, eval=FALSE}
-dynarev <- dynarev_uttrekk(delregnr = num,               # Må oppgis
-                            skjema = "char",             # Må oppgis
-                            enhets_type = "char",        # Default = c("BEDR", "FRTK)
-                            skjema_cols = boolsk/liste,  # Default = TRUE
-                            sfu_cols = boolsk/liste,     # Default = FALSE
-                            skjema_sfu_merge = boolsk,   # Default = FALSE
-                            dublettsjekk = boolsk/liste, # Default = FALSE
-                            con_ask = boolsk/"con",      # Default = TRUE
-                            raadata = boolsk)            # Default = FALSE
+dynarev_uttrekk(
+  delregnr,
+  skjema,
+  enhets_type = c("FRTK", "BEDR"),
+  skjema_cols = T,
+  sfu_cols = F,
+  skjema_sfu_merge = F,
+  dublettsjekk = F,
+  con_ask = T,
+  raadata = F
+)
 ```
 
 
-**delregnr** : Velg delregisternummer <br />
-**skjema** : Velg skjemanavn <br />
-**enhets_type** : Velg enhetstype fra Dynarev (f.eks. BEDR og/eller FRTK) <br />
-**skjema_cols** : Velg kolonner fra skjemadata. Hvis TRUE henter man alle variabler. Hvis FALSE henter man ikke skjemadata, kun SFU-data (hvis sfu_cols = TRUE). Det er også mulig å lage en vektor/liste av variabelnavn, f.eks. c("variabel1", "variabel2"), dersom man kun vil ha utvalgte skjemakolonner.  <br />
-**sfu_cols** : Hvis TRUE blir alle variabler fra SFU for valgt delregister og skjema inkludert. For å kun velge én eller flere variabler fra SFU skrives disse i en vektor, f.eks. c("variabel1", "variabel2"). <br />
-**skjema_sfu_merge** : Om man henter skjemadata og SFU samtidig blir dataene merget hvis TRUE. Dersom FALSE blir dataene hentet som to separate datasett i en liste; [1] skjemadata og [2] SFU-data.  <br />
-**dublettsjekk** : Hvis TRUE sjekkes det for dubletter i skjemadata etter ENHETS_ID. Dersom man ønsker å sjekke for dubletter etter én eller flere selvvalgte variabler skrives disse i en vektor, f.eks. c("variabel1", "variabel2"). Liste med to datasett returneres; [1] skjemadata og [2] dublettdata (dersom det finnes dubletter, hvis ikke er denne blank). <br />
-**con_ask** : Hvis TRUE får man opp en boks som spør etter Oracle-passord. Hvis FALSE spørres det ikke om passord. Ved å skrive dynarev_uttrekk(con_ask = "con") får man opp en boks som spør etter Oracle-passord og kun passord blir returnert. Denne kan brukes dersom man skal lese inn flere skjema etter hverandre for å unngå å skrive inn passordet flere ganger. <br />
-**raadata** : Hvis FALSE returneres reviderte data fra FELT_VERDI, TRUE returnerer rådata.
+`delregnr` : Numerisk vektor med delregisternummer. <br />
+`skjema` : Karaktervektor med skjemanavn. <br />
+`enhets_type` : Karaktervektor med enhetstype (f.eks. BEDR og/eller FRTK). <br />
+`skjema_cols` : Boolsk/karaktervektor. Hvis TRUE henter man alle variabler fra skjema. Hvis FALSE henter man ikke skjemadata, kun SFU-data (hvis `sfu_cols` = TRUE). Det er også mulig å lage en vektor/liste av variabelnavn, f.eks. c("variabel1", "variabel2"), dersom man kun vil ha utvalgte variabler fra skjema. <br />
+`sfu_cols` : Boolsk/karaktervektor. Hvis TRUE blir alle variabler fra SFU for valgt delregister og skjema inkludert. For å kun velge én eller flere variabler fra SFU skrives disse i en vektor/liste, f.eks. c("variabel1", "variabel2"). <br />
+`skjema_sfu_merge` : Boolsk. Hvis TRUE blir skjemadataene og SFU-dataene merget. Dersom FALSE blir dataene hentet som to separate datasett i en liste; [1] skjemadata og [2] SFU-data.  <br />
+`dublettsjekk` : Boolsk/karaktervektor. Hvis TRUE sjekkes det for dubletter i skjemadata etter ENHETS_ID. Dersom man ønsker å sjekke for dubletter etter én eller flere selvvalgte variabler skrives disse i en vektor, f.eks. c("variabel1", "variabel2"). Liste med to datasett returneres; [1] skjemadata og [2] dublettdata (dersom det finnes dubletter, hvis ikke er denne blank). <br />
+`con_ask` : Boolsk/karaktervektor. Hvis TRUE får man opp en boks som spør etter Oracle-passord. Hvis FALSE spørres det ikke om passord. Ved å skrive `dynarev_uttrekk(con_ask = "con")` får man opp en boks som spør etter Oracle-passord og kun koblingen mot Oracle blir returnert (ikke data). Denne kan brukes dersom man skal lese inn flere skjema etter hverandre for å unngå å skrive inn passordet flere ganger. <br />
+`raadata` : Boolsk. Hvis FALSE returneres reviderte data (fra FELT_VERDI), TRUE returnerer rådata.
 
 
 ## Eksempler
 
-Under følger en rekke eksempler på hvordan man bruker funksjonen **dynarev_uttrekk**.
+Under følger en rekke eksempler på hvordan man bruker funksjonen `dynarev_uttrekk`.
 
 ### Alle kolonner fra valgt skjema
 
@@ -62,7 +64,7 @@ dynarev <- dynarev_uttrekk(delregnr = 2421,
 
 ### Utvalgte kolonner fra valgt skjema
 
-Her får man lastet ned utvalgte kolonner fra valgt skjema. Her er AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR valgt.
+Her får man lastet ned utvalgte kolonner fra valgt skjema. Her er kolonnene AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR valgt.
 
 ```{r, eval=FALSE}
 dynarev <- dynarev_uttrekk(delregnr = 2421,
@@ -96,7 +98,7 @@ dynarev <- dynarev_uttrekk(delregnr = 2421,
 
 ### Alle SFU-kolonner fra alle skjemaer
 
-Her får man lastet ned alle kolonnene med SFU-data fra alle skjema i valgt delregister. Dersom man kun ønsker utvalgte variabler fra SFU-data erstattes sfu_cols = T med sfu_cols = c("NAVN", "ORGNR").
+Her får man lastet ned alle kolonnene med SFU-data fra alle skjema i valgt delregister. Dersom man kun ønsker utvalgte variabler fra SFU-data erstattes `sfu_cols = T` med `sfu_cols = c("variabel1", "variabel2")`.
 
 ```{r, eval=FALSE}
 dynarev <- dynarev_uttrekk(delregnr = 2421,
@@ -107,7 +109,7 @@ dynarev <- dynarev_uttrekk(delregnr = 2421,
 
 ### Alle kolonner fra valgt skjema og alle SFU-kolonner
 
-Her får man lastet ned både skjemadata (alle kolonner) og SFU-data (alle kolonner) fra valgt delregister. Objektet dynarev inneholder her altså to datasett. For å få hentet ut skjemadata skriver man dynarev_skjema <- data.frame(dynarev[1]) og for å hente ut SFU-data skriver man dynarev_sfu <- data.frame(dynarev[2]).
+Her får man lastet ned både skjemadata (alle kolonner) og SFU-data (alle kolonner) fra valgt delregister. Objektet dynarev inneholder her altså to datasett. For å få hentet ut skjemadata skriver man `dynarev_skjema <- data.frame(dynarev[1])` og for å hente ut SFU-data skriver man `dynarev_sfu <- data.frame(dynarev[2])`.
 
 ```{r, eval=FALSE}
 dynarev <- dynarev_uttrekk(delregnr = 2421,
@@ -122,7 +124,7 @@ dynarev_sfu <- data.frame(dynarev[2])
 
 ### Alle kolonner fra valgt skjema og utvalgte SFU-kolonner
 
-Her får man lastet ned både skjemadata (alle kolonner) og SFU-data (utvalgte kolonner, her NAVN og ORGNR) fra valgt delregister. Objektet dynarev inneholder her altså to datasett. For å få hentet ut skjemadata skriver man dynarev_skjema <- data.frame(dynarev[1]) og for å hente ut SFU-data skriver man dynarev_sfu <- data.frame(dynarev[2]).
+Her får man lastet ned både skjemadata (alle kolonner) og SFU-data (utvalgte kolonner, her NAVN og ORGNR) fra valgt delregister. Objektet dynarev inneholder her altså to datasett. For å få hentet ut skjemadata skriver man `dynarev_skjema <- data.frame(dynarev[1])` og for å hente ut SFU-data skriver man `dynarev_sfu <- data.frame(dynarev[2])`.
 
 ```{r, eval=FALSE}
 dynarev <- dynarev_uttrekk(delregnr = 2421,
@@ -136,7 +138,7 @@ dynarev_sfu <- data.frame(dynarev[2])
 
 ### Utvalgte kolonner fra valgt skjema og utvalgte SFU-kolonner
 
-Her får man lastet ned både skjemadata (utvalgte kolonner, her AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR) og SFU-data (utvalgte kolonner, her NAVN og ORGNR) fra valgt delregister. Objektet dynarev inneholder her altså to datasett. For å få hentet ut skjemadata skriver man dynarev_skjema <- data.frame(dynarev[1]) og for å hente ut SFU-data skriver man dynarev_sfu <- data.frame(dynarev[2]).
+Her får man lastet ned både skjemadata (utvalgte kolonner, her AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR) og SFU-data (utvalgte kolonner, her NAVN og ORGNR) fra valgt delregister. Objektet dynarev inneholder her altså to datasett. For å få hentet ut skjemadata skriver man `dynarev_skjema <- data.frame(dynarev[1])` og for å hente ut SFU-data skriver man `dynarev_sfu <- data.frame(dynarev[2])`.
 
 ```{r, eval=FALSE}
 dynarev <- dynarev_uttrekk(delregnr = 2421,
@@ -200,7 +202,7 @@ dynarev_dubletter <- data.frame(dynarev[2])
 
 ### Dublettsjekk etter egenvalgte variabler
 
-Dersom man ønsker å sjekke for dubletter etter én eller flere selvvalgte variabler skrives disse i en vektor, f.eks. dublettsjekk = c("variabel1", "variabel2"). 
+Dersom man ønsker å sjekke for dubletter etter én eller flere selvvalgte variabler skrives disse i en vektor, f.eks. `dublettsjekk = c("variabel1", "variabel2")`. 
 
 ```{r, eval=FALSE}
 dynarev <- dynarev_uttrekk(delregnr = 2421,
@@ -213,7 +215,7 @@ dynarev_dubletter <- data.frame(dynarev[2])
 
 ### Laste inn flere skjema uten å skive passord 
 
-For å slippe å oppgi passord flere ganger når man skal laste inn flere skjema kan man skrive con_ask = FALSE. For at dette skal fungere må man logge på først øverst i scriptet: con <- dynarev_uttrekk(con_ask = "con")
+For å slippe å oppgi passord flere ganger når man skal laste inn flere skjema kan man skrive con_ask = FALSE. For at dette skal fungere må man logge på først øverst i scriptet: `con <- dynarev_uttrekk(con_ask = "con")`
 
 ```{r, eval=FALSE}
 con <- dynarev_uttrekk(con_ask = "con")
@@ -237,6 +239,8 @@ dynarev_3 <- dynarev_uttrekk(delregnr = 2421,
 
 ### Laste inn flere skjema fra samme delreg i samme fil
 
+For å laste inn data fra flere skjemaer i samme fil skriver man skjemanavnene i en karaktervektor i argumentet `skjema`. Her er skjemaene HELSE38P, HELSE39 og HELSE44P valgt.
+
 ```{r, eval=FALSE}
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = c("HELSE38P", "HELSE39", "HELSE44P"),
@@ -247,7 +251,7 @@ dynarev <- dynarev_uttrekk(delregnr = 2421,
 
 ### Laste inn alle skjema fra delreg i samme fil
 
-For å laste inn alle skjema fra samme delregister i samme fil skriver man skjema = T. Under enhets_type må man samtidig skrive inn alle enhetstypene som finnes i det valgte delregisteret (f.eks. BEDR og FRTK).
+For å laste inn alle skjema fra samme delregister i samme fil skriver man `skjema = T`. Under enhets_type må man samtidig skrive inn alle enhetstypene som finnes i det valgte delregisteret (f.eks. BEDR og FRTK).
 
 OBS: dette uttrekket kan føre til en veldig stor fil med mange rader og kolonner så det kan være lurt å spesifisere hvilke variabler man ønsker å hente ut.
 

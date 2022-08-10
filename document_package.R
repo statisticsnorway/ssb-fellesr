@@ -3,12 +3,11 @@
 devtools::document()
 
 # Add imports
-usethis::use_package("dplyr", type = "imports")
+# usethis::use_pipe()
+# usethis::use_package("dplyr", type = "imports")
+# usethis::use_package("RODBC", type = "suggests") # OBS: kun installert i RStudio Windows
+# usethis::use_package("ROracle", type = "suggests") # OBS: ikke installert i RStudio Windows
 
-usethis::use_package("RODBC", type = "suggests") # OBS: kun installert i RStudio Windows
-usethis::use_package("ROracle", type = "suggests") # OBS: ikke installert i RStudio Windows
-
-usethis::use_pipe()
 
 # Vignette #
 devtools::load_all()

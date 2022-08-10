@@ -53,9 +53,9 @@
 <span>  <span class="va">skjema</span>,</span>
 <span>  enhets_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FRTK"</span>, <span class="st">"BEDR"</span><span class="op">)</span>,</span>
 <span>  skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
+<span>  sfu_cols <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  skjema_sfu_merge <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  dublettsjekk <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>  sfu_cols <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  con_ask <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>  raadata <span class="op">=</span> <span class="cn">F</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -68,42 +68,42 @@
 
 
 <dt>skjema</dt>
-<dd><p>Karakter vektor med skjemanavn.</p></dd>
+<dd><p>Karaktervektor med skjemanavn.</p></dd>
 
 
 <dt>enhets_type</dt>
-<dd><p>Karakter vektor med enhetstype.</p></dd>
+<dd><p>Karaktervektor med enhetstype (f.eks. BEDR og/eller FRTK).</p></dd>
 
 
 <dt>skjema_cols</dt>
-<dd><p>TRUE = alle kolonner fra skjema. Karakter vektor for kun utvalgte kolonner.</p></dd>
-
-
-<dt>skjema_sfu_merge</dt>
-<dd><p>TRUE = skjemadata og SFU merges sammen til én data.frame.</p></dd>
-
-
-<dt>dublettsjekk</dt>
-<dd><p>TRUE = dublettsjekk etter ENHETS_ID. Karakter vektor for dublettsjekk etter valgte kolonner.</p></dd>
+<dd><p>Boolsk/karaktervektor. Hvis TRUE henter man alle variabler fra skjema. Hvis FALSE henter man ikke skjemadata, kun SFU-data (hvis sfu_cols = TRUE). Det er også mulig å lage en vektor/liste av variabelnavn, f.eks. c("variabel1", "variabel2"), dersom man kun vil ha utvalgte variabler fra skjema.</p></dd>
 
 
 <dt>sfu_cols</dt>
-<dd><p>TRUE = alle kolonner fra SFU. Karakter vektor for kun utvalgte kolonner.</p></dd>
+<dd><p>Boolsk/karaktervektor. Hvis TRUE blir alle variabler fra SFU for valgt delregister og skjema inkludert. For å kun velge én eller flere variabler fra SFU skrives disse i en vektor/liste, f.eks. c("variabel1", "variabel2").</p></dd>
+
+
+<dt>skjema_sfu_merge</dt>
+<dd><p>Boolsk. Hvis TRUE blir skjemadataene og SFU-dataene merget. Dersom FALSE blir dataene hentet som to separate datasett i en liste; [1] skjemadata og [2] SFU-data.</p></dd>
+
+
+<dt>dublettsjekk</dt>
+<dd><p>Boolsk/karaktervektor. Hvis TRUE sjekkes det for dubletter i skjemadata etter ENHETS_ID. Dersom man ønsker å sjekke for dubletter etter én eller flere selvvalgte variabler skrives disse i en vektor, f.eks. c("variabel1", "variabel2"). Liste med to datasett returneres; [1] skjemadata og [2] dublettdata (dersom det finnes dubletter, hvis ikke er denne blank).</p></dd>
 
 
 <dt>con_ask</dt>
-<dd><p>TRUE = spør om passord for å koble til DB1P og laster inn data. Dersom con_ask = "con" kobles det til DB1P uten å laste inn data.</p></dd>
+<dd><p>Boolsk/karaktervektor. Hvis TRUE får man opp en boks som spør etter Oracle-passord. Hvis FALSE spørres det ikke om passord. Ved å skrive dynarev_uttrekk(con_ask = "con") får man opp en boks som spør etter Oracle-passord og kun koblingen mot Oracle blir returnert (ikke data). Denne kan brukes dersom man skal lese inn flere skjema etter hverandre for å unngå å skrive inn passordet flere ganger.</p></dd>
 
 
 <dt>raadata</dt>
-<dd><p>FALSE returnerer reviderte data, TRUE returnerer rådata.</p></dd>
+<dd><p>Boolsk. Hvis FALSE returneres reviderte data (fra FELT_VERDI), TRUE returnerer rådata.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>data.frame med valgt data fra Dynarev, dersom enten skjema_cols eller sfu_cols = TRUE. Om både skjema_cols og sfu_cols = TRUE returneres en liste med to datasett [1] skjema_cols og [2] sfu_cols. Om skjema_cols, sfu_cols og skjema_sfu_merge returneres det en data frame.</p>
+<p>Objekt (data.frame) med valgt data fra Dynarev, dersom enten skjema_cols eller sfu_cols = TRUE. Om både skjema_cols og sfu_cols = TRUE returneres en liste med to datasett [1] skjema_cols og [2] sfu_cols. Om skjema_cols, sfu_cols og skjema_sfu_merge = TRUE returneres det ett objekt (data.frame).</p>
     </div>
 
     <div class="section level2">
