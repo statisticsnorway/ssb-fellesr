@@ -13,7 +13,7 @@ ssb_library(package, ...)
 \item{...}{}
 }
 \value{
-Invisible `NULL`
+Invisible \code{NULL}
 }
 \description{
 library function for a difficult package

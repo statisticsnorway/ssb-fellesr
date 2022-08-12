@@ -13,7 +13,7 @@ restore(repo, ...)
 \item{...}{}
 }
 \value{
-Invisible `NULL`
+Invisible \code{NULL}
 }
 \description{
 Restore a SSB project

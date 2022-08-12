@@ -10,7 +10,7 @@ try_common_library(pkg)
 \item{pkg}{Character vector with the name of the package}
 }
 \value{
-Invisible `NULL`
+Invisible \code{NULL}
 }
 \description{
 Internal library function for a difficult package

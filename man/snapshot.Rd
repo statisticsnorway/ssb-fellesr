@@ -12,7 +12,7 @@ snapshot(ignore, ...)
 }
 \value{
 None. Both lock and dependencies.R files will be updated. For more
-details see <https://rstudio.github.io/renv/reference/snapshot.html>
+details see \url{https://rstudio.github.io/renv/reference/snapshot.html}
 }
 \description{
 Snapshot a SSB project

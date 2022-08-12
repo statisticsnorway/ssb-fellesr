@@ -12,7 +12,7 @@ find_problem(pkg, lib)
 \item{lib}{Character vector with the path to the librarys}
 }
 \value{
-Invisible `NULL`
+Invisible \code{NULL}
 }
 \description{
 Internal library function for a difficult package

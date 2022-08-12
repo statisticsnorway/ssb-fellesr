@@ -2,7 +2,7 @@
 % Please edit documentation in R/renv_funcs.R
 \name{install.packages}
 \alias{install.packages}
-\title{Install packages in SSB from CRAN 
+\title{Install packages in SSB from CRAN
 Wrapper function for utils::install.packages}
 \usage{
 install.packages(pkgs, lib, repos, ...)
@@ -17,9 +17,9 @@ install.packages(pkgs, lib, repos, ...)
 \item{...}{Addition parameters (see https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/install.packages)}
 }
 \value{
-Invisible `NULL`
+Invisible \code{NULL}
 }
 \description{
-Install packages in SSB from CRAN 
+Install packages in SSB from CRAN
 Wrapper function for utils::install.packages
 }
