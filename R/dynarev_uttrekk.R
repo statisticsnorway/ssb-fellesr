@@ -25,7 +25,7 @@
 #'@encoding UTF-8
 
 dynarev_uttrekk <- function(delregnr,
-                            skjema,
+                            skjema = T,
                             enhets_type = c("FRTK", "BEDR"),
                             skjema_cols = T,
                             sfu_cols = F,
