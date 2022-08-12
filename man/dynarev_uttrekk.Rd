@@ -37,7 +37,7 @@ dynarev_uttrekk(
 \item{raadata}{Boolsk. Hvis FALSE returneres reviderte data (fra FELT_VERDI), TRUE returnerer rådata.}
 }
 \value{
-Objekt (data.frame) med valgt data fra Dynarev, dersom enten \code{skjema_cols} eller \code{sfu_cols = TRUE}. Om både \code{skjema_cols} og \code{sfu_cols = TRUE} returneres en liste med to datasett [1] \code{skjema_cols} og [2] \code{sfu_cols}. Om \code{skjema_cols}, \code{sfu_cols} og \code{skjema_sfu_merge = TRUE} returneres det ett objekt (data.frame).
+Objekt (data.frame) med valgt data fra Dynarev, dersom enten \code{skjema_cols} eller \code{sfu_cols = TRUE}. Om både \code{skjema_cols} og \code{sfu_cols = TRUE} returneres en liste med to datasett [1] \code{skjema_cols} og [2] \code{sfu_cols}. Om \code{skjema_cols}, \code{sfu_cols} og \code{skjema_sfu_merge = TRUE} returneres det ett objekt (data.frame). Dersom \code{con_ask = "con"} returneres kun kobling mot Oracle.
 }
 \description{
 \code{dynarev_uttrekk} er en funksjon som henter inn data fra Dynarev til R så lenge man oppgir delregisternummer (og ev. skjemanavn). Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.

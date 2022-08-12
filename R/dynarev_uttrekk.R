@@ -13,7 +13,7 @@
 #' @param con_ask Boolsk/karaktervektor. Hvis TRUE får man opp en boks som spør etter Oracle-passord. Hvis FALSE spørres det ikke om passord. Ved å skrive `dynarev_uttrekk(con_ask = "con")` får man opp en boks som spør etter Oracle-passord og kun koblingen mot Oracle blir returnert (ikke data). Denne kan brukes dersom man skal lese inn flere skjema etter hverandre for å unngå å skrive inn passordet flere ganger.
 #' @param raadata Boolsk. Hvis FALSE returneres reviderte data (fra FELT_VERDI), TRUE returnerer rådata.
 #'
-#' @returns Objekt (data.frame) med valgt data fra Dynarev, dersom enten `skjema_cols` eller `sfu_cols = TRUE`. Om både `skjema_cols` og `sfu_cols = TRUE` returneres en liste med to datasett \[1] `skjema_cols` og \[2] `sfu_cols`. Om `skjema_cols`, `sfu_cols` og `skjema_sfu_merge = TRUE` returneres det ett objekt (data.frame).
+#' @returns Objekt (data.frame) med valgt data fra Dynarev, dersom enten `skjema_cols` eller `sfu_cols = TRUE`. Om både `skjema_cols` og `sfu_cols = TRUE` returneres en liste med to datasett \[1] `skjema_cols` og \[2] `sfu_cols`. Om `skjema_cols`, `sfu_cols` og `skjema_sfu_merge = TRUE` returneres det ett objekt (data.frame). Dersom `con_ask = "con"` returneres kun kobling mot Oracle.
 #' @export
 #'
 #' @examples
