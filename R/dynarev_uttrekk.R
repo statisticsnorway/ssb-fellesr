@@ -515,18 +515,81 @@ dynarev_uttrekk <- function(delregnr,
           readRenviron("~/.Renviron")
           SkjemaData <- GetTheDataFromOracle()
           CleanUpNlsSentence()
-          return(SkjemaData)
+
+          if (class(SkjemaData)=="RODBC" | class(SkjemaData)=="OraConnection") {
+            return(SkjemaData)
+          }
+
+          if (class(SkjemaData)[1] %in% c("tbl_df", "data.frame")) {
+            if (nrow(SkjemaData) == 0) {
+              return(print(paste0("Ingen data i delregister: ", delregnr, ". Sjekk om delregisternummeret er skrevet riktig eller sjekk tilgangen med LDA")))
+            } else {
+              return(SkjemaData)
+            }
+          }
+
+          if (class(SkjemaData)=="list") {
+            if (nrow(SkjemaData[[1]]) == 0) {
+              return(print(paste0("Ingen data i delregister: ", delregnr, ". Sjekk om delregisternummeret er skrevet riktig eller sjekk tilgangen med LDA")))
+            } else {
+              return(SkjemaData)
+            }
+          }
+
+
         }
         if (TestIfNlsLangIsSet() == 0)
           SkjemaData <- GetTheDataFromOracle()
-        return(SkjemaData)
+
+        if (class(SkjemaData)=="RODBC" | class(SkjemaData)=="OraConnection") {
+          return(SkjemaData)
+        }
+
+        if (class(SkjemaData)[1] %in% c("tbl_df", "data.frame")) {
+          if (nrow(SkjemaData) == 0) {
+            return(print(paste0("Ingen data i delregister: ", delregnr, ". Sjekk om delregisternummeret er skrevet riktig eller sjekk tilgangen med LDA")))
+          } else {
+            return(SkjemaData)
+          }
+        }
+
+        if (class(SkjemaData)=="list") {
+          if (nrow(SkjemaData[[1]]) == 0) {
+            return(print(paste0("Ingen data i delregister: ", delregnr, ". Sjekk om delregisternummeret er skrevet riktig eller sjekk tilgangen med LDA")))
+          } else {
+            return(SkjemaData)
+          }
+        }
+
+
       }
       if (TestIfRenvironExist() == FALSE) {
         CreateRenvironFile()
         readRenviron("~/.Renviron")
         SkjemaData <- GetTheDataFromOracle()
         DeleteRenviron()
-        return(SkjemaData)
+
+        if (class(SkjemaData)=="RODBC" | class(SkjemaData)=="OraConnection") {
+          return(SkjemaData)
+        }
+
+        if (class(SkjemaData)[1] %in% c("tbl_df", "data.frame")) {
+          if (nrow(SkjemaData) == 0) {
+            return(print(paste0("Ingen data i delregister: ", delregnr, ". Sjekk om delregisternummeret er skrevet riktig eller sjekk tilgangen med LDA")))
+          } else {
+            return(SkjemaData)
+          }
+        }
+
+        if (class(SkjemaData)=="list") {
+          if (nrow(SkjemaData[[1]]) == 0) {
+            return(print(paste0("Ingen data i delregister: ", delregnr, ". Sjekk om delregisternummeret er skrevet riktig eller sjekk tilgangen med LDA")))
+          } else {
+            return(SkjemaData)
+          }
+        }
+
+
       }
     }
     RunQuery()
