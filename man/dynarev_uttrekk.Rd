@@ -20,27 +20,27 @@ dynarev_uttrekk(
 \arguments{
 \item{delregnr}{Numerisk vektor med delregisternummer.}
 
-\item{skjema}{Karaktervektor med skjemanavn.}
+\item{skjema}{Boolsk/karaktervektor med skjemanavn. Hvis TRUE returneres alle skjema i valgt delregister.}
 
 \item{enhets_type}{Karaktervektor med enhetstype (f.eks. BEDR og/eller FRTK).}
 
-\item{skjema_cols}{Boolsk/karaktervektor. Hvis TRUE henter man alle variabler fra skjema. Hvis FALSE henter man ikke skjemadata, kun SFU-data (hvis \code{sfu_cols = TRUE}). Det er også mulig å lage en vektor/liste av variabelnavn, f.eks. c("variabel1", "variabel2"), dersom man kun vil ha utvalgte variabler fra skjema.}
+\item{skjema_cols}{Boolsk/karaktervektor. Hvis TRUE henter man alle variabler fra skjema. Hvis FALSE henter man ikke skjemadata, kun SFU-data (hvis \code{skjema_cols = TRUE}). Det er også mulig å lage en vektor/liste av variabelnavn, f.eks. \code{skjema_cols = c("variabel1", "variabel2")}, dersom man kun vil ha utvalgte variabler fra skjema.}
 
-\item{sfu_cols}{Boolsk/karaktervektor. Hvis TRUE blir alle variabler fra SFU for valgt delregister og skjema inkludert. For å kun velge én eller flere variabler fra SFU skrives disse i en vektor/liste, f.eks. c("variabel1", "variabel2").}
+\item{sfu_cols}{Boolsk/karaktervektor. Hvis TRUE blir alle variabler fra SFU for valgt delregister og skjema inkludert. For å kun velge én eller flere variabler fra SFU skrives disse i en vektor/liste, f.eks. \code{sfu_cols = c("variabel1", "variabel2")}.}
 
-\item{skjema_sfu_merge}{Boolsk. Hvis TRUE blir skjemadataene og SFU-dataene merget. Dersom FALSE blir dataene hentet som to separate datasett i en liste; \link{1} skjemadata og \link{2} SFU-data.}
+\item{skjema_sfu_merge}{Boolsk. Hvis TRUE blir skjemadataene og SFU-dataene merget. Dersom FALSE blir dataene hentet som to separate datasett i en liste; [1] skjemadata og [2] SFU-data.}
 
-\item{dublettsjekk}{Boolsk/karaktervektor. Hvis TRUE sjekkes det for dubletter i skjemadata etter ENHETS_ID. Dersom man ønsker å sjekke for dubletter etter én eller flere selvvalgte variabler skrives disse i en vektor, f.eks. c("variabel1", "variabel2"). Liste med to datasett returneres; \link{1} skjemadata og \link{2} dublettdata (dersom det finnes dubletter, hvis ikke er denne blank).}
+\item{dublettsjekk}{Boolsk/karaktervektor. Hvis TRUE sjekkes det for dubletter i skjemadata etter ENHETS_ID. Dersom man ønsker å sjekke for dubletter etter én eller flere selvvalgte variabler skrives disse i en vektor, f.eks. \code{dublettsjekk = c("variabel1", "variabel2")}. Liste med to datasett returneres; [1] skjemadata og [2] dublettdata (dersom det finnes dubletter, hvis ikke er denne blank).}
 
 \item{con_ask}{Boolsk/karaktervektor. Hvis TRUE får man opp en boks som spør etter Oracle-passord. Hvis FALSE spørres det ikke om passord. Ved å skrive \code{dynarev_uttrekk(con_ask = "con")} får man opp en boks som spør etter Oracle-passord og kun koblingen mot Oracle blir returnert (ikke data). Denne kan brukes dersom man skal lese inn flere skjema etter hverandre for å unngå å skrive inn passordet flere ganger.}
 
 \item{raadata}{Boolsk. Hvis FALSE returneres reviderte data (fra FELT_VERDI), TRUE returnerer rådata.}
 }
 \value{
-Objekt (data.frame) med valgt data fra Dynarev, dersom enten \code{skjema_cols} eller \code{sfu_cols = TRUE}. Om både \code{skjema_cols} og \code{sfu_cols = TRUE} returneres en liste med to datasett \link{1} skjema_cols og \link{2} sfu_cols. Om \code{skjema_cols}, \code{sfu_cols} og \code{skjema_sfu_merge = TRUE} returneres det ett objekt (data.frame).
+Objekt (data.frame) med valgt data fra Dynarev, dersom enten \code{skjema_cols} eller \code{sfu_cols = TRUE}. Om både \code{skjema_cols} og \code{sfu_cols = TRUE} returneres en liste med to datasett [1] \code{skjema_cols} og [2] \code{sfu_cols}. Om \code{skjema_cols}, \code{sfu_cols} og \code{skjema_sfu_merge = TRUE} returneres det ett objekt (data.frame).
 }
 \description{
-\code{dynarev_uttrekk} er en funksjon som henter inn data fra Dynarev til R så lenge man oppgir delregisternummer og skjemanavn. Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.
+\code{dynarev_uttrekk} er en funksjon som henter inn data fra Dynarev til R så lenge man oppgir delregisternummer (og ev. skjemanavn). Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.
 }
 \examples{
 \dontrun{
