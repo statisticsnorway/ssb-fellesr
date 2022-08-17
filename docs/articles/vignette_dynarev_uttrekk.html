@@ -8,8 +8,8 @@
 <meta name="description" content="fellesr">
 <title>Uttrekk fra Dynarev til R • fellesr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Uttrekk fra Dynarev til R">
 <meta property="og:description" content="fellesr">
@@ -42,6 +42,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a>
+    <a class="dropdown-item" href="../articles/vignette_renv.html">R pakkehåndtering med renv og fellesr</a>
   </div>
 </li>
       </ul>
@@ -65,7 +66,7 @@
                         <h4 data-toc-skip class="author">Sindre Mikael
 Haugen</h4>
             
-            <h4 data-toc-skip class="date">2022-08-12</h4>
+            <h4 data-toc-skip class="date">2022-08-17</h4>
       
       
       <div class="d-none name"><code>vignette_dynarev_uttrekk.Rmd</code></div>
@@ -86,17 +87,17 @@ produksjonssonen.</p>
 <h2 id="parametre">Parametre<a class="anchor" aria-label="anchor" href="#parametre"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span></span>
-<span>  <span class="va">delregnr</span>,</span>
-<span>  <span class="va">skjema</span>,</span>
-<span>  enhets_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FRTK"</span>, <span class="st">"BEDR"</span><span class="op">)</span>,</span>
-<span>  skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>  sfu_cols <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>  skjema_sfu_merge <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>  dublettsjekk <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>  con_ask <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>  raadata <span class="op">=</span> <span class="cn">F</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>
+  <span class="va">delregnr</span>,
+  <span class="va">skjema</span>,
+  enhets_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FRTK"</span>, <span class="st">"BEDR"</span><span class="op">)</span>,
+  skjema_cols <span class="op">=</span> <span class="cn">T</span>,
+  sfu_cols <span class="op">=</span> <span class="cn">F</span>,
+  skjema_sfu_merge <span class="op">=</span> <span class="cn">F</span>,
+  dublettsjekk <span class="op">=</span> <span class="cn">F</span>,
+  con_ask <span class="op">=</span> <span class="cn">T</span>,
+  raadata <span class="op">=</span> <span class="cn">F</span>
+<span class="op">)</span></code></pre></div>
 <p><code>delregnr</code> : Numerisk vektor med delregisternummer. <br><code>skjema</code> : Karaktervektor med skjemanavn. <br><code>enhets_type</code> : Karaktervektor med enhetstype (f.eks. BEDR
 og/eller FRTK). <br><code>skjema_cols</code> : Boolsk/karaktervektor.
 Hvis TRUE henter man alle variabler fra skjema. Hvis FALSE henter man
@@ -132,9 +133,9 @@ FELT_VERDI), TRUE returnerer rådata.</p>
 </h3>
 <p>Her får man lastet inn alle kolonnene fra valgt skjema.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="utvalgte-kolonner-fra-valgt-skjema">Utvalgte kolonner fra valgt skjema<a class="anchor" aria-label="anchor" href="#utvalgte-kolonner-fra-valgt-skjema"></a>
@@ -142,9 +143,9 @@ FELT_VERDI), TRUE returnerer rådata.</p>
 <p>Her får man lastet ned utvalgte kolonner fra valgt skjema. Her er
 kolonnene AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR valgt.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AARGANG"</span>, <span class="st">"FORETAKETS_NAVN"</span>, <span class="st">"FORETAKETS_ORGNR"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                           skjema_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AARGANG"</span>, <span class="st">"FORETAKETS_NAVN"</span>, <span class="st">"FORETAKETS_ORGNR"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="alle-sfu-kolonner-fra-valgt-skjema">Alle SFU-kolonner fra valgt skjema<a class="anchor" aria-label="anchor" href="#alle-sfu-kolonner-fra-valgt-skjema"></a>
@@ -152,10 +153,10 @@ kolonnene AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR valgt.</p>
 <p>Her får man lastet ned alle kolonnene med SFU-data fra valgt
 skjema.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>                           sfu_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">F</span>,
+                           sfu_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="utvalgte-sfu-kolonner-fra-valgt-skjema">Utvalgte SFU-kolonner fra valgt skjema<a class="anchor" aria-label="anchor" href="#utvalgte-sfu-kolonner-fra-valgt-skjema"></a>
@@ -163,10 +164,10 @@ skjema.</p>
 <p>Her får man lastet ned utvalgte kolonner med SFU-data fra valgt
 skjema. Her er kolonnene NAVN og ORGNR valgt.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>                           sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">F</span>,
+                           sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="alle-sfu-kolonner-fra-alle-skjemaer">Alle SFU-kolonner fra alle skjemaer<a class="anchor" aria-label="anchor" href="#alle-sfu-kolonner-fra-alle-skjemaer"></a>
@@ -176,10 +177,10 @@ valgt delregister. Dersom man kun ønsker utvalgte variabler fra SFU-data
 erstattes <code>sfu_cols = T</code> med
 <code>sfu_cols = c("variabel1", "variabel2")</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>                           sfu_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="cn">T</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">F</span>,
+                           sfu_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="alle-kolonner-fra-valgt-skjema-og-alle-sfu-kolonner">Alle kolonner fra valgt skjema og alle SFU-kolonner<a class="anchor" aria-label="anchor" href="#alle-kolonner-fra-valgt-skjema-og-alle-sfu-kolonner"></a>
@@ -191,13 +192,13 @@ altså to datasett. For å få hentet ut skjemadata skriver man
 ut SFU-data skriver man
 <code>dynarev_sfu &lt;- data.frame(dynarev[2])</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                           sfu_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">dynarev_sfu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,
+                           sfu_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
+
+<span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>
+<span class="va">dynarev_sfu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="alle-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner">Alle kolonner fra valgt skjema og utvalgte SFU-kolonner<a class="anchor" aria-label="anchor" href="#alle-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner"></a>
@@ -209,13 +210,13 @@ skriver man <code>dynarev_skjema &lt;- data.frame(dynarev[1])</code> og
 for å hente ut SFU-data skriver man
 <code>dynarev_sfu &lt;- data.frame(dynarev[2])</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                           sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">dynarev_sfu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,
+                           sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>
+<span class="va">dynarev_sfu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="utvalgte-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner">Utvalgte kolonner fra valgt skjema og utvalgte SFU-kolonner<a class="anchor" aria-label="anchor" href="#utvalgte-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner"></a>
@@ -228,13 +229,13 @@ man <code>dynarev_skjema &lt;- data.frame(dynarev[1])</code> og for å
 hente ut SFU-data skriver man
 <code>dynarev_sfu &lt;- data.frame(dynarev[2])</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AARGANG"</span>, <span class="st">"FORETAKETS_NAVN"</span>, <span class="st">"FORETAKETS_ORGNR"</span><span class="op">)</span>,</span>
-<span>                           sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">dynarev_sfu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                           skjema_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AARGANG"</span>, <span class="st">"FORETAKETS_NAVN"</span>, <span class="st">"FORETAKETS_ORGNR"</span><span class="op">)</span>,
+                           sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>
+<span class="va">dynarev_sfu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="alle-kolonner-fra-valgt-skjema-og-alle-sfu-kolonner-koblet-sammen">Alle kolonner fra valgt skjema og alle SFU-kolonner (koblet
@@ -244,11 +245,11 @@ sammen)<a class="anchor" aria-label="anchor" href="#alle-kolonner-fra-valgt-skje
 (alle kolonner) fra valgt delregister. SFU-dataene blir koblet på
 skjemadataene slik at man kun får én fil.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                           sfu_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                           skjema_sfu_merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,
+                           sfu_cols <span class="op">=</span> <span class="cn">T</span>,
+                           skjema_sfu_merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="alle-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner-koblet-sammen">Alle kolonner fra valgt skjema og utvalgte SFU-kolonner (koblet
@@ -258,11 +259,11 @@ sammen)<a class="anchor" aria-label="anchor" href="#alle-kolonner-fra-valgt-skje
 (utvalgte kolonner, her NAVN og ORGNR) fra valgt delregister.
 SFU-dataene blir koblet på skjemadataene slik at man kun får én fil.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                           sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span>,</span>
-<span>                           skjema_sfu_merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,
+                           sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span>,
+                           skjema_sfu_merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="utvalgte-kolonner-fra-valgt-skjema-og-utvalgte-sfu-kolonner-koblet-sammen">Utvalgte kolonner fra valgt skjema og utvalgte SFU-kolonner (koblet
@@ -273,11 +274,11 @@ AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR) og SFU-data (utvalgte
 kolonner, her NAVN og ORGNR) fra valgt delregister. SFU-dataene blir
 koblet på skjemadataene slik at man kun får én fil.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                                    skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                                    skjema_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AARGANG"</span>, <span class="st">"FORETAKETS_NAVN"</span>, <span class="st">"FORETAKETS_ORGNR"</span><span class="op">)</span>,</span>
-<span>                                    sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span>,</span>
-<span>                                    skjema_sfu_merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                                    skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                                    skjema_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AARGANG"</span>, <span class="st">"FORETAKETS_NAVN"</span>, <span class="st">"FORETAKETS_ORGNR"</span><span class="op">)</span>,
+                                    sfu_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NAVN"</span>, <span class="st">"ORGNR"</span><span class="op">)</span>,
+                                    skjema_sfu_merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="dublettsjekk-etter-enhets_id">Dublettsjekk etter ENHETS_ID<a class="anchor" aria-label="anchor" href="#dublettsjekk-etter-enhets_id"></a>
@@ -286,12 +287,12 @@ koblet på skjemadataene slik at man kun får én fil.</p>
 Liste med to datasett returneres; [1] skjemadata og [2] dublettdata
 (dersom det finnes dubletter, hvis ikke er denne blank).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE39"</span>,</span>
-<span>                           dublettsjekk <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">dynarev_dubletter</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE39"</span>,
+                           dublettsjekk <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
+
+<span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>
+<span class="va">dynarev_dubletter</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="dublettsjekk-etter-egenvalgte-variabler">Dublettsjekk etter egenvalgte variabler<a class="anchor" aria-label="anchor" href="#dublettsjekk-etter-egenvalgte-variabler"></a>
@@ -300,12 +301,12 @@ Liste med to datasett returneres; [1] skjemadata og [2] dublettdata
 selvvalgte variabler skrives disse i en vektor, f.eks.
 <code>dublettsjekk = c("variabel1", "variabel2")</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="st">"HELSE0X"</span>,</span>
-<span>                           dublettsjekk <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FORETAKSNR"</span>, <span class="st">"ART_SEKTOR"</span>, <span class="st">"FUNKSJON_KAPITTEL"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">dynarev_dubletter</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="st">"HELSE0X"</span>,
+                           dublettsjekk <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FORETAKSNR"</span>, <span class="st">"ART_SEKTOR"</span>, <span class="st">"FUNKSJON_KAPITTEL"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">dynarev_skjema</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>
+<span class="va">dynarev_dubletter</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">dynarev</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="laste-inn-flere-skjema-uten-å-skive-passord">Laste inn flere skjema uten å skive passord<a class="anchor" aria-label="anchor" href="#laste-inn-flere-skjema-uten-%C3%A5-skive-passord"></a>
@@ -315,22 +316,22 @@ flere skjema kan man skrive con_ask = FALSE. For at dette skal fungere
 må man logge på først øverst i scriptet:
 <code>con &lt;- dynarev_uttrekk(con_ask = "con")</code></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>con_ask <span class="op">=</span> <span class="st">"con"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dynarev_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                             skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,</span>
-<span>                             skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                             con_ask <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dynarev_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                             skjema <span class="op">=</span> <span class="st">"HELSE46P"</span>,</span>
-<span>                             skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                             con_ask <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dynarev_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                             skjema <span class="op">=</span> <span class="st">"HELSE39"</span>,</span>
-<span>                             skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                             con_ask <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>con_ask <span class="op">=</span> <span class="st">"con"</span><span class="op">)</span>
+
+<span class="va">dynarev_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                             skjema <span class="op">=</span> <span class="st">"HELSE41"</span>,
+                             skjema_cols <span class="op">=</span> <span class="cn">T</span>,
+                             con_ask <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>
+
+<span class="va">dynarev_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                             skjema <span class="op">=</span> <span class="st">"HELSE46P"</span>,
+                             skjema_cols <span class="op">=</span> <span class="cn">T</span>,
+                             con_ask <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>
+
+<span class="va">dynarev_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                             skjema <span class="op">=</span> <span class="st">"HELSE39"</span>,
+                             skjema_cols <span class="op">=</span> <span class="cn">T</span>,
+                             con_ask <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="laste-inn-flere-skjema-fra-samme-delreg-i-samme-fil">Laste inn flere skjema fra samme delreg i samme fil<a class="anchor" aria-label="anchor" href="#laste-inn-flere-skjema-fra-samme-delreg-i-samme-fil"></a>
@@ -339,9 +340,9 @@ må man logge på først øverst i scriptet:
 skjemanavnene i en karaktervektor i argumentet <code>skjema</code>. Her
 er skjemaene HELSE38P, HELSE39 og HELSE44P valgt.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HELSE38P"</span>, <span class="st">"HELSE39"</span>, <span class="st">"HELSE44P"</span><span class="op">)</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FORETAKETS_NAVN"</span>, <span class="st">"FORETAKETS_ORGNR"</span>, <span class="st">"HELSEREGION_EPOST"</span>, <span class="st">"HELSEREGION_NAVN"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HELSE38P"</span>, <span class="st">"HELSE39"</span>, <span class="st">"HELSE44P"</span><span class="op">)</span>,
+                           skjema_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FORETAKETS_NAVN"</span>, <span class="st">"FORETAKETS_ORGNR"</span>, <span class="st">"HELSEREGION_EPOST"</span>, <span class="st">"HELSEREGION_NAVN"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="laste-inn-alle-skjema-fra-delreg-i-samme-fil">Laste inn alle skjema fra delreg i samme fil<a class="anchor" aria-label="anchor" href="#laste-inn-alle-skjema-fra-delreg-i-samme-fil"></a>
@@ -354,10 +355,10 @@ og FRTK).</p>
 og kolonner så det kan være lurt å spesifisere hvilke variabler man
 ønsker å hente ut.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>, </span>
-<span>                                    skjema <span class="op">=</span> <span class="cn">T</span>, </span>
-<span>                                    skjema_cols <span class="op">=</span> <span class="cn">T</span>, </span>
-<span>                                    sfu_cols <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>, 
+                                    skjema <span class="op">=</span> <span class="cn">T</span>, 
+                                    skjema_cols <span class="op">=</span> <span class="cn">T</span>, 
+                                    sfu_cols <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="laste-inn-sfu-data-fra-flere-skjema-fra-delreg-i-samme-fil">Laste inn sfu-data fra flere skjema fra delreg i samme fil<a class="anchor" aria-label="anchor" href="#laste-inn-sfu-data-fra-flere-skjema-fra-delreg-i-samme-fil"></a>
@@ -365,10 +366,10 @@ og kolonner så det kan være lurt å spesifisere hvilke variabler man
 <p>Her lastes det inn SFU-data fra flere skjema (fra samme
 delregister).</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HELSE38P"</span>, <span class="st">"HELSE39"</span>, <span class="st">"HELSE44P"</span><span class="op">)</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>                           sfu_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HELSE38P"</span>, <span class="st">"HELSE39"</span>, <span class="st">"HELSE44P"</span><span class="op">)</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">F</span>,
+                           sfu_cols <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="laste-inn-rådata">Laste inn rådata<a class="anchor" aria-label="anchor" href="#laste-inn-r%C3%A5data"></a>
@@ -376,10 +377,10 @@ delregister).</p>
 <p>Her lastes det inn rådata fra de aktive enhetene i valgt
 skjema/valgte skjemaer.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,</span>
-<span>                           skjema <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>                           raadata <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span class="va">dynarev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dynarev_uttrekk.html">dynarev_uttrekk</a></span><span class="op">(</span>delregnr <span class="op">=</span> <span class="fl">2421</span>,
+                           skjema <span class="op">=</span> <span class="cn">T</span>,
+                           skjema_cols <span class="op">=</span> <span class="cn">T</span>,
+                           raadata <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -390,7 +391,7 @@ skjema/valgte skjemaer.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Susie Jentoft.</p>
+<p>Developed by Susie Jentoft, Sindre Haugen.</p>
 </div>
 
 <div class="pkgdown-footer-right">

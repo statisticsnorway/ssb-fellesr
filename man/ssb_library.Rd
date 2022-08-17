@@ -2,8 +2,8 @@
 % Please edit documentation in R/renv_funcs.R
 \name{ssb_library}
 \alias{ssb_library}
-\title{library function for a difficult package
-Some packages are not abel to be installed by the user. In this case the package is intalled from the felles library}
+\title{Library function for a difficult package
+Some packages are not able to be installed by the user for various reasons. In this case the package may be able to be called from the common SSB library using this function.}
 \usage{
 ssb_library(package, ...)
 }
@@ -16,6 +16,6 @@ ssb_library(package, ...)
 Invisible \code{NULL}
 }
 \description{
-library function for a difficult package
-Some packages are not abel to be installed by the user. In this case the package is intalled from the felles library
+Library function for a difficult package
+Some packages are not able to be installed by the user for various reasons. In this case the package may be able to be called from the common SSB library using this function.
 }

@@ -1,0 +1,152 @@
+---
+title: "R pakkehåndtering med renv og fellesr"
+author: "Susie Jentoft"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{R pakkehåndtering med renv og fellesr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval=FALSE
+)
+```
+
+# Hva er renv?
+Det er utrolig mange tilleggspakker tilgjengelig i R. Over tid vil funksjonalitet i disse pakkene utvikle og endre seg. I en produksjonsløp har vi behov for stabilitet og at koden kan kjøres på nytt neste kvartal og neste år. 
+
+`renv` er en pakkehåndteringsverktøy som kan brukes til å forsikre at kode kan kjøres over tid. Det lagres en "lock" fil hvor versjonsnummer av installerte og brukt pakker lagres. Denne filen kan da skape det samme miljø med de samme versjonene av pakkene i fremtida og av forskjellige personer. Disse filer kan pushes opp til github slik at andre kan bruke de. 
+
+
+
+
+# Hvordan installere jeg renv?
+Vi har laget noen tilleggs-funksjoner som gjøre det lettere å ta i bruk renv på SSB. Disse ligger i felles pakken `fellesr`. 
+
+Hvis renv/fellesr ikke er installert fra før kan du installere dem med
+
+```{r}
+library(getPass)
+devtools::install_github("statisticsnorway/fellesr", 
+                         auth_token = getPass("PAT: "))
+```
+Passordet her er Personal Access Token du har lagret for Github (den lange med masse tall og tegn). 
+
+# Hvordan bruker jeg renv?
+For å bruke renv må du først kalle biblioteket: 
+
+```{r}
+library(fellesr)
+```
+
+Det er tre oppgaver som er viktig å lære deg for å kunne ta i bruk renv:
+
+- [Opprette og lagre et ny renv miljø til et prosjekt](#opprett)
+- [Bruk et eksisterende renv miljø](#bruk)
+- [Endre et eksisterende renv miljø](#endre)
+
+Disse blir forklarte i mer detaljer her
+
+## Opprette et nytt renv miljø {#opprett}
+Første gang renv skal brukes i et prosjekt/produksjonsløp må det opprettes noen filer. Dette kan gjøres ved
+
+```{r}
+init()
+```
+
+Du vil se at en renv mappe nå ligge klar i mappe-struktur. Hvis du jobber i Dapla/Jupyter trenger du også en fil som spesifisere hvilken pakke skal brukes som deretter skrives til lock filen. Du kan opprette denne filen ved 
+
+```{r}
+create_dependencies()
+```
+
+Og da er du klar for å jobbe og kjøre koden din!!
+
+![](https://media.giphy.com/media/scZPhLqaVOM1qG4lT9/giphy.gif)
+
+Installere og bruker de pakkene du ønsker i koden din. Pakken `fellesr` inkludere en funksjon `install.packages()` som vil peke til riktig sted å installere fra og kan dermed brukes i lukket soner på SSB. For eksempel:
+
+```{r}
+install.packages(A3)
+library(A3)
+a3(rating ~ ., attitude, lm, p.acc = 0.1)
+```
+
+```{r, eval = T, echo=F}
+
+knitr::include_graphics("../images/a3Model.PNG", dpi = 200)
+```
+
+Hvis du sliter med å installere en pakke du ønsker og den ligger i felles installerte pakker can du prøve funksjonen `ssb_library()`. FOr example å installere `dply` pakken:
+
+```{r}
+ssb_library(dplyr)
+```
+
+Når du er fornøyd med koden din og de pakkene og funksjoner som er brukt i produksjonsløpet, lage en "snapshot" av det.
+
+```{r}
+snapshot()
+```
+
+Dette vil skrive hvilke pakker er brukt til dependencies-filen og lagre versjonsnummer i lock-filen. 
+
+
+## Bruk et eksisterende renv miljø {#bruk}
+For å bruke et eksistende renv miljø må du først si at du ønsker å ta i bruk renv (hvis du ikke har gjort det før) ved
+```{r}
+library(fellesr)
+init()
+```
+
+For å endre og oppdatere pakkene så at de er det samme som i lock-filen, kjøre du
+
+```{r}
+restore()
+```
+
+
+Du kan se hvilken pakken som er i lock-filen ved
+
+```{r}
+dependencies()
+```
+
+## Endre et renv miljø {#endre}
+Etter tid vil du sannsynligivs får behov for å endre koden din, legge til nye funksjonaliteter eller nye figurer osv. Hvis din nye kode er avhengige av andre pakker trenger du å oppdatere lock-filen. Igjen, forsøke at du har tatt i bruk renv ved
+
+```{r}
+library(fellesr)
+init()
+```
+
+For å oppdatere lock-filen ta en snapshot
+
+```{r}
+snapshot()
+```
+
+Hvis det er pakker du ikke ønsker å bruke lengere kan du fjerne dem og rydde opp
+```{r}
+remove(A3)
+clean(actions = "unused.packages")
+```
+
+
+![](https://media.giphy.com/media/Q8IqvLa3CpdzG2aons/giphy.gif)
+
+For å sjekke hvilken pakke er lagret i lock-filen kan du kjøre
+
+```{r}
+dependencies()
+
+```
+
+

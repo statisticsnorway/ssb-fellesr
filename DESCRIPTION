@@ -2,8 +2,15 @@ Package: fellesr
 Type: Package
 Title: General R functions for SSB
 Version: 0.1.0
-Author: Employees at SSB
-Maintainer: Susie Jentoft <susie.jentoft@ssb.no>
+Authors@R: 
+  c(person(given = "Susie",
+           family = "Jentoft",
+           role = c("aut", "cre"),
+           email = "susie.jentoft@ssb.no"),
+    person(given = "Sindre",
+           family = "Haugen",
+           role = "aut",
+           email = "sindre.haugen@ssb.no"))
 Description: This package is for gerenal R functions which may be useful for general use at SSB.
 Imports: 
     here,
