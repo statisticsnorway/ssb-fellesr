@@ -1,7 +1,8 @@
-pandoc: '2.18'
+pandoc: 2.17.1.1
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   vignette_dynarev_uttrekk: vignette_dynarev_uttrekk.html
-last_built: 2022-08-12T14:04Z
+  vignette_renv: vignette_renv.html
+last_built: 2022-08-17T13:16Z
 
