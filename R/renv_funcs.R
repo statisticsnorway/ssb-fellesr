@@ -24,7 +24,7 @@ create_dependencies <- function(lines = NULL, force = FALSE, warning = TRUE){
     fileConn <- file("dependencies.R")
     writeLines(lines, fileConn)
     close(fileConn)
-    } 
+    }
 
 
 #' Snapshot a SSB project
@@ -70,7 +70,7 @@ snapshot <- function(ignore, ...){
 }
 
 
-#' Install packages in SSB from CRAN 
+#' Install packages in SSB from CRAN
 #' Wrapper function for utils::install.packages
 #'
 #' @param pkgs Name of the packages to install
@@ -97,8 +97,8 @@ install.packages <- function(pkgs, lib, repos, ...){
 #' Restore a SSB project
 #' Wrapper function for renv::restore()
 #'
-#' @param repo Character vector pointing to which repository should be used  
-#' @param ... 
+#' @param repo Character vector pointing to which repository should be used
+#' @param ...
 #'
 #' @return Invisible `NULL`
 #' @export
@@ -110,13 +110,13 @@ restore <- function(repo, ...){
             } else {
             repo <- 'https://nexus.ssb.no/repository/CRAN/'
             }
-    }    
+    }
     renv::restore(repos = repo)
     }
 
 
-#' library function for a difficult package
-#' Some packages are not abel to be installed by the user. In this case the package is intalled from the felles library
+#' Library function for a difficult package
+#' Some packages are not able to be installed by the user for various reasons. In this case the package may be able to be called from the common SSB library using this function.
 #'
 #' @param package Character vector with the name of the package
 #' @param ...
@@ -124,7 +124,7 @@ restore <- function(repo, ...){
 #' @return Invisible `NULL`
 #' @export
 ssb_library <- function(package, ...){
-    tryCatch(library(package, character.only = T, ...), silent = TRUE, 
+    tryCatch(library(package, character.only = T, ...), silent = TRUE,
              error = try_common_library(package))
     }
 
