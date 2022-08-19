@@ -185,9 +185,9 @@ dynarev_uttrekk <- function(delregnr,
                 as.is = T) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
                 # Fix for kolonner som har blitt gitt forskjellige variabeltyper i metadata for ulike skjemaer (velger variabeltypen som finnes flest ganger)
-                group_by(FELT_TYPE, FELT_ID) %>%
-                tally() %>%
-                group_by(FELT_ID) %>%
+                dplyr::group_by(FELT_TYPE, FELT_ID) %>%
+                dplyr::tally() %>%
+                dplyr::group_by(FELT_ID) %>%
                 dplyr::slice(which.max(n)) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
                 dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
@@ -201,8 +201,8 @@ dynarev_uttrekk <- function(delregnr,
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
                 # Fix for kolonner som har blitt gitt forskjellige variabeltyper i metadata for ulike skjemaer (velger variabeltypen som finnes flest ganger)
                 dplyr::group_by(FELT_TYPE, FELT_ID) %>%
-                tally() %>%
-                group_by(FELT_ID) %>%
+                dplyr::tally() %>%
+                dplyr::group_by(FELT_ID) %>%
                 dplyr::slice(which.max(n)) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
                 dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
@@ -222,7 +222,7 @@ dynarev_uttrekk <- function(delregnr,
             dplyr::mutate(dplyr::across(c(-SKJEMA, -DELREG_NR, -ENHETS_TYPE, -ENHETS_ID, -LOPENR, -RAD_NR),
                                         as.numeric)) %>%
             dplyr::group_by(SKJEMA, ENHETS_ID, ENHETS_TYPE, DELREG_NR, LOPENR, RAD_NR) %>%
-            dplyr::summarise(across(.cols = everything(), sum), .groups = 'drop')
+            dplyr::summarise(dplyr::across(.cols = everything(), sum), .groups = 'drop')
 
           # Skiller ut karaktervariabler
           filter_char <- metadata %>% dplyr::filter(!FELT_TYPE %in% c("DESIMAL", "NUMBER"))
@@ -232,7 +232,7 @@ dynarev_uttrekk <- function(delregnr,
             tidyr::spread(FELT_ID, FELT_VERDI, fill = "") %>%
             dplyr::mutate(dplyr::across(c(-SKJEMA, -DELREG_NR, -ENHETS_TYPE, -ENHETS_ID, -LOPENR, -RAD_NR), as.character)) %>%
             dplyr::group_by(SKJEMA, ENHETS_ID, ENHETS_TYPE, DELREG_NR, LOPENR, RAD_NR) %>%
-            dplyr::summarise(across(.cols = everything(), max), .groups = 'drop')
+            dplyr::summarise(dplyr::across(.cols = everything(), max), .groups = 'drop')
 
           # Merger karakter og numerisk
           skjema_data  <- dplyr::full_join(karakter, numerisk, by = c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR"))
@@ -293,9 +293,9 @@ dynarev_uttrekk <- function(delregnr,
                 dplyr::select(-AKTIV)
             }
 
-            data <- inner_join(raadata, data_enhet, by = c("SKJEMA", "ENHETS_ID", "LOPENR")) %>%
+            data <- dplyr::inner_join(raadata, data_enhet, by = c("SKJEMA", "ENHETS_ID", "LOPENR")) %>%
               dplyr::filter(AKTIV == 1) %>%
-              collect()
+              dplyr::collect()
           }
 
           # Henter metadata
@@ -350,7 +350,7 @@ dynarev_uttrekk <- function(delregnr,
             dplyr::mutate(dplyr::across(c(-SKJEMA, -DELREG_NR, -ENHETS_TYPE, -ENHETS_ID, -LOPENR, -RAD_NR),
                                         as.numeric)) %>%
             dplyr::group_by(SKJEMA, ENHETS_ID, ENHETS_TYPE, DELREG_NR, LOPENR, RAD_NR) %>%
-            dplyr::summarise(across(.cols = everything(), sum), .groups = 'drop')
+            dplyr::summarise(dplyr::across(.cols = everything(), sum), .groups = 'drop')
 
           # Skiller ut karaktervariabler
           filter_char <- metadata %>% dplyr::filter(!FELT_TYPE %in% c("DESIMAL", "NUMBER"))
@@ -360,7 +360,7 @@ dynarev_uttrekk <- function(delregnr,
             tidyr::spread(FELT_ID, FELT_VERDI, fill = "") %>%
             dplyr::mutate(dplyr::across(c(-SKJEMA, -DELREG_NR, -ENHETS_TYPE, -ENHETS_ID, -LOPENR, -RAD_NR), as.character)) %>%
             dplyr::group_by(SKJEMA, ENHETS_ID, ENHETS_TYPE, DELREG_NR, LOPENR, RAD_NR) %>% #
-            dplyr::summarise(across(.cols = everything(), max), .groups = 'drop')
+            dplyr::summarise(dplyr::across(.cols = everything(), max), .groups = 'drop')
 
           # Merger karakter og numerisk
           skjema_data  <- dplyr::full_join(karakter, numerisk, by = c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR"))
@@ -368,7 +368,7 @@ dynarev_uttrekk <- function(delregnr,
         # Dublettsjekk (etter ENHETS_ID)
         if (dublettsjekk == TRUE) {
           dublett_test <- skjema_data %>%
-            dplyr::group_by(ENHETS_ID) %>% # OBS?
+            dplyr::group_by(ENHETS_ID) %>%
             dplyr::tally() %>%
             dplyr::filter(n > 1)
 
@@ -459,7 +459,7 @@ dynarev_uttrekk <- function(delregnr,
         }
         # Både sfu_cols og skjema_cols - MERGE
         if ((sfu_cols == T) & (skjema_sfu_merge == T) & (skjema_cols == T) & (dublettsjekk == F)) {
-          skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR")) # OBS: inner join?
+          skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
         # Kun sfu_cols
@@ -472,7 +472,7 @@ dynarev_uttrekk <- function(delregnr,
         }
         # Både sfu_cols (utvalgte variabler) og skjema_cols - MERGE
         if ((class(sfu_cols) == "character") & (skjema_sfu_merge == T) & (skjema_cols == T) & (dublettsjekk == F)) {
-          skjema_data <- dplyr::left_join(skjema_data, sfu_subset, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR")) # OBS: inner join?
+          skjema_data <- dplyr::left_join(skjema_data, sfu_subset, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
         # Kun sfu_cols, utvalgte variabler
@@ -485,7 +485,7 @@ dynarev_uttrekk <- function(delregnr,
         }
         # Både sfu_cols og skjema_cols (utvalgte variabler) - MERGE
         if ((class(skjema_cols) == "character") & (sfu_cols == T) & (skjema_sfu_merge == T) & (dublettsjekk == F)) {
-          skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR")) # OBS: inner join?
+          skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
         # Kun skjema_cols

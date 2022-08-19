@@ -16,7 +16,11 @@ Imports:
     here,
     getPass,
     dplyr,
-    magrittr
+    magrittr,
+    tidyr,
+    dbplyr,
+    DBI,
+    renv
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
