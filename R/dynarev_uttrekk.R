@@ -395,7 +395,7 @@ dynarev_uttrekk <- function(delregnr,
           return(list(skjema_data, dublett_test))
         }
         # Inkluder SFU-data (alle skjema og alle kolonner)
-        if (skjema == TRUE & sfu_cols == TRUE) {
+        if (skjema == TRUE & sfu_cols != FALSE) {
           if (grepl("FW-XAPROD", nodename)){
             sfu <- RODBC::sqlQuery(
               channel = con,
@@ -448,39 +448,6 @@ dynarev_uttrekk <- function(delregnr,
         }
         # Lager SFU-subset
         if (class(sfu_cols) == "character" & (dublettsjekk == F)) {
-          if (grepl("FW-XAPROD", nodename)){
-            sfu_skjema <-
-              RODBC::sqlQuery(
-                channel = con,
-                query = paste0("SELECT * FROM DSBBASE.DLR_ENHET_I_DELREG_SKJEMA WHERE DELREG_NR = '", delregnr, "'"),
-                as.is = T)
-
-            sfu <- RODBC::sqlQuery(
-              channel = con,
-              query = paste0("SELECT * FROM DSBBASE.DLR_ENHET_I_DELREG WHERE DELREG_NR = '", delregnr, "'"),
-              as.is = T) %>%
-              dplyr::filter(IDENT_NR %in% c(unique(sfu_skjema$IDENT_NR),
-                                            ENHETS_TYPE %in% c(unique(sfu_skjema$ENHETS_TYPE)),
-                                            # SKJEMA_TYPE %in% c(unique(sfu_skjema$SKJEMA_TYPE)),
-                                            is.na(PROSEDYRE))) %>%
-              dplyr::rename(ENHETS_ID = IDENT_NR) # %>% # Endrer navn fra IDENT_NR til ENHETS_ID for å merge
-          } else {
-            sfu_skjema <- dplyr::tbl(con, dbplyr::in_schema("DSBBASE", "DLR_ENHET_I_DELREG_SKJEMA")) %>%
-              dplyr::filter(DELREG_NR == delregnr) %>%
-              dplyr::collect()
-
-            # Henter inn SFU data
-            sfu <- dplyr::tbl(con, dbplyr::in_schema("DSBBASE", "DLR_ENHET_I_DELREG")) %>%
-              dplyr::filter(DELREG_NR == delregnr) %>%
-              dplyr::collect() %>%
-              dplyr::filter(IDENT_NR %in% c(unique(sfu_skjema$IDENT_NR),
-                                            ENHETS_TYPE %in% c(unique(sfu_skjema$ENHETS_TYPE)),
-                                            # SKJEMA_TYPE %in% c(unique(sfu_skjema$SKJEMA_TYPE)),
-                                            is.na(PROSEDYRE))) %>%
-              dplyr::rename(ENHETS_ID = IDENT_NR) # Endrer navn fra IDENT_NR til ENHETS_ID for å merge
-          }
-
-
           sfu_subset <- sfu %>%
             dplyr::select(ENHETS_ID, ENHETS_TYPE, DELREG_NR, all_of(sfu_cols))
         }
