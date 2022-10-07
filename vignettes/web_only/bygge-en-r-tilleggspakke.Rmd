@@ -70,7 +70,7 @@ create_package("~/path/to/minpakke")
 Dette  oppretter noen mapper og filer og vil ligne på dette
 
 ```{r, echo = FALSE, out.width="100%"}
-knitr::include_graphics("../../images/pakke_struktur.PNG")
+knitr::include_graphics("images/pakke_struktur.PNG")
 ```
 
 Hovedkomponenter er:
@@ -85,7 +85,7 @@ Hovedkomponenter er:
 `DESCRIPTION` filen sier noen generelt om pakken du lager. Det inkluderer navn av pakken, beskrivelsen og hvem som har skrevet det. Denne filen kan åpnes og redigeres direkte i RStudio. For eksempel:
 
 ```{r, echo = FALSE, out.width="100%"}
-knitr::include_graphics("../../images/description.png")
+knitr::include_graphics("images/description.png")
 ```
 
 Mer detaljer om DESCRIPTION filen finner du [her](https://r-pkgs.org/description.html) 
@@ -140,5 +140,5 @@ Mer informasjon om hvordan å sette opp github action for R finner på [Github A
 Hvis du sitter fast med et problem med pakke bygging er det veldig sannsynlig at andre på SSB har hatt de samme problem. Ta gjerne kontakt med andre på [Yammer](https://www.yammer.com/ssb.no/#/threads/inGroup?type=in_group&feedId=9481952) 
 
 ```{r, echo = FALSE}
-knitr::include_graphics("../../images/frustrated.png")
+knitr::include_graphics("images/frustrated.png")
 ```

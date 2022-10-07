@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r, echo = FALSE, out.width="100%"}
-knitr::include_graphics("../images/statbank.PNG")
+knitr::include_graphics("images/statbank.PNG")
 ```
 
 Her finner du eksempler på hvordan å laste opp en tabell til statbank, direkt fra R (i prod sone). Funksjonen ligger i pakken `fellesr` som er installerte i de fleste sone i SSB. Du trenger `fellesr` versjon >= 0.1.1.

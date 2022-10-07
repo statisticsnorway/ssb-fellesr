@@ -81,7 +81,7 @@ a3(rating ~ ., attitude, lm, p.acc = 0.1)
 
 ```{r, eval = T, echo=F}
 
-knitr::include_graphics("../images/a3Model.PNG", dpi = 200)
+knitr::include_graphics("images/a3Model.PNG", dpi = 200)
 ```
 
 Hvis du sliter med å installere en pakke du ønsker og den ligger i felles installerte pakker can du prøve funksjonen `ssb_library()`. FOr example å installere `dply` pakken:
