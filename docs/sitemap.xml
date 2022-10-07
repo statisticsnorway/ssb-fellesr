@@ -13,6 +13,12 @@
     <loc>/articles/vignette_renv.html</loc>
   </url>
   <url>
+    <loc>/articles/vignette_statbank_lasting.html</loc>
+  </url>
+  <url>
+    <loc>/articles/web_only/bygge-en-r-tilleggspakke.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -23,6 +29,9 @@
   </url>
   <url>
     <loc>/reference/dynarev_uttrekk.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fellesr-package.html</loc>
   </url>
   <url>
     <loc>/reference/find_problem.html</loc>

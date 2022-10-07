@@ -20,7 +20,7 @@ draft: false
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 library(testthat)
 ```
@@ -101,7 +101,7 @@ Det er mye annet som kan inkludere i en pakke. For eksempel kan det være nyttig
 # Testing
 Det er ikke strengt nødvendig å lage noen formelle tester (enhetstester) til funksjoner i en pakke men det er anbefalt. Det kan ofte bidra til færre bugs og bedre struktur i koden. Pakken [testthat](https://testthat.r-lib.org) gi et rammeverk for å lage og kjøre tester. En typisk test er å sjekke at en funksjon returnere en forventet verdi. For eksempel kan vi bruke vectoren `x` nede for å teste at funksjonen `mean` returnerer den riktige verdien:
 
-```{r}
+```{r, warnings=FALSE}
 x <- c(3, 4, 5)
 test_that("The function mean returns a correct value",{
   expect_equal(mean(x), 4)
@@ -137,7 +137,7 @@ Mer informasjon om hvordan å sette opp github action for R finner på [Github A
 
 
 # Sitte fast?
-Hvis du sitter fast med et problem med pakke bygging er det veldig sannsynlig at andre på SSB har hatt de samme problem. Ta gjerne kontakt med andre på [Yammer](https://www.yammer.com/ssb.no/#/threads/inGroup?type=in_group&feedId=9481952) 
+Hvis du sitter fast med et problem med pakke bygging er det veldig sannsynlig at andre på SSB har hatt det samme problemet. Ta gjerne kontakt med andre på [Yammer](https://www.yammer.com/ssb.no/#/threads/inGroup?type=in_group&feedId=9481952) 
 
 ```{r, echo = FALSE}
 knitr::include_graphics("images/frustrated.png")

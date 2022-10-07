@@ -1,8 +1,10 @@
-pandoc: 2.17.1.1
+pandoc: '2.18'
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   vignette_dynarev_uttrekk: vignette_dynarev_uttrekk.html
   vignette_renv: vignette_renv.html
-last_built: 2022-08-17T13:16Z
+  vignette_statbank_lasting: vignette_statbank_lasting.html
+  bygge-en-r-tilleggspakke: web_only/bygge-en-r-tilleggspakke.html
+last_built: 2022-10-07T11:32Z
 
