@@ -9,7 +9,7 @@ vignette: >
 categories:
   - publisering
 ---
-Her finner du eksempler på hvordan å laste opp en tabell til statbank, direkt fra R (i prod sone). Funksjonen ligger i pakken `fellesr` som er installerte i de fleste sone i SSB. Du trenger `fellesr` versjon > 0.1.1.
+Her finner du eksempler på hvordan å laste opp en tabell til statbank, direkt fra R (i prod sone). Funksjonen ligger i pakken `fellesr` som er installerte i de fleste sone i SSB. Du trenger `fellesr` versjon >= 0.1.1.
 
 Løsning er ikke tilgjengelig i Dapla enda.
 
