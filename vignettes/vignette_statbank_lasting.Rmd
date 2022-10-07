@@ -1,0 +1,61 @@
+---
+title: "Lasting til Statbank"
+author: Susie Jentoft & Jan Sebastian Rothe
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette_statbank_lasting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+categories:
+  - publisering
+---
+Her finner du eksempler på hvordan å laste opp en tabell til statbank, direkt fra R (i prod sone). Funksjonen ligger i pakken `fellesr` som er installerte i de fleste sone i SSB. Du trenger `fellesr` versjon > 0.1.1.
+
+Løsning er ikke tilgjengelig i Dapla enda.
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, echo = TRUE, eval = FALSE}
+library(statbankr)
+```
+
+Pakken inneholder en hovedfunksjon `statbank_lasting()`. Akkurat nå, lastes det opp en (eller flere) .dat fil som er lagret fra før. Dette kan gjøres som en steg i en arbeidsprosess med `write.table()` for eksempel.
+
+Funksjonen krever at en database (`laste_dbase`) og bruke (`laste_bruke`) spesifiseres. Database kan være "TEST", "PROD" eller "QA". Bruker er det felles brukernavn for statistikken.
+
+Alle tabeller i Statbank har en unik navn som spesifiseres ved parameter i funksjonen hovedtabell. Dato for publisering spesifiseres ved `publiseringsdato`. Dette skal være i form "YYYY-mm-dd".
+
+Her er et eksempel:
+
+```{r, echo = TRUE, eval=FALSE}
+statbank_lasting(
+  laste_dbase = "TEST",
+  laste_bruker = "LAST425",
+  lastefilsti = "/ssb/stamme02/test",
+  lastefil = "kollektivu21.dat",
+  hovedtabell = "KollektivU2",
+  publiseringsdato = "2021-09-30"
+)
+```
+
+Flere filer kan lastes opp samtidig ved å spesifiere en vektor av filer. For eksempel:
+
+```{r, echo = TRUE, eval=FALSE}
+statbank_lasting(
+  laste_dbase = "TEST",
+  laste_bruker = "LAST425",
+  lastefilsti = "/ssb/stamme02/test",
+  lastefil = c("kollektivu21.dat", "kollektivu22.dat"),
+  hovedtabell = "KollektivU2",
+  publiseringsdato = "2021-09-30"
+)
+```
+
+Filene må ligge på samme sti og tilhøre samme hovedtabellen.
+
+Parameter `mailto` kan  spesifiseres ved behov hvis du ønsker at epost konfirmasjon av opplastning skal til noen som ikke er deg selv. 
