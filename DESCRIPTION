@@ -21,7 +21,9 @@ Imports:
     dbplyr,
     DBI,
     renv,
-    statbankr
+    statbankr,
+    arrow,
+    httr
 Remotes:
     statisticsnorway/statbankr
 License: Apache license 2.0

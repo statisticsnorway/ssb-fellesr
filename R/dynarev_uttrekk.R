@@ -1,7 +1,7 @@
 
 #' Uttrekk fra Dynarev til R
 #'
-#' `dynarev_uttrekk` er en funksjon som henter inn data fra Dynarev til R så lenge man oppgir delregisternummer (og ev. skjemanavn). Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.
+#' Funksjonen `dynarev_uttrekk` henter inn data fra Dynarev til R så lenge man oppgir delregisternummer (og ev. skjemanavn). Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.
 #'
 #' @param delregnr Numerisk vektor med delregisternummer.
 #' @param skjema Boolsk/karaktervektor med skjemanavn. Hvis TRUE returneres alle skjema i valgt delregister.

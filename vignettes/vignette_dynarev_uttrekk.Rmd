@@ -25,7 +25,7 @@ Funksjonen finnes i pakken [fellesr](https://github.com/statisticsnorway/fellesr
 ```{r, eval=FALSE}
 dynarev_uttrekk(
   delregnr,
-  skjema,
+  skjema = T,
   enhets_type = c("FRTK", "BEDR"),
   skjema_cols = T,
   sfu_cols = F,
@@ -38,7 +38,7 @@ dynarev_uttrekk(
 
 
 `delregnr` : Numerisk vektor med delregisternummer. <br />
-`skjema` : Karaktervektor med skjemanavn. <br />
+`skjema` : Boolsk/karaktervektor med skjemanavn. Hvis TRUE returneres alle skjema i valgt delregister. <br />
 `enhets_type` : Karaktervektor med enhetstype (f.eks. BEDR og/eller FRTK). <br />
 `skjema_cols` : Boolsk/karaktervektor. Hvis TRUE henter man alle variabler fra skjema. Hvis FALSE henter man ikke skjemadata, kun SFU-data (hvis `sfu_cols` = TRUE). Det er også mulig å lage en vektor/liste av variabelnavn, f.eks. c("variabel1", "variabel2"), dersom man kun vil ha utvalgte variabler fra skjema. <br />
 `sfu_cols` : Boolsk/karaktervektor. Hvis TRUE blir alle variabler fra SFU for valgt delregister og skjema inkludert. For å kun velge én eller flere variabler fra SFU skrives disse i en vektor/liste, f.eks. c("variabel1", "variabel2"). <br />

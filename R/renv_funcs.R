@@ -132,7 +132,6 @@ ssb_library <- function(package, ...){
 #' Internal library function for a difficult package
 #'
 #' @param pkg Character vector with the name of the package
-#' @param
 #'
 #' @return Invisible `NULL`
 #' @keywords internal

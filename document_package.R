@@ -12,8 +12,11 @@ devtools::document()
 # usethis::use_package("getPass", type = "imports")
 # usethis::use_package("DBI", type = "imports")
 # usethis::use_package("renv", type = "imports")
+# usethis::use_package("arrow", type = "imports")
+# usethis::use_package("getPass", type = "imports")
+# usethis::use_package("httr", type = "imports")
 
-
+# sfarrow?
 
 # Vignette #
 devtools::load_all()
