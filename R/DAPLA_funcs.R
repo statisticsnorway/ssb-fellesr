@@ -88,9 +88,6 @@ read_parquet <- function(file, ...) {
 
 read_feather <- function(file, ...) {
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
-    # file <- gsub(".feather", "", file)
-    # df <- arrow::read_feather(gcs_bucket(bucket)$path(paste0(file, ".feather")), ...)
-    # df <- arrow::read_feather(gcs_bucket(bucket)$path(paste0(file, ".feather")), ...)
     df <- arrow::read_feather(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
 
   }
@@ -143,7 +140,24 @@ read_feather <- function(file, ...) {
 #'@encoding UTF-8
 
 open_dataset <- function(bucket, ...) {
+
+  # Jupyterlab (DAPLA)
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
   ds <- arrow::open_dataset(gcs_bucket(bucket), ...)
+  }
+
+  # Jupyterlab (produksjonssonen)
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+    # OBS: mangler
+  }
+
+  # Windows (produksjonssonen) - fra Linux
+  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
+    # OBS: mangler
+  }
+
+  return(df)
 }
 
 #' Funksjon for å laste inn .JSON-fil fra GCS bucket
@@ -167,6 +181,18 @@ read_json <- function(file, ...) {
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
 
   }
+
+  # Jupyterlab (produksjonssonen)
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+    # OBS: mangler
+  }
+
+  # Windows (produksjonssonen) - fra Linux
+  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
+    # OBS: mangler
+  }
+
 }
 
 
@@ -186,9 +212,6 @@ read_json <- function(file, ...) {
 
 read_csv <- function(file, ...) {
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
-    # file <- gsub(".csv", "", file)
-    # df <- arrow::read_delim_arrow(gcs_bucket(bucket)$path(paste0(file, ".csv")), ...)
-    # df <- arrow::read_delim_arrow(gcs_bucket(bucket)$path(paste0(file, ".csv")), ...)
     df <- arrow::read_delim_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
 
@@ -229,7 +252,6 @@ read_csv <- function(file, ...) {
 #'@encoding UTF-8
 
 write_parquet <- function(data, bucket, file, ...) {
-  # legg til .parquet endelse dersom dette ikke finnes?
   arrow::write_parquet(data, gcs_bucket(bucket)$path(file), ...)
 }
 
@@ -251,6 +273,8 @@ write_feather <- function(data, bucket, file, ...) {
   arrow::write_feather(data, gcs_bucket(bucket)$path(file), ...)
 }
 
+
+
 #' Funksjon for å lagre .csv-fil til GCS bucket
 #'
 #' Funksjonen `write_csv` kan brukes til å skrive parquet-filer til GCS bucket.
@@ -270,6 +294,8 @@ write_csv <- function(data, bucket, file, ...) {
   arrow::write_csv_arrow(data, gcs_bucket(bucket)$path(file), ...)
 }
 
+
+
 #' Funksjon for å sjekke hvilke filer som finnes i en GCS bucket
 #'
 #' Funksjonen `list.files` kan brukes til å sjekke hvilke filer som finnes i en GCS bucket
@@ -282,6 +308,7 @@ write_csv <- function(data, bucket, file, ...) {
 #' }
 #'@encoding UTF-8
 #'
+
 list.files <- function(bucket) {
   gcs_bucket(bucket)$ls(recursive = T)
 }
@@ -292,7 +319,7 @@ list.files <- function(bucket) {
 
 #' Funksjon for å laste inn filer fra GCS bucket
 #' #'
-#' Funksjonen `read_DAPLA` kan brukes til å lese inn filer fra GCS.
+#' Funksjonen `read_SSB` kan brukes til å lese inn filer fra GCS.
 #'
 #' @param bucket Full sti til GCS bucket.
 #' @param file Navn på filen som skal leses inn.
@@ -300,31 +327,63 @@ list.files <- function(bucket) {
 #'
 #' @examples
 #' \dontrun{
-#' data <- read_parquet(bucket = "ssb-prod-dapla-felles-data-delt/R_smoke_test", file = "1987")
+#' read_SSB_parquet <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet")
 #'
-#' data <- read_parquet(bucket = "ssb-prod-dapla-felles-data-delt/R_smoke_test", file = "1987", col_select = c("Year", "Month"))
+#' read_SSB_MFD <- read_SSB("ssb-prod-spesh-personell-data-kilde/enda_en_ny_mappe")
+#'
+#' read_SSB_feather <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.feather")
+#'
+#' read_SSB_csv <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv")
+#'
+#' read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json")
 #'}
 #'@encoding UTF-8
 
 read_SSB <- function(file, ...) {
 
-
   if(grepl(".parquet", basename(file))){
     df <- read_parquet(file, ...)
-  }
-
-  if(grepl(".feather", basename(file))){
+  } else if(grepl(".feather", basename(file))){
     df <- read_feather(file, ...)
-  }
-
-  if(grepl(".csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
+  } else if(grepl(".csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
     df <- read_csv(file, ...)
-  }
-
-  if(grepl(".json", basename(file))){
+  } else if(grepl(".json", basename(file))){
     df <- read_json(file, ...)
-  }
+  } else {
+   df <- open_dataset(file, ...) %>%
+       dplyr::collect()
+    }
   return(df)
+
+  }
+
+
+#' Funksjon for å skrive filer til GCS bucket
+#' #'
+#' Funksjonen `write_SSB` kan brukes til å skrive filer til GCS.
+#'
+#' @param bucket Full sti til GCS bucket.
+#' @param file Navn på filen som skal leses inn.
+#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)
+#'
+#' @examples
+#' \dontrun{
+#'}
+#'@encoding UTF-8
+
+# OBS: denne er ikke påbegynt
+write_SSB <- function(file, ...) {
+  if(grepl(".parquet", basename(file))){
+    write_parquet(data, file, ...)
+  } else if(grepl(".feather", basename(file))){
+    write_feather(data, file, ...)
+  } else if(grepl(".csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
+    write_csv(data, file, ...)
+  } else if(grepl(".json", basename(file))){
+    write_json(data, file, ...)
+  } else {
+    # df <- open_dataset(file, ...) %>%
+    #   dplyr::collect()
+  }
+
 }
-
-

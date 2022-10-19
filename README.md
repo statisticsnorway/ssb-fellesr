@@ -1,6 +1,6 @@
 # Fellesfunksjoner i R for SSB (`fellesr`)
 
-Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Se under «Articles» for å velge emner.
+Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Se under «Articles» [her](https://statisticsnorway.github.io/fellesr/) eller lenkene nedenfor for å velge emner.
 
 Pakken fellesr inneholder følgende funksjoner:
 
@@ -17,7 +17,13 @@ Pakken fellesr inneholder følgende funksjoner:
 
 I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under følger en foreløpig oversikt. Dersom du har laget en funksjon eller en pakke og ønsker å få lagt den til i `fellesr` eller i listen under er det bare å ta kontakt. 
 
++ [struktuR](https://github.com/statisticsnorway/struktuR)
++ [SSBpris](https://github.com/statisticsnorway/SSBpris)
++ [SmallCountRounding](https://cran.r-project.org/web/packages/SmallCountRounding/vignettes/Introduction_to_SmallCountRounding.html)
++ [SSBtools](https://github.com/statisticsnorway/SSBtools)
++ [SdcForetakPerson](https://github.com/statisticsnorway/SdcForetakPerson)
 + [GISSB – Nettverksanalyse i R](https://statisticsnorway.github.io/GISSB/articles/GISSB_vignette.html)
+
 
 ### Annet
 + SSB fargepallet i R (kommer)
