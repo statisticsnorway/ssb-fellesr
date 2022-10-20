@@ -142,7 +142,7 @@ open_dataset <- function(file, ...) {
 
   # Jupyterlab (DAPLA)
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
-  ds <- arrow::open_dataset(gcs_bucket(bucket), ...)
+  ds <- arrow::open_dataset(gcs_bucket(file), ...)
   }
 
   # Jupyterlab (produksjonssonen)
