@@ -8,8 +8,8 @@
 <meta name="description" content="fellesr">
 <title>R pakkehåndtering med renv og fellesr • fellesr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="R pakkehåndtering med renv og fellesr">
 <meta property="og:description" content="fellesr">
@@ -44,6 +44,7 @@
     <a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a>
     <a class="dropdown-item" href="../articles/vignette_renv.html">R pakkehåndtering med renv og fellesr</a>
     <a class="dropdown-item" href="../articles/vignette_statbank_lasting.html">Lasting til Statbank</a>
+    <a class="dropdown-item" href="../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a>
     <a class="dropdown-item" href="../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a>
   </div>
 </li>
@@ -68,7 +69,7 @@
                         <h4 data-toc-skip class="author">Susie
 Jentoft</h4>
             
-            <h4 data-toc-skip class="date">2022-10-07</h4>
+            <h4 data-toc-skip class="date">2022-10-20</h4>
       
       
       <div class="d-none name"><code>vignette_renv.Rmd</code></div>
@@ -98,9 +99,9 @@ bruk renv på SSB. Disse ligger i felles pakken <code>fellesr</code>.</p>
 <p>Hvis renv/fellesr ikke er installert fra før kan du installere dem
 med</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wrathematics/getPass" class="external-link">getPass</a></span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"statisticsnorway/fellesr"</span>, 
-                         auth_token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/getPass/man/getPass.html" class="external-link">getPass</a></span><span class="op">(</span><span class="st">"PAT: "</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wrathematics/getPass" class="external-link">getPass</a></span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"statisticsnorway/fellesr"</span>, </span>
+<span>                         auth_token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/getPass/man/getPass.html" class="external-link">getPass</a></span><span class="op">(</span><span class="st">"PAT: "</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Passordet her er Personal Access Token du har lagret for Github (den
 lange med masse tall og tegn).</p>
 </div>
@@ -109,7 +110,7 @@ lange med masse tall og tegn).</p>
 </h2>
 <p>For å bruke renv må du først kalle biblioteket:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr</a></span><span class="op">)</span></span></code></pre></div>
 <p>Det er tre oppgaver som er viktig å lære deg for å kunne ta i bruk
 renv:</p>
 <ul>
@@ -125,13 +126,13 @@ prosjekt</a></li>
 <p>Første gang renv skal brukes i et prosjekt/produksjonsløp må det
 opprettes noen filer. Dette kan gjøres ved</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">init</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">init</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Du vil se at en renv mappe nå ligge klar i mappe-struktur. Hvis du
 jobber i Dapla/Jupyter trenger du også en fil som spesifisere hvilken
 pakke skal brukes som deretter skrives til lock filen. Du kan opprette
 denne filen ved</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/create_dependencies.html">create_dependencies</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_dependencies.html">create_dependencies</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Og da er du klar for å jobbe og kjøre koden din!!</p>
 <p><img src="https://media.giphy.com/media/scZPhLqaVOM1qG4lT9/giphy.gif"></p>
 <p>Installere og bruker de pakkene du ønsker i koden din. Pakken
@@ -140,20 +141,20 @@ denne filen ved</p>
 installere fra og kan dermed brukes i lukket soner på SSB. For
 eksempel:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/install.packages.html">install.packages</a></span><span class="op">(</span><span class="va">A3</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">A3</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/A3/man/a3.html" class="external-link">a3</a></span><span class="op">(</span><span class="va">rating</span> <span class="op">~</span> <span class="va">.</span>, <span class="va">attitude</span>, <span class="va">lm</span>, p.acc <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/install.packages.html">install.packages</a></span><span class="op">(</span><span class="va">A3</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">A3</span><span class="op">)</span></span>
+<span><span class="fu">a3</span><span class="op">(</span><span class="va">rating</span> <span class="op">~</span> <span class="va">.</span>, <span class="va">attitude</span>, <span class="va">lm</span>, p.acc <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/a3Model.PNG" width="264"></p>
 <p>Hvis du sliter med å installere en pakke du ønsker og den ligger i
 felles installerte pakker can du prøve funksjonen
 <code><a href="../reference/ssb_library.html">ssb_library()</a></code>. FOr example å installere <code>dply</code>
 pakken:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/ssb_library.html">ssb_library</a></span><span class="op">(</span><span class="va">dplyr</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssb_library.html">ssb_library</a></span><span class="op">(</span><span class="va">dplyr</span><span class="op">)</span></span></code></pre></div>
 <p>Når du er fornøyd med koden din og de pakkene og funksjoner som er
 brukt i produksjonsløpet, lage en “snapshot” av det.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/snapshot.html">snapshot</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/snapshot.html">snapshot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Dette vil skrive hvilke pakker er brukt til dependencies-filen og
 lagre versjonsnummer i lock-filen.</p>
 </div>
@@ -163,15 +164,15 @@ lagre versjonsnummer i lock-filen.</p>
 <p>For å bruke et eksistende renv miljø må du først si at du ønsker å ta
 i bruk renv (hvis du ikke har gjort det før) ved</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr</a></span><span class="op">)</span>
-<span class="fu">init</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr</a></span><span class="op">)</span></span>
+<span><span class="fu">init</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>For å endre og oppdatere pakkene så at de er det samme som i
 lock-filen, kjøre du</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/restore.html">restore</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/restore.html">restore</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Du kan se hvilken pakken som er i lock-filen ved</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">dependencies</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">dependencies</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="endre">Endre et renv miljø<a class="anchor" aria-label="anchor" href="#endre"></a>
@@ -181,20 +182,20 @@ til nye funksjonaliteter eller nye figurer osv. Hvis din nye kode er
 avhengige av andre pakker trenger du å oppdatere lock-filen. Igjen,
 forsøke at du har tatt i bruk renv ved</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr</a></span><span class="op">)</span>
-<span class="fu">init</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr</a></span><span class="op">)</span></span>
+<span><span class="fu">init</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>For å oppdatere lock-filen ta en snapshot</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/snapshot.html">snapshot</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/snapshot.html">snapshot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Hvis det er pakker du ikke ønsker å bruke lengere kan du fjerne dem
 og rydde opp</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">remove</a></span><span class="op">(</span><span class="va">A3</span><span class="op">)</span>
-<span class="fu">clean</span><span class="op">(</span>actions <span class="op">=</span> <span class="st">"unused.packages"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">remove</a></span><span class="op">(</span><span class="va">A3</span><span class="op">)</span></span>
+<span><span class="fu">clean</span><span class="op">(</span>actions <span class="op">=</span> <span class="st">"unused.packages"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="https://media.giphy.com/media/Q8IqvLa3CpdzG2aons/giphy.gif"></p>
 <p>For å sjekke hvilken pakke er lagret i lock-filen kan du kjøre</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">dependencies</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">dependencies</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

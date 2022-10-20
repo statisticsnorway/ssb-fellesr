@@ -5,14 +5,14 @@
 \alias{read_json}
 \title{Funksjon for å laste inn .JSON-fil fra GCS bucket}
 \usage{
-read_json(bucket, file, ...)
+read_json(file, ...)
 }
 \arguments{
-\item{bucket}{Full sti til GCS bucket.}
-
 \item{file}{Navn på filen som skal leses inn.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_json_arrow.html)}
+
+\item{bucket}{Full sti til GCS bucket.}
 }
 \description{
 Funksjonen \code{read_json} kan brukes til å lese inn JSON-filer GCS.

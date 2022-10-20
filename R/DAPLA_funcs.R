@@ -55,7 +55,7 @@ read_parquet <- function(file, ...) {
     df <- arrow::read_parquet(file, ...)
   }
 
-  # Windows (produksjonssonen) - fra Linux
+  # RStudio Windows (produksjonssonen) - fra Linux
   if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
     # Brukernavn og passord (Windows) #
     options(usr = Sys.info()[["user"]])
@@ -87,9 +87,9 @@ read_parquet <- function(file, ...) {
 #'@encoding UTF-8
 
 read_feather <- function(file, ...) {
+  # Jupyterlab (DAPLA)
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
     df <- arrow::read_feather(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-
   }
 
   # Jupyterlab (produksjonssonen)
@@ -98,12 +98,11 @@ read_feather <- function(file, ...) {
     df <- arrow::read_feather(file, ...)
   }
 
-  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
-
+  # RStudio Windows - fra Linux
+  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){
     # Brukernavn og passord (Windows) #
     options(usr = Sys.info()[["user"]])
     options(passwd = rstudioapi::askForPassword("Windows passord:"))
-
     df <- arrow::read_feather(
       RCurl::getBinaryURL(
         url = paste0("sftp://sl-sas-work-1", file),
@@ -139,7 +138,7 @@ read_feather <- function(file, ...) {
 #'}
 #'@encoding UTF-8
 
-open_dataset <- function(bucket, ...) {
+open_dataset <- function(file, ...) {
 
   # Jupyterlab (DAPLA)
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
@@ -149,7 +148,7 @@ open_dataset <- function(bucket, ...) {
   # Jupyterlab (produksjonssonen)
   if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
-    # OBS: mangler
+  ds <- arrow::open_dataset(file, ...)
   }
 
   # Windows (produksjonssonen) - fra Linux
@@ -157,7 +156,7 @@ open_dataset <- function(bucket, ...) {
     # OBS: mangler
   }
 
-  return(df)
+  return(ds)
 }
 
 #' Funksjon for å laste inn .JSON-fil fra GCS bucket
@@ -176,20 +175,18 @@ open_dataset <- function(bucket, ...) {
 
 read_json <- function(file, ...) {
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
-    # file <- gsub(".json", "", basename(file))
-    # df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file), ".json")), ...)
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
 
   }
 
-  # Jupyterlab (produksjonssonen)
+  # Jupyterlab (produksjonssonen) + lokale filer fra RStudio Windows (produksjonssonen)
   if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
-    # OBS: mangler
+    df <- arrow::read_json_arrow(file, ...)
   }
 
-  # Windows (produksjonssonen) - fra Linux
-  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
+  # RStudio Windows (produksjonssonen) - fra Linux
+  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (RStudio Windows)
     # OBS: mangler
   }
 

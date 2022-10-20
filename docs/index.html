@@ -8,8 +8,8 @@
 <meta name="description" content="This package is for gerenal R functions which may be useful for general use at SSB.">
 <title>General R functions for SSB • fellesr</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="General R functions for SSB">
 <meta property="og:description" content="This package is for gerenal R functions which may be useful for general use at SSB.">
@@ -44,6 +44,7 @@
     <a class="dropdown-item" href="articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a>
     <a class="dropdown-item" href="articles/vignette_renv.html">R pakkehåndtering med renv og fellesr</a>
     <a class="dropdown-item" href="articles/vignette_statbank_lasting.html">Lasting til Statbank</a>
+    <a class="dropdown-item" href="articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a>
     <a class="dropdown-item" href="articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a>
   </div>
 </li>
@@ -59,11 +60,61 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><div class="section level2">
-<h2 id="general-functions-for-ssb">General functions for SSB<a class="anchor" aria-label="anchor" href="#general-functions-for-ssb"></a>
-</h2>
-<p>Here you can find an array of functions specifically for tasks unique to SSB R users. Search under “Articles” for topics.</p>
+  <main id="main" class="col-md-9"><div class="section level1">
+<div class="page-header"><h1 id="fellesfunksjoner-i-r-for-ssb-fellesr">Fellesfunksjoner i R for SSB (<code>fellesr</code>)<a class="anchor" aria-label="anchor" href="#fellesfunksjoner-i-r-for-ssb-fellesr"></a>
+</h1></div>
+<p>Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Se under «Articles» <a href="https://statisticsnorway.github.io/fellesr/" class="external-link">her</a> eller lenkene nedenfor for å velge emner.</p>
+<p>Pakken fellesr inneholder følgende funksjoner:</p>
+<div class="section level4">
+<h4 id="produksjonssonen">Produksjonssonen<a class="anchor" aria-label="anchor" href="#produksjonssonen"></a>
+</h4>
+<ul>
+<li>
+<a href="https://statisticsnorway.github.io/fellesr/articles/vignette_dynarev_uttrekk.html" class="external-link">Uttrekk fra Dynarev i R</a> (<code>dynarev_uttrekk</code>)</li>
+<li>
+<a href="https://statisticsnorway.github.io/fellesr/articles/vignette_statbank_lasting.html" class="external-link">Laste opp data til Statistikkbanken</a> (<code>statbank_lasting</code>)</li>
+<li>
+<a href="https://statisticsnorway.github.io/fellesr/articles/vignette_renv.html" class="external-link">R pakkehåndtering med renv</a> (<code>create_dependencies</code>, <code>install.packages</code>, <code>restore</code>, <code>snapshot</code>, <code>ssb_library</code>)</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="dapla">DAPLA<a class="anchor" aria-label="anchor" href="#dapla"></a>
+</h4>
+<ul>
+<li>Lese inn og skrive filer på DAPLA (<code>read_parquet</code>, <code>open_dataset</code>, <code>write_parquet</code>, <code>read_feather</code>, <code>write_feather</code>, <code>gcs_bucket</code>, <code>list.files</code>, <code>read_csv</code>, <code>write_csv</code>, <code>read_json</code>)</li>
+<li>
+<a href="https://statisticsnorway.github.io/fellesr/articles/vignette_renv.html" class="external-link">R pakkehåndtering med renv</a> (<code>create_dependencies</code>, <code>install.packages</code>, <code>restore</code>, <code>snapshot</code>, <code>ssb_library</code>)</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="andre-pakker-laget-for-bruk-i-ssb">Andre pakker laget for bruk i SSB<a class="anchor" aria-label="anchor" href="#andre-pakker-laget-for-bruk-i-ssb"></a>
+</h3>
+<p>I tillegg til <code>fellesr</code> har det blitt laget flere pakker for bruk i SSB. Under følger en foreløpig oversikt. Dersom du har laget en funksjon eller en pakke og ønsker å få lagt den til i <code>fellesr</code> eller i listen under er det bare å ta kontakt.</p>
+<ul>
+<li><a href="https://github.com/statisticsnorway/struktuR" class="external-link">struktuR</a></li>
+<li><a href="https://github.com/statisticsnorway/SSBpris" class="external-link">SSBpris</a></li>
+<li><a href="https://cran.r-project.org/web/packages/SmallCountRounding/vignettes/Introduction_to_SmallCountRounding.html" class="external-link">SmallCountRounding</a></li>
+<li><a href="https://github.com/statisticsnorway/SSBtools" class="external-link">SSBtools</a></li>
+<li><a href="https://github.com/statisticsnorway/SdcForetakPerson" class="external-link">SdcForetakPerson</a></li>
+<li><a href="https://statisticsnorway.github.io/GISSB/articles/GISSB_vignette.html" class="external-link">GISSB – Nettverksanalyse i R</a></li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="annet">Annet<a class="anchor" aria-label="anchor" href="#annet"></a>
+</h3>
+<ul>
+<li>SSB fargepallet i R (kommer)</li>
+<li>R jukseark (kommer)</li>
+</ul>
 <p><a href="https://statisticsnorway.github.io/fellesr/" class="external-link uri">https://statisticsnorway.github.io/fellesr/</a></p>
+</div>
+<div class="section level3">
+<h3 id="eksempler-på-produksjonsløp-i-r">Eksempler på produksjonsløp i R<a class="anchor" aria-label="anchor" href="#eksempler-p%C3%A5-produksjonsl%C3%B8p-i-r"></a>
+</h3>
+<ul>
+<li>(kommer)</li>
+</ul>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="license">
 <h2 data-toc-skip>License</h2>

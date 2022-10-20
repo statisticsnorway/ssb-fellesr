@@ -5,21 +5,21 @@
 \alias{read_parquet}
 \title{Funksjon for å laste inn .parquet-fil fra GCS bucket
 #'
-Funksjonen \code{read_parquet} kan brukes til å lese inn parquet-filer GCS.}
+Funksjonen \code{read_parquet} kan brukes til å lese inn .parquet-filer fra GCS.}
 \usage{
-read_parquet(bucket, file, ...)
+read_parquet(file, ...)
 }
 \arguments{
-\item{bucket}{Full sti til GCS bucket.}
-
 \item{file}{Navn på filen som skal leses inn.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)}
+
+\item{bucket}{Full sti til GCS bucket.}
 }
 \description{
 Funksjon for å laste inn .parquet-fil fra GCS bucket
 #'
-Funksjonen \code{read_parquet} kan brukes til å lese inn parquet-filer GCS.
+Funksjonen \code{read_parquet} kan brukes til å lese inn .parquet-filer fra GCS.
 }
 \examples{
 \dontrun{

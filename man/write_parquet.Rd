@@ -19,6 +19,5 @@ Funksjonen \code{write_parquet} kan brukes til å skrive parquet-filer til GCS b
 }
 \examples{
 \dontrun{
-write_parquet(data, bucket = "ssb-prod-dapla-felles-data-delt/R_smoke_test", file = "1987_1996.parquet")
 }
 }

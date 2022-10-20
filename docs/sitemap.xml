@@ -16,6 +16,9 @@
     <loc>/articles/vignette_statbank_lasting.html</loc>
   </url>
   <url>
+    <loc>/articles/vignette__DAPLA_jukseark.html</loc>
+  </url>
+  <url>
     <loc>/articles/web_only/bygge-en-r-tilleggspakke.html</loc>
   </url>
   <url>
@@ -23,6 +26,12 @@
   </url>
   <url>
     <loc>/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/call_perl.html</loc>
+  </url>
+  <url>
+    <loc>/reference/call_shell.html</loc>
   </url>
   <url>
     <loc>/reference/create_dependencies.html</loc>
@@ -37,6 +46,9 @@
     <loc>/reference/find_problem.html</loc>
   </url>
   <url>
+    <loc>/reference/gcs_bucket.html</loc>
+  </url>
+  <url>
     <loc>/reference/hello.html</loc>
   </url>
   <url>
@@ -46,7 +58,28 @@
     <loc>/reference/install.packages.html</loc>
   </url>
   <url>
+    <loc>/reference/list.files.html</loc>
+  </url>
+  <url>
+    <loc>/reference/open_dataset.html</loc>
+  </url>
+  <url>
     <loc>/reference/pipe.html</loc>
+  </url>
+  <url>
+    <loc>/reference/read_csv.html</loc>
+  </url>
+  <url>
+    <loc>/reference/read_feather.html</loc>
+  </url>
+  <url>
+    <loc>/reference/read_json.html</loc>
+  </url>
+  <url>
+    <loc>/reference/read_parquet.html</loc>
+  </url>
+  <url>
+    <loc>/reference/read_SSB.html</loc>
   </url>
   <url>
     <loc>/reference/restore.html</loc>
@@ -58,6 +91,21 @@
     <loc>/reference/ssb_library.html</loc>
   </url>
   <url>
+    <loc>/reference/statbank_lasting.html</loc>
+  </url>
+  <url>
     <loc>/reference/try_common_library.html</loc>
+  </url>
+  <url>
+    <loc>/reference/write_csv.html</loc>
+  </url>
+  <url>
+    <loc>/reference/write_feather.html</loc>
+  </url>
+  <url>
+    <loc>/reference/write_parquet.html</loc>
+  </url>
+  <url>
+    <loc>/reference/write_SSB.html</loc>
   </url>
 </urlset>

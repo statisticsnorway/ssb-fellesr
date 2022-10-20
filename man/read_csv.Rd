@@ -5,14 +5,14 @@
 \alias{read_csv}
 \title{Funksjon for å laste inn .csv-fil fra GCS bucket}
 \usage{
-read_csv(bucket, file, ...)
+read_csv(file, ...)
 }
 \arguments{
-\item{bucket}{Full sti til GCS bucket.}
-
 \item{file}{Navn på filen som skal leses inn.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)}
+
+\item{bucket}{Full sti til GCS bucket.}
 }
 \description{
 Funksjonen \code{read_csv} kan brukes til å lese inn JSON-filer GCS.
