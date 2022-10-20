@@ -34,9 +34,13 @@ gcs_bucket <- function(bucket) {
 #'
 #' @examples
 #' \dontrun{
-#' data <- read_parquet(bucket = "ssb-prod-dapla-felles-data-delt/R_smoke_test", file = "1987")
+#' # Jupyterlab (DAPLA)
+#' data <- read_parquet("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet")
 #'
-#' data <- read_parquet(bucket = "ssb-prod-dapla-felles-data-delt/R_smoke_test", file = "1987", col_select = c("Year", "Month"))
+#' # Jupyterlab (produksjonssonen)
+#'
+#' # RStudio Windows (produksjonssonen) - fra Linux
+#'
 #'}
 #'@encoding UTF-8
 
@@ -44,8 +48,6 @@ read_parquet <- function(file, ...) {
 
   # Jupyterlab (DAPLA)
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
-    # file <- gsub(".parquet", "", file)
-    # df <- arrow::read_parquet(gcs_bucket(bucket)$path(paste0(file, ".parquet")), ...)
     df <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
 
@@ -56,11 +58,11 @@ read_parquet <- function(file, ...) {
   }
 
   # RStudio Windows (produksjonssonen) - fra Linux
-  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
+  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){
+
     # Brukernavn og passord (Windows) #
     options(usr = Sys.info()[["user"]])
     options(passwd = rstudioapi::askForPassword("Windows passord:"))
-
     df <- arrow::read_parquet(
       RCurl::getBinaryURL(
         url = paste0("sftp://sl-sas-work-1", file),
@@ -83,6 +85,12 @@ read_parquet <- function(file, ...) {
 #'
 #' @examples
 #' \dontrun{
+#' # Jupyterlab (DAPLA)
+#' data <- read_feather("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.feather")
+#'
+#' # Jupyterlab (produksjonssonen)
+#'
+#' # RStudio Windows - fra Linux
 #'}
 #'@encoding UTF-8
 
@@ -114,7 +122,6 @@ read_feather <- function(file, ...) {
 
 
 }
-
 
 
 #' Funksjon for å laste inn "multifile" datasett fra GCS bucket
@@ -249,8 +256,8 @@ read_csv <- function(file, ...) {
 #' }
 #'@encoding UTF-8
 
-write_parquet <- function(data, bucket, file, ...) {
-  arrow::write_parquet(data, gcs_bucket(bucket)$path(file), ...)
+write_parquet <- function(data, file, ...) {
+  arrow::write_parquet(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
 }
 
 #' Funksjon for å lagre .feather-fil til GCS bucket
@@ -266,9 +273,9 @@ write_parquet <- function(data, bucket, file, ...) {
 #' }
 #'@encoding UTF-8
 
-write_feather <- function(data, bucket, file, ...) {
-  # legg til .feather endelse dersom dette ikke finnes?
-  arrow::write_feather(data, gcs_bucket(bucket)$path(file), ...)
+write_feather <- function(data, file, ...) {
+  arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
+
 }
 
 
@@ -288,8 +295,8 @@ write_feather <- function(data, bucket, file, ...) {
 #'@encoding UTF-8
 
 write_csv <- function(data, bucket, file, ...) {
-  # legg til .csv endelse dersom dette ikke finnes?
-  arrow::write_csv_arrow(data, gcs_bucket(bucket)$path(file), ...)
+  arrow::write_csv_arrow(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
+
 }
 
 
@@ -339,13 +346,13 @@ list.files <- function(bucket) {
 
 read_SSB <- function(file, ...) {
 
-  if(grepl(".parquet", basename(file))){
+  if(grepl("\\.parquet", basename(file))){
     df <- read_parquet(file, ...)
-  } else if(grepl(".feather", basename(file))){
+  } else if(grepl("\\.feather", basename(file))){
     df <- read_feather(file, ...)
-  } else if(grepl(".csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
+  } else if(grepl("\\.csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
     df <- read_csv(file, ...)
-  } else if(grepl(".json", basename(file))){
+  } else if(grepl("\\.json", basename(file))){
     df <- read_json(file, ...)
   } else {
    df <- open_dataset(file, ...) %>%
@@ -369,19 +376,14 @@ read_SSB <- function(file, ...) {
 #'}
 #'@encoding UTF-8
 
-# OBS: denne er ikke påbegynt
-write_SSB <- function(file, ...) {
-  if(grepl(".parquet", basename(file))){
+write_SSB <- function(data, file, ...) {
+  if (grepl("\\.parquet", basename(file))){
     write_parquet(data, file, ...)
-  } else if(grepl(".feather", basename(file))){
+  } else if (grepl("\\.feather", basename(file))){
     write_feather(data, file, ...)
-  } else if(grepl(".csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
+  } else if (grepl("\\.csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
     write_csv(data, file, ...)
-  } else if(grepl(".json", basename(file))){
-    write_json(data, file, ...)
   } else {
-    # df <- open_dataset(file, ...) %>%
-    #   dplyr::collect()
+    print("write_SSB kan for øyeblikket kun skrive .parquet-, .feather- og .csv-filer")
   }
-
 }

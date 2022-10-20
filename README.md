@@ -10,7 +10,7 @@ Pakken fellesr inneholder følgende funksjoner:
 + [R pakkehåndtering med renv](https://statisticsnorway.github.io/fellesr/articles/vignette_renv.html) (`create_dependencies`, `install.packages`, `restore`, `snapshot`, `ssb_library`)
 
 #### DAPLA
-+ Lese inn og skrive filer på DAPLA (`read_parquet`, `open_dataset`, `write_parquet`, `read_feather`, `write_feather`, `gcs_bucket`, `list.files`, `read_csv`, `write_csv`, `read_json`) 
++ Lese inn og skrive filer på DAPLA (`read_SSB`, `write_SSB`, `gcs_bucket`, `list.files`) 
 + [R pakkehåndtering med renv](https://statisticsnorway.github.io/fellesr/articles/vignette_renv.html) (`create_dependencies`, `install.packages`, `restore`, `snapshot`, `ssb_library`)
 
 ### Andre pakker laget for bruk i SSB
@@ -30,8 +30,10 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 + R jukseark (kommer)
 
 
-https://statisticsnorway.github.io/fellesr/
+### Kursmateriell
++ (kommer)
 
 ### Eksempler på produksjonsløp i R
 + (kommer)
+
 
