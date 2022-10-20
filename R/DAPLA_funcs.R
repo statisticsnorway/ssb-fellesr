@@ -176,7 +176,6 @@ open_dataset <- function(file, ...) {
 read_json <- function(file, ...) {
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-
   }
 
   # Jupyterlab (produksjonssonen) + lokale filer fra RStudio Windows (produksjonssonen)
@@ -189,6 +188,8 @@ read_json <- function(file, ...) {
   if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (RStudio Windows)
     # OBS: mangler
   }
+
+  return(df)
 
 }
 
