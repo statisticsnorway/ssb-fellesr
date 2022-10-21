@@ -3,19 +3,19 @@
 \encoding{UTF-8}
 \name{write_feather}
 \alias{write_feather}
-\title{Funksjon for å lagre .feather-fil til GCS bucket}
+\title{Funksjon for å lagre .feather-fil til Google Cloud Storage bucket}
 \usage{
-write_feather(data, bucket, file, ...)
+write_feather(data, file, ...)
 }
 \arguments{
-\item{bucket}{Full sti til GCS bucket.}
-
 \item{file}{Navn på filen som skal skrives.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_feather.html)}
+
+\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjonen \code{write_parquet} kan brukes til å skrive .feather-filer til GCS bucket.
+Funksjonen \code{write_feather} kan brukes til å skrive .feather-filer til Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{

@@ -3,9 +3,9 @@
 \encoding{UTF-8}
 \name{read_SSB}
 \alias{read_SSB}
-\title{Funksjon for å laste inn filer fra GCS bucket
+\title{Funksjon for å laste inn filer fra Google Cloud Storage bucket
 #'
-Funksjonen \code{read_SSB} kan brukes til å lese inn filer fra GCS.}
+Funksjonen \code{read_SSB} kan brukes til å lese inn filer fra Google Cloud Storage.}
 \usage{
 read_SSB(file, ...)
 }
@@ -14,23 +14,23 @@ read_SSB(file, ...)
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)}
 
-\item{bucket}{Full sti til GCS bucket.}
+\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjon for å laste inn filer fra GCS bucket
+Funksjon for å laste inn filer fra Google Cloud Storage bucket
 #'
-Funksjonen \code{read_SSB} kan brukes til å lese inn filer fra GCS.
+Funksjonen \code{read_SSB} kan brukes til å lese inn filer fra Google Cloud Storage.
 }
 \examples{
 \dontrun{
 read_SSB_parquet <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet")
 
-read_SSB_MFD <- read_SSB("ssb-prod-spesh-personell-data-kilde/enda_en_ny_mappe")
+read_SSB_MFD <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dataset")
 
 read_SSB_feather <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.feather")
 
 read_SSB_csv <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv")
 
-read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json")
+read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json") # OBS: flytt filen til delt
 }
 }

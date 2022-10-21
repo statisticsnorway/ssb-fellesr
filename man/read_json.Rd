@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{read_json}
 \alias{read_json}
-\title{Funksjon for å laste inn .JSON-fil fra GCS bucket}
+\title{Funksjon for å laste inn .json-fil fra Google Cloud Storage}
 \usage{
 read_json(file, ...)
 }
@@ -12,13 +12,13 @@ read_json(file, ...)
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_json_arrow.html)}
 
-\item{bucket}{Full sti til GCS bucket.}
+\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjonen \code{read_json} kan brukes til å lese inn JSON-filer GCS.
+Funksjonen \code{read_json} kan brukes til å lese inn JSON-filer Google Cloud Storage.
 }
 \examples{
 \dontrun{
-data <- read_json(bucket = "ssb-prod-spesh-personell-data-kilde", file = "example_1.json")
+data <- read_json("ssb-prod-spesh-personell-data-kilde/example_1.json")
 }
 }

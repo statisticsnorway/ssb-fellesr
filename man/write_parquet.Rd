@@ -3,19 +3,19 @@
 \encoding{UTF-8}
 \name{write_parquet}
 \alias{write_parquet}
-\title{Funksjon for å lagre .parquet-fil til GCS bucket}
+\title{Funksjon for å lagre .parquet-fil til Google Cloud Storage bucket}
 \usage{
-write_parquet(data, bucket, file, ...)
+write_parquet(data, file, ...)
 }
 \arguments{
-\item{bucket}{Full sti til GCS bucket.}
-
 \item{file}{Navn på filen som skal skrives.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)}
+
+\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjonen \code{write_parquet} kan brukes til å skrive parquet-filer til GCS bucket.
+Funksjonen \code{write_parquet} kan brukes til å skrive parquet-filer til Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{

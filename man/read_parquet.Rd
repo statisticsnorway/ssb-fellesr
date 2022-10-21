@@ -3,9 +3,9 @@
 \encoding{UTF-8}
 \name{read_parquet}
 \alias{read_parquet}
-\title{Funksjon for å laste inn .parquet-fil fra GCS bucket
+\title{Funksjon for å laste inn .parquet-fil fra Google Cloud Storage bucket
 #'
-Funksjonen \code{read_parquet} kan brukes til å lese inn .parquet-filer fra GCS.}
+Funksjonen \code{read_parquet} kan brukes til å lese inn .parquet-filer fra Google Cloud Storage.}
 \usage{
 read_parquet(file, ...)
 }
@@ -14,17 +14,22 @@ read_parquet(file, ...)
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)}
 
-\item{bucket}{Full sti til GCS bucket.}
+\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjon for å laste inn .parquet-fil fra GCS bucket
+Funksjon for å laste inn .parquet-fil fra Google Cloud Storage bucket
 #'
-Funksjonen \code{read_parquet} kan brukes til å lese inn .parquet-filer fra GCS.
+Funksjonen \code{read_parquet} kan brukes til å lese inn .parquet-filer fra Google Cloud Storage.
 }
 \examples{
 \dontrun{
-data <- read_parquet(bucket = "ssb-prod-dapla-felles-data-delt/R_smoke_test", file = "1987")
+# Jupyterlab (DAPLA)
+data <- read_parquet("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet")
 
-data <- read_parquet(bucket = "ssb-prod-dapla-felles-data-delt/R_smoke_test", file = "1987", col_select = c("Year", "Month"))
+# Jupyterlab (produksjonssonen)
+# OBS: mangler
+
+# RStudio Windows (produksjonssonen) - fra Linux
+# OBS: mangler
 }
 }

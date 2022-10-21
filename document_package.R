@@ -21,6 +21,7 @@ devtools::document()
 # Vignette #
 devtools::load_all()
 
-usethis::use_pkgdown() # OBS: docs legges i .gitignore (må fjernes)
+detach_package(fellesr)
+# usethis::use_pkgdown() # OBS: docs legges i .gitignore (må fjernes)
 pkgdown::build_site()
 

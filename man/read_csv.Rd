@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{read_csv}
 \alias{read_csv}
-\title{Funksjon for å laste inn .csv-fil fra GCS bucket}
+\title{Funksjon for å laste inn .csv-fil fra Google Cloud Storage bucket}
 \usage{
 read_csv(file, ...)
 }
@@ -12,13 +12,13 @@ read_csv(file, ...)
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)}
 
-\item{bucket}{Full sti til GCS bucket.}
+\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjonen \code{read_csv} kan brukes til å lese inn JSON-filer GCS.
+Funksjonen \code{read_csv} kan brukes til å lese inn JSON-filer Google Cloud Storage.
 }
 \examples{
 \dontrun{
-data <- read_csv(bucket = "ssb-prod-spesh-personell-data-kilde", file = "example_1.csv")
+data <- read_csv("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv")
 }
 }

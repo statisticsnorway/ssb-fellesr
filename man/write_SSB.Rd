@@ -3,23 +3,23 @@
 \encoding{UTF-8}
 \name{write_SSB}
 \alias{write_SSB}
-\title{Funksjon for å skrive filer til GCS bucket
+\title{Funksjon for å skrive filer til Google Cloud Storage bucket
 #'
-Funksjonen \code{write_SSB} kan brukes til å skrive filer til GCS.}
+Funksjonen \code{write_SSB} kan brukes til å skrive filer til Google Cloud Storage.}
 \usage{
-write_SSB(file, ...)
+write_SSB(data, file, partitioning = FALSE, ...)
 }
 \arguments{
 \item{file}{Navn på filen som skal leses inn.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)}
 
-\item{bucket}{Full sti til GCS bucket.}
+\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjon for å skrive filer til GCS bucket
+Funksjon for å skrive filer til Google Cloud Storage bucket
 #'
-Funksjonen \code{write_SSB} kan brukes til å skrive filer til GCS.
+Funksjonen \code{write_SSB} kan brukes til å skrive filer til Google Cloud Storage.
 }
 \examples{
 \dontrun{

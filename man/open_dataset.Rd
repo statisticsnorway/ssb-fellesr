@@ -3,21 +3,27 @@
 \encoding{UTF-8}
 \name{open_dataset}
 \alias{open_dataset}
-\title{Funksjon for å laste inn "multifile" datasett fra GCS bucket}
+\title{Funksjon for å laste inn "multifile" datasett fra Google Cloud Storage bucket}
 \usage{
-open_dataset(bucket, ...)
+open_dataset(file, ...)
 }
 \arguments{
-\item{bucket}{Full sti til GCS bucket.}
+\item{file}{Navn på filen som skal leses inn.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)}
 
-\item{file}{Navn på filen som skal leses inn.}
+\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjonen \code{open_dataset} kan brukes til å lese deler av datasett (bl.a. .parquet-, .feather- og .csv-filer) fra GCS. Det lages en forbindelse til mappen der filen ligger og deretter kan man bruke argumenter fra \code{dplyr}, som \code{filter} og \code{select}, før man bruker \code{collect} til å lese inn dataene i R. \code{open_dataset} kan også brukes til å lese inn sf-objekter (lagret som .parquet-fil med pakken \code{sfarrow}).
+Funksjonen \code{open_dataset} kan brukes til å lese deler av datasett (bl.a. .parquet-, .feather- og .csv-filer) fra Google Cloud Storage. Det lages en forbindelse til mappen der filen ligger og deretter kan man bruke argumenter fra \code{dplyr}, som \code{filter} og \code{select}, før man bruker \code{collect} til å lese inn dataene i R. \code{open_dataset} kan også brukes til å lese inn sf-objekter (lagret som .parquet-fil med pakken \code{sfarrow}).
 }
 \examples{
 \dontrun{
+data <- open_dataset("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dataset") \%>\%
+ dplyr::filter(Year == 1996 & TailNum == "N2823W") \%>\%
+ dplyr::select(Year, Month, DayofMonth, TailNum) \%>\%
+ dplyr::collect()
+
+# SF (OBS: legge denne på ssb-prod-dapla-felles-data-delt)
 }
 }

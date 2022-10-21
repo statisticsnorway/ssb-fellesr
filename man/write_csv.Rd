@@ -3,22 +3,22 @@
 \encoding{UTF-8}
 \name{write_csv}
 \alias{write_csv}
-\title{Funksjon for å lagre .csv-fil til GCS bucket}
+\title{Funksjon for å lagre .csv-fil til Google Cloud Storage bucket}
 \usage{
 write_csv(data, bucket, file, ...)
 }
 \arguments{
-\item{bucket}{Full sti til GCS bucket.}
+\item{bucket}{Full sti til Google Cloud Storage bucket.}
 
 \item{file}{Navn på filen som skal skrives.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)}
 }
 \description{
-Funksjonen \code{write_csv} kan brukes til å skrive parquet-filer til GCS bucket.
+Funksjonen \code{write_csv} kan brukes til å skrive parquet-filer til Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{
-write_csv(data, bucket = "ssb-prod-dapla-felles-data-delt/R_smoke_test", file = "1987_1996.parquet")
+write_csv(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.csv")
 }
 }
