@@ -308,7 +308,8 @@ dynarev_uttrekk <- function(delregnr,
                                "') AND FELT_ID IN ('", paste(skjema_cols, collapse = "', '"), "')"),
                 as.is = T) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
-                dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
+                dplyr::filter(FELT_ID %in% unique(data$FELT_ID)) %>%
+                dplyr::filter(!FELT_ID %in% c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR")) # FIX dersom grupperingskolonner ligger i metadata
             } else {
               metadata <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_METADATA")) %>%
                 dplyr::filter(DELREG_NR %in% delregnr,
@@ -316,7 +317,8 @@ dynarev_uttrekk <- function(delregnr,
                               FELT_ID %in% skjema_cols) %>%
                 dplyr::collect() %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
-                dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
+                dplyr::filter(FELT_ID %in% unique(data$FELT_ID)) %>%
+                dplyr::filter(!FELT_ID %in% c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR")) # FIX dersom grupperingskolonner ligger i metadata
             }
 
 
@@ -327,7 +329,8 @@ dynarev_uttrekk <- function(delregnr,
                 query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_METADATA WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"), "') AND SKJEMA = '", skjema, "'"),
                 as.is = T) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
-                dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
+                dplyr::filter(FELT_ID %in% unique(data$FELT_ID)) %>%
+                dplyr::filter(!FELT_ID %in% c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR")) # FIX dersom grupperingskolonner ligger i metadata
 
             } else {
               # Henter metadata
@@ -336,7 +339,8 @@ dynarev_uttrekk <- function(delregnr,
                               SKJEMA %in% skjema) %>%
                 dplyr::collect() %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
-                dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
+                dplyr::filter(FELT_ID %in% unique(data$FELT_ID)) %>%
+                dplyr::filter(!FELT_ID %in% c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR")) # FIX dersom grupperingskolonner ligger i metadata
             }
           }
 

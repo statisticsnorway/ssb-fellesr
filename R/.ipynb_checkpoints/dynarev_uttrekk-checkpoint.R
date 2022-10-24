@@ -1,7 +1,7 @@
 
 #' Uttrekk fra Dynarev til R
 #'
-#' `dynarev_uttrekk` er en funksjon som henter inn data fra Dynarev til R så lenge man oppgir delregisternummer (og ev. skjemanavn). Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.
+#' Funksjonen `dynarev_uttrekk` henter inn data fra Dynarev til R så lenge man oppgir delregisternummer (og ev. skjemanavn). Det er kun enheter som er satt som aktive (AKTIV = 1) som blir lastet ned. Det er mulig å hente skjemadata (variablene i selve skjemaet) og SFU-data (enhetsinformasjon). Man kan også gjennomføre dublettsjekker og velge mellom reviderte data og rådata.
 #'
 #' @param delregnr Numerisk vektor med delregisternummer.
 #' @param skjema Boolsk/karaktervektor med skjemanavn. Hvis TRUE returneres alle skjema i valgt delregister.
@@ -13,7 +13,7 @@
 #' @param con_ask Boolsk/karaktervektor. Hvis TRUE får man opp en boks som spør etter Oracle-passord. Hvis FALSE spørres det ikke om passord. Ved å skrive `dynarev_uttrekk(con_ask = "con")` får man opp en boks som spør etter Oracle-passord og kun koblingen mot Oracle blir returnert (ikke data). Denne kan brukes dersom man skal lese inn flere skjema etter hverandre for å unngå å skrive inn passordet flere ganger.
 #' @param raadata Boolsk. Hvis FALSE returneres reviderte data (fra FELT_VERDI), TRUE returnerer rådata.
 #'
-#' @returns Objekt (data.frame) med valgt data fra Dynarev, dersom enten `skjema_cols` eller `sfu_cols = TRUE`. Om både `skjema_cols` og `sfu_cols = TRUE` returneres en liste med to datasett \[1] `skjema_cols` og \[2] `sfu_cols`. Om `skjema_cols`, `sfu_cols` og `skjema_sfu_merge = TRUE` returneres det ett objekt (data.frame).
+#' @returns Objekt (data.frame) med valgt data fra Dynarev, dersom enten `skjema_cols` eller `sfu_cols = TRUE`. Om både `skjema_cols` og `sfu_cols = TRUE` returneres en liste med to datasett \[1] `skjema_cols` og \[2] `sfu_cols`. Om `skjema_cols`, `sfu_cols` og `skjema_sfu_merge = TRUE` returneres det ett objekt (data.frame). Dersom `con_ask = "con"` returneres kun kobling mot Oracle.
 #' @export
 #'
 #' @examples
@@ -103,16 +103,16 @@ dynarev_uttrekk <- function(delregnr,
             if (grepl("FW-XAPROD", nodename)){
               data <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_DATA WHERE DELREG_NR = '", delregnr,
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_DATA WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"),
                                # "' AND SKJEMA = '", skjema,
-                               "' AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"),
+                               "') AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"),
                                "') AND AKTIV = '1'"),
                 as.is = T)
 
             } else {
 
               data <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_DATA")) %>%
-                dplyr::filter(DELREG_NR == delregnr,
+                dplyr::filter(DELREG_NR %in% delregnr,
                               ENHETS_TYPE %in% enhets_type,
                               AKTIV == 1) %>%
                 dplyr::collect()
@@ -125,27 +125,27 @@ dynarev_uttrekk <- function(delregnr,
             if (grepl("FW-XAPROD", nodename)){
               data_enhet <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_ENHET WHERE DELREG_NR = '", delregnr,
-                               "' AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"), "')"),
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_ENHET WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"),
+                               "') AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"), "')"),
                 as.is = T) %>%
                 dplyr::select(ENHETS_ID, SKJEMA, LOPENR, AKTIV)
 
               raadata <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_DATA_RAADATA WHERE DELREG_NR = '", delregnr,
-                               "' AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"), "')"),
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_DATA_RAADATA WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"),
+                               "') AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"), "')"),
                 as.is = T) %>%
                 dplyr::select(-AKTIV)
 
             } else {
 
               data_enhet <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_ENHET")) %>%
-                dplyr::filter(DELREG_NR == delregnr,
+                dplyr::filter(DELREG_NR %in% delregnr,
                               ENHETS_TYPE %in% enhets_type) %>%
                 dplyr::select(ENHETS_ID, SKJEMA, LOPENR, AKTIV)
 
               raadata <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_DATA_RAADATA")) %>%
-                dplyr::filter(DELREG_NR == delregnr,
+                dplyr::filter(DELREG_NR %in% delregnr,
                               ENHETS_TYPE %in% enhets_type) %>%
                 dplyr::select(-AKTIV)
             }
@@ -162,13 +162,13 @@ dynarev_uttrekk <- function(delregnr,
             if (grepl("FW-XAPROD", nodename)){
               metadata <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_METADATA WHERE DELREG_NR = '", delregnr,
-                               "' AND FELT_ID IN ('", paste(unique(data$FELT_ID), collapse = "', '"), "')"),
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_METADATA WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"),
+                               "') AND FELT_ID IN ('", paste(unique(data$FELT_ID), collapse = "', '"), "')"),
                 as.is = T)
 
             } else {
               metadata <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_METADATA")) %>%
-                dplyr::filter(DELREG_NR == delregnr,
+                dplyr::filter(DELREG_NR %in% delregnr,
                               FELT_ID %in% skjema_cols) %>%
                 dplyr::collect() %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
@@ -181,13 +181,13 @@ dynarev_uttrekk <- function(delregnr,
 
               metadata <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_METADATA WHERE DELREG_NR = '", delregnr, "'"),
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_METADATA WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"), "')"),
                 as.is = T) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
                 # Fix for kolonner som har blitt gitt forskjellige variabeltyper i metadata for ulike skjemaer (velger variabeltypen som finnes flest ganger)
-                group_by(FELT_TYPE, FELT_ID) %>%
-                tally() %>%
-                group_by(FELT_ID) %>%
+                dplyr::group_by(FELT_TYPE, FELT_ID) %>%
+                dplyr::tally() %>%
+                dplyr::group_by(FELT_ID) %>%
                 dplyr::slice(which.max(n)) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
                 dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
@@ -195,14 +195,14 @@ dynarev_uttrekk <- function(delregnr,
             } else {
 
               metadata <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_METADATA")) %>%
-                dplyr::filter(DELREG_NR == delregnr) %>%
+                dplyr::filter(DELREG_NR %in% delregnr) %>%
                 dplyr::collect() %>%
 
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
                 # Fix for kolonner som har blitt gitt forskjellige variabeltyper i metadata for ulike skjemaer (velger variabeltypen som finnes flest ganger)
                 dplyr::group_by(FELT_TYPE, FELT_ID) %>%
-                tally() %>%
-                group_by(FELT_ID) %>%
+                dplyr::tally() %>%
+                dplyr::group_by(FELT_ID) %>%
                 dplyr::slice(which.max(n)) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
                 dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
@@ -222,7 +222,7 @@ dynarev_uttrekk <- function(delregnr,
             dplyr::mutate(dplyr::across(c(-SKJEMA, -DELREG_NR, -ENHETS_TYPE, -ENHETS_ID, -LOPENR, -RAD_NR),
                                         as.numeric)) %>%
             dplyr::group_by(SKJEMA, ENHETS_ID, ENHETS_TYPE, DELREG_NR, LOPENR, RAD_NR) %>%
-            dplyr::summarise(across(.cols = everything(), sum), .groups = 'drop')
+            dplyr::summarise(dplyr::across(.cols = everything(), sum), .groups = 'drop')
 
           # Skiller ut karaktervariabler
           filter_char <- metadata %>% dplyr::filter(!FELT_TYPE %in% c("DESIMAL", "NUMBER"))
@@ -232,7 +232,7 @@ dynarev_uttrekk <- function(delregnr,
             tidyr::spread(FELT_ID, FELT_VERDI, fill = "") %>%
             dplyr::mutate(dplyr::across(c(-SKJEMA, -DELREG_NR, -ENHETS_TYPE, -ENHETS_ID, -LOPENR, -RAD_NR), as.character)) %>%
             dplyr::group_by(SKJEMA, ENHETS_ID, ENHETS_TYPE, DELREG_NR, LOPENR, RAD_NR) %>%
-            dplyr::summarise(across(.cols = everything(), max), .groups = 'drop')
+            dplyr::summarise(dplyr::across(.cols = everything(), max), .groups = 'drop')
 
           # Merger karakter og numerisk
           skjema_data  <- dplyr::full_join(karakter, numerisk, by = c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR"))
@@ -246,15 +246,15 @@ dynarev_uttrekk <- function(delregnr,
             if (grepl("FW-XAPROD", nodename)){
               data <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_DATA WHERE DELREG_NR = '", delregnr,
-                               "' AND SKJEMA IN ('", paste(skjema, collapse = "', '"),
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_DATA WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"),
+                               "') AND SKJEMA IN ('", paste(skjema, collapse = "', '"),
                                "') AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"),
                                "') AND AKTIV = '1'"),
                 as.is = T)
             } else {
 
               data <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_DATA")) %>%
-                dplyr::filter(DELREG_NR == delregnr,
+                dplyr::filter(DELREG_NR %in% delregnr,
                               ENHETS_TYPE %in% enhets_type,
                               SKJEMA %in% skjema,
                               AKTIV == 1) %>%
@@ -266,36 +266,36 @@ dynarev_uttrekk <- function(delregnr,
             if (grepl("FW-XAPROD", nodename)){
               data_enhet <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_ENHET WHERE DELREG_NR = '", delregnr,
-                               "' AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"),
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_ENHET WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"),
+                               "') AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"),
                                "') AND SKJEMA IN ('", paste(skjema, collapse = "', '"), "')"),
                 as.is = T) %>%
                 dplyr::select(ENHETS_ID, SKJEMA, LOPENR, AKTIV)
 
               raadata <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_DATA_RAADATA WHERE DELREG_NR = '", delregnr,
-                               "' AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"),
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_DATA_RAADATA WHERE DELREG_NR IN ('", delregnr,
+                               "') AND ENHETS_TYPE IN ('", paste(enhets_type, collapse = "', '"),
                                "') AND SKJEMA IN ('", paste(skjema, collapse = "', '"), "')"),
                 as.is = T) %>%
                 dplyr::select(-AKTIV)
             } else {
               data_enhet <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_ENHET")) %>%
-                dplyr::filter(DELREG_NR == delregnr,
+                dplyr::filter(DELREG_NR %in% delregnr,
                               ENHETS_TYPE %in% enhets_type,
                               SKJEMA %in% skjema) %>%
                 dplyr::select(ENHETS_ID, SKJEMA, LOPENR, AKTIV)
 
               raadata <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_DATA_RAADATA")) %>%
-                dplyr::filter(DELREG_NR == delregnr,
+                dplyr::filter(DELREG_NR %in% delregnr,
                               ENHETS_TYPE %in% enhets_type,
                               SKJEMA %in% skjema) %>%
                 dplyr::select(-AKTIV)
             }
 
-            data <- inner_join(raadata, data_enhet, by = c("SKJEMA", "ENHETS_ID", "LOPENR")) %>%
+            data <- dplyr::inner_join(raadata, data_enhet, by = c("SKJEMA", "ENHETS_ID", "LOPENR")) %>%
               dplyr::filter(AKTIV == 1) %>%
-              collect()
+              dplyr::collect()
           }
 
           # Henter metadata
@@ -303,20 +303,22 @@ dynarev_uttrekk <- function(delregnr,
             if (grepl("FW-XAPROD", nodename)){
               metadata <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_METADATA WHERE DELREG_NR = '", delregnr,
-                               "' AND SKJEMA IN ('", paste(skjema, collapse = "', '"),
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_METADATA WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"),
+                               "') AND SKJEMA IN ('", paste(skjema, collapse = "', '"),
                                "') AND FELT_ID IN ('", paste(skjema_cols, collapse = "', '"), "')"),
                 as.is = T) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
-                dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
+                dplyr::filter(FELT_ID %in% unique(data$FELT_ID)) %>%
+                dplyr::filter(!FELT_ID %in% c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR")) # FIX dersom grupperingskolonner ligger i metadata
             } else {
               metadata <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_METADATA")) %>%
-                dplyr::filter(DELREG_NR == delregnr,
+                dplyr::filter(DELREG_NR %in% delregnr,
                               SKJEMA %in% skjema,
                               FELT_ID %in% skjema_cols) %>%
                 dplyr::collect() %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
-                dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
+                dplyr::filter(FELT_ID %in% unique(data$FELT_ID)) %>%
+                dplyr::filter(!FELT_ID %in% c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR")) # FIX dersom grupperingskolonner ligger i metadata
             }
 
 
@@ -324,19 +326,21 @@ dynarev_uttrekk <- function(delregnr,
             if (grepl("FW-XAPROD", nodename)){
               metadata <- RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_METADATA WHERE DELREG_NR = '", delregnr, "' AND SKJEMA = '", skjema, "'"),
+                query = paste0("SELECT * FROM DYNAREV.VW_SKJEMA_METADATA WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"), "') AND SKJEMA = '", skjema, "'"),
                 as.is = T) %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
-                dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
+                dplyr::filter(FELT_ID %in% unique(data$FELT_ID)) %>%
+                dplyr::filter(!FELT_ID %in% c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR")) # FIX dersom grupperingskolonner ligger i metadata
 
             } else {
               # Henter metadata
               metadata <- dplyr::tbl(con, dbplyr::in_schema("DYNAREV", "VW_SKJEMA_METADATA")) %>%
-                dplyr::filter(DELREG_NR == delregnr,
+                dplyr::filter(DELREG_NR %in% delregnr,
                               SKJEMA %in% skjema) %>%
                 dplyr::collect() %>%
                 dplyr::select(FELT_TYPE, FELT_ID) %>%
-                dplyr::filter(FELT_ID %in% unique(data$FELT_ID))
+                dplyr::filter(FELT_ID %in% unique(data$FELT_ID)) %>%
+                dplyr::filter(!FELT_ID %in% c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR")) # FIX dersom grupperingskolonner ligger i metadata
             }
           }
 
@@ -350,7 +354,7 @@ dynarev_uttrekk <- function(delregnr,
             dplyr::mutate(dplyr::across(c(-SKJEMA, -DELREG_NR, -ENHETS_TYPE, -ENHETS_ID, -LOPENR, -RAD_NR),
                                         as.numeric)) %>%
             dplyr::group_by(SKJEMA, ENHETS_ID, ENHETS_TYPE, DELREG_NR, LOPENR, RAD_NR) %>%
-            dplyr::summarise(across(.cols = everything(), sum), .groups = 'drop')
+            dplyr::summarise(dplyr::across(.cols = everything(), sum), .groups = 'drop')
 
           # Skiller ut karaktervariabler
           filter_char <- metadata %>% dplyr::filter(!FELT_TYPE %in% c("DESIMAL", "NUMBER"))
@@ -360,7 +364,7 @@ dynarev_uttrekk <- function(delregnr,
             tidyr::spread(FELT_ID, FELT_VERDI, fill = "") %>%
             dplyr::mutate(dplyr::across(c(-SKJEMA, -DELREG_NR, -ENHETS_TYPE, -ENHETS_ID, -LOPENR, -RAD_NR), as.character)) %>%
             dplyr::group_by(SKJEMA, ENHETS_ID, ENHETS_TYPE, DELREG_NR, LOPENR, RAD_NR) %>% #
-            dplyr::summarise(across(.cols = everything(), max), .groups = 'drop')
+            dplyr::summarise(dplyr::across(.cols = everything(), max), .groups = 'drop')
 
           # Merger karakter og numerisk
           skjema_data  <- dplyr::full_join(karakter, numerisk, by = c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR"))
@@ -368,7 +372,7 @@ dynarev_uttrekk <- function(delregnr,
         # Dublettsjekk (etter ENHETS_ID)
         if (dublettsjekk == TRUE) {
           dublett_test <- skjema_data %>%
-            dplyr::group_by(ENHETS_ID) %>% # OBS?
+            dplyr::group_by(ENHETS_ID) %>%
             dplyr::tally() %>%
             dplyr::filter(n > 1)
 
@@ -395,16 +399,16 @@ dynarev_uttrekk <- function(delregnr,
           return(list(skjema_data, dublett_test))
         }
         # Inkluder SFU-data (alle skjema og alle kolonner)
-        if (skjema == TRUE & sfu_cols == TRUE) {
+        if (skjema == TRUE & sfu_cols != FALSE) {
           if (grepl("FW-XAPROD", nodename)){
             sfu <- RODBC::sqlQuery(
               channel = con,
-              query = paste0("SELECT * FROM DSBBASE.DLR_ENHET_I_DELREG WHERE DELREG_NR = '", delregnr, "'"),
+              query = paste0("SELECT * FROM DSBBASE.DLR_ENHET_I_DELREG WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"), "')"),
               as.is = T) %>%
               dplyr::rename(ENHETS_ID = IDENT_NR) # Endrer navn fra IDENT_NR til ENHETS_ID for å merge
           } else {
             sfu <- dplyr::tbl(con, dbplyr::in_schema("DSBBASE", "DLR_ENHET_I_DELREG")) %>%
-              dplyr::filter(DELREG_NR == delregnr) %>%
+              dplyr::filter(DELREG_NR %in% delregnr) %>%
               dplyr::collect() %>%
               dplyr::rename(ENHETS_ID = IDENT_NR) # Endrer navn fra IDENT_NR til ENHETS_ID for å merge
 
@@ -416,13 +420,13 @@ dynarev_uttrekk <- function(delregnr,
             sfu_skjema <-
               RODBC::sqlQuery(
                 channel = con,
-                query = paste0("SELECT * FROM DSBBASE.DLR_ENHET_I_DELREG_SKJEMA WHERE DELREG_NR = '", delregnr,
-                               "' AND SKJEMA_TYPE IN ('", paste(skjema, collapse = "', '"), "')"),
+                query = paste0("SELECT * FROM DSBBASE.DLR_ENHET_I_DELREG_SKJEMA WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"),
+                               "') AND SKJEMA_TYPE IN ('", paste(skjema, collapse = "', '"), "')"),
                 as.is = T)
 
             sfu <- RODBC::sqlQuery(
               channel = con,
-              query = paste0("SELECT * FROM DSBBASE.DLR_ENHET_I_DELREG WHERE DELREG_NR = '", delregnr, "'"),
+              query = paste0("SELECT * FROM DSBBASE.DLR_ENHET_I_DELREG WHERE DELREG_NR IN ('", paste(delregnr, collapse = "', '"), "')"),
               as.is = T) %>%
               dplyr::filter(IDENT_NR %in% c(unique(sfu_skjema$IDENT_NR),
                                             ENHETS_TYPE %in% c(unique(sfu_skjema$ENHETS_TYPE)),
@@ -431,13 +435,13 @@ dynarev_uttrekk <- function(delregnr,
               dplyr::rename(ENHETS_ID = IDENT_NR) # %>% # Endrer navn fra IDENT_NR til ENHETS_ID for å merge
           } else {
             sfu_skjema <- dplyr::tbl(con, dbplyr::in_schema("DSBBASE", "DLR_ENHET_I_DELREG_SKJEMA")) %>%
-              dplyr::filter(DELREG_NR == delregnr, #) %>%
+              dplyr::filter(DELREG_NR %in% delregnr, #) %>%
                             SKJEMA_TYPE %in% skjema) %>%
               dplyr::collect()
 
             # Henter inn SFU data
             sfu <- dplyr::tbl(con, dbplyr::in_schema("DSBBASE", "DLR_ENHET_I_DELREG")) %>%
-              dplyr::filter(DELREG_NR == delregnr) %>%
+              dplyr::filter(DELREG_NR %in% delregnr) %>%
               dplyr::collect() %>%
               dplyr::filter(IDENT_NR %in% c(unique(sfu_skjema$IDENT_NR),
                                             ENHETS_TYPE %in% c(unique(sfu_skjema$ENHETS_TYPE)),
@@ -459,7 +463,7 @@ dynarev_uttrekk <- function(delregnr,
         }
         # Både sfu_cols og skjema_cols - MERGE
         if ((sfu_cols == T) & (skjema_sfu_merge == T) & (skjema_cols == T) & (dublettsjekk == F)) {
-          skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR")) # OBS: inner join?
+          skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
         # Kun sfu_cols
@@ -472,7 +476,7 @@ dynarev_uttrekk <- function(delregnr,
         }
         # Både sfu_cols (utvalgte variabler) og skjema_cols - MERGE
         if ((class(sfu_cols) == "character") & (skjema_sfu_merge == T) & (skjema_cols == T) & (dublettsjekk == F)) {
-          skjema_data <- dplyr::left_join(skjema_data, sfu_subset, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR")) # OBS: inner join?
+          skjema_data <- dplyr::left_join(skjema_data, sfu_subset, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
         # Kun sfu_cols, utvalgte variabler
@@ -485,7 +489,7 @@ dynarev_uttrekk <- function(delregnr,
         }
         # Både sfu_cols og skjema_cols (utvalgte variabler) - MERGE
         if ((class(skjema_cols) == "character") & (sfu_cols == T) & (skjema_sfu_merge == T) & (dublettsjekk == F)) {
-          skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR")) # OBS: inner join?
+          skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
         # Kun skjema_cols
