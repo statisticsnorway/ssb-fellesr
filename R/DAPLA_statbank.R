@@ -23,10 +23,11 @@ return(username_encryptedpassword)
 
 
 # statbank_uttaksbeskrivelse #
-statbank_uttaksbeskrivelse <- function(tabell_id = "05307", 
+statbank_uttaksbeskrivelse <- function(tabell_id,
+                                       lastebruker,
                                       ask = TRUE) {
   if (ask == TRUE){
-        username_encryptedpassword <- statbank_encrypt_request()
+        username_encryptedpassword <- statbank_encrypt_request(lastebruker = lastebruker)
       }
   
   URL <- paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/uttaksbeskrivelse?', "tableId=", tabell_id)
