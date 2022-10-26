@@ -25,7 +25,8 @@ return(username_encryptedpassword)
 # statbank_uttaksbeskrivelse #
 statbank_uttaksbeskrivelse <- function(tabell_id,
                                        lastebruker,
-                                      ask = TRUE) {
+                                      ask = TRUE, 
+                                      boundary = 12345) {
   if (ask == TRUE){
         username_encryptedpassword <- statbank_encrypt_request(lastebruker = lastebruker)
       }
@@ -35,7 +36,7 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
   uttaksbeksrivelse <- httr::GET(URL,
                                  httr::add_headers(
                                    'Authorization' = paste0('Basic ', username_encryptedpassword), 
-                                   'Content-Type' = 'multipart/form-data; boundary=12345', 
+                                   'Content-Type' = paste0('multipart/form-data; boundary=', boundary),
                                    'Connection' = 'keep-alive',
                                    'Accept' = '*/*'
                                  ))
@@ -45,11 +46,10 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
 }
 
 # statbank_body #
-statbank_body <- function(data, tabell_id, ask = TRUE) {
+statbank_body <- function(data, tabell_id, ask = TRUE, boundary = 12345) {
 
 filename <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = ask)$DeltabellTitler$Filnavn
-entotrefirefem <- 12345
-start <- paste0("--", entotrefirefem, "\r\nContent-Disposition:form-data; filename=", filename, "\r\nContent-type:text/plain\r\n\r\n")
+start <- paste0("--", boundary, "\r\nContent-Disposition:form-data; filename=", filename, "\r\nContent-type:text/plain\r\n\r\n")
     
 data$V4 <- format(data$V4, decimal.mark = ',')
 data$V5 <- format(data$V5, decimal.mark = ',')
@@ -65,7 +65,7 @@ data <- paste(str_trim(data$V1),
 # testdata <- testdata %>%
 # summarise(paste0(V1, collapse = "\r\n"))
 
-stop <- paste0("\r\n--", entotrefirefem, "--\r\n")
+stop <- paste0("\r\n--", boundary, "--\r\n")
 
 body <- paste0(start, data, stop)
 
@@ -99,7 +99,7 @@ url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/
 transfer_log <- httr::POST(url_transfer,
                             httr::add_headers(
                               'Authorization' = paste0('Basic ', username_encryptedpassword), 
-                              'Content-Type' = paste0('multipart/form-data; boundary=', boundary, '12345'),  
+                              'Content-Type' = paste0('multipart/form-data; boundary=', boundary),
                               'Connection' = 'keep-alive',
                              'Accept-Encoding' = 'gzip, deflate, br',
                               'Accept' = '*/*'),
