@@ -48,25 +48,26 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
 # statbank_body #
 statbank_body <- function(data, tabell_id, ask = TRUE, boundary = 12345) {
 
-filename <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = ask)$DeltabellTitler$Filnavn
-start <- paste0("--", boundary, "\r\nContent-Disposition:form-data; filename=", filename, "\r\nContent-type:text/plain\r\n\r\n")
+data_all <- ""
+
+for (i in 1:length(data)) {
     
-data$V4 <- format(data$V4, decimal.mark = ',')
-data$V5 <- format(data$V5, decimal.mark = ',')
+filename <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = ask)$DeltabellTitler$Filnavn[i]
+start <- paste0("--", boundary, "\r\nContent-Disposition:form-data; filename=", filename, "\r\nContent-type:text/plain\r\n\r\n")
+ 
+data_1 <- data.frame(data[i])
+data_1 <- data_1 %>%
+dplyr::mutate_all(~format(., decimal.mark = ',')) %>% # endrer desimaltegn til komma
+dplyr::mutate_all(., str_trim) # fjerner whitespace
+data_1 <- do.call(paste, c(data_1[colnames(data_1)], sep = ";", collapse = "\r\n"))
+    
+data_1 <- paste0(start, data_1)
 
-data <- paste(str_trim(data$V1), 
-               str_trim(data$V2), 
-               str_trim(data$V3), 
-               str_trim(data$V4), 
-               str_trim(data$V5), 
-               sep = ";", 
-               collapse = "\r\n")
+data_all <- paste0(data_all, data_1, sep = paste0("\r\n"))    
+    }
 
-stop <- paste0("\r\n--", boundary, "--\r\n")
-
-body <- paste0(start, data, stop)
-
-return(body)
+data_all <- paste0(data_all, "--12345--\r\n")
+    return(data_all)
     }
     
  # statbank_transfer #   
