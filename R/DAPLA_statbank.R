@@ -62,9 +62,6 @@ data <- paste(str_trim(data$V1),
                sep = ";", 
                collapse = "\r\n")
 
-# testdata <- testdata %>%
-# summarise(paste0(V1, collapse = "\r\n"))
-
 stop <- paste0("\r\n--", boundary, "--\r\n")
 
 body <- paste0(start, data, stop)
@@ -84,7 +81,7 @@ return(body)
 
 username_encryptedpassword <- statbank_encrypt_request(lastebruker = lastebruker)
 uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE)
-body <- statbank_body(testdata, tabell_id, ask = FALSE)
+body <- statbank_body(data = data, tabell_id = tabell_id, ask = FALSE)
 
 url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'), 
                        "initialier=", initialer,
