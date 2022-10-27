@@ -2,7 +2,7 @@
 ### statbank_encrypt_request ###
 ################################
 
-statbank_encrypt_request <- function(lastebruker) {
+statbank_encrypt_request <- function(laste_bruker) {
   if (Sys.getenv('CLUSTER_ID')=="staging-bip-app") {
     db <- "TEST"
   }
@@ -19,7 +19,7 @@ statbank_encrypt_request <- function(lastebruker) {
     body = list(message = getPass::getPass(paste0("Lastepassord (", db, "):"))), 
     encode = "json"
   )
-  username_encryptedpassword <- openssl::base64_encode(paste0(lastebruker, ":", httr::content(encrypt_request)$message))
+  username_encryptedpassword <- openssl::base64_encode(paste0(laste_bruker, ":", httr::content(encrypt_request)$message))
   return(username_encryptedpassword)
 }
 
@@ -27,11 +27,11 @@ statbank_encrypt_request <- function(lastebruker) {
 
 # statbank_uttaksbeskrivelse #
 statbank_uttaksbeskrivelse <- function(tabell_id,
-                                       lastebruker,
+                                       laste_bruker,
                                        ask = TRUE, 
                                        boundary = 12345) {
   if (ask == TRUE){
-    username_encryptedpassword <- statbank_encrypt_request(lastebruker = lastebruker)
+    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
   }
   
   URL <- paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/uttaksbeskrivelse?', "tableId=", tabell_id)
@@ -89,10 +89,10 @@ statbank_body <- function(data, tabell_id, ask = TRUE, boundary = 12345) {
 
 statbank_validering <- function(data, 
                                 tabell_id, 
-                                lastebruker, 
+                                laste_bruker, 
                                 ask = FALSE) {
-    
-  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, lastebruker = lastebruker, ask = ask)
+  
+  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, laste_bruker = laste_bruker, ask = ask)
   
   problemer_alle <- data.frame()
   
@@ -165,31 +165,31 @@ statbank_validering <- function(data,
 
 statbank_transfer <- function(data, 
                               tabell_id,
-                              lastebruker,
+                              laste_bruker,
                               publiseringsdato, 
                               initialer = gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER')), 
-                              auto_overskriv_data = 1, 
-                              auto_godkjenn_data = 2, 
+                              autooverskriv = 1, 
+                              autogodkjenn = 2, 
                               boundary = 12345, 
                               ask = TRUE, 
                               validering = TRUE) {
-    
-if (validering == TRUE) {
-validering <- statbank_validering(data = data, 
-                   tabell_id = tabell_id, 
-                   lastebruker = lastebruker, 
-                   ask = FALSE)
+  
+  if (validering == TRUE) {
+    validering <- statbank_validering(data = data, 
+                                      tabell_id = tabell_id, 
+                                      laste_bruker = laste_bruker, 
+                                      ask = FALSE)
     
     if (length(validering)>1) {
-        print("Ugyldige verdier finnes i kodeliste. Lasteoppdrag ikke startet.")
-        return(validering)
-        stop()
-        }
- 
-}    
- 
-if (ask == TRUE){
-    username_encryptedpassword <- statbank_encrypt_request(lastebruker = lastebruker)
+      print("Ugyldige verdier finnes i kodeliste. Lasteoppdrag ikke startet.")
+      return(validering)
+      stop()
+    }
+    
+  }    
+  
+  if (ask == TRUE){
+    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
   }
   
   uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE)
@@ -201,8 +201,8 @@ if (ask == TRUE){
                          "&publiseringsdato=", publiseringsdato, 
                          "&fagansvarlig1=", initialer, 
                          "&fagansvarlig2=", initialer, 
-                         "&auto_overskriv_data=", auto_overskriv_data,
-                         "&auto_godkjenn_data=", auto_godkjenn_data) 
+                         "&auto_overskriv_data=", autooverskriv,
+                         "&auto_godkjenn_data=", autogodkjenn) 
   
   
   transfer_log <- httr::POST(url_transfer,
@@ -214,25 +214,25 @@ if (ask == TRUE){
                                'Accept' = '*/*'),
                              body = list(raw = body))
   
-    
-if (httr::content(transfer_log)$TotalResult$Status == "Success") {
-print("Lasting vellykket!")
-return(transfer_log)
-stop()
-}   
-    
-if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(grepl("brudd på unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
-print("Lasting mislyktes. Kan skyldes at forrige opplasting ikke er ferdig. Vent noen minutter og prøv igjen.")
-return(transfer_log)
-}       
-    
-if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(!grepl("brudd på unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
-print("Lasting mislyktes")
-return(transfer_log)
-}           
-    
-# return(transfer_log)
-    
+  
+  if (httr::content(transfer_log)$TotalResult$Status == "Success") {
+    print("Lasting vellykket!")
+    return(transfer_log)
+    stop()
+  }   
+  
+  if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(grepl("brudd på unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
+    print("Lasting mislyktes. Kan skyldes at forrige opplasting ikke er ferdig. Vent noen minutter og prøv igjen.")
+    return(transfer_log)
+  }       
+  
+  if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(!grepl("brudd på unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
+    print("Lasting mislyktes")
+    return(transfer_log)
+  }           
+  
+  # return(transfer_log)
+  
 }
 
 

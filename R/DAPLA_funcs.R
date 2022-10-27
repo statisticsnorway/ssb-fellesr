@@ -12,7 +12,7 @@
 #'@encoding UTF-8
 
 gcs_bucket <- function(bucket) {
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-ap", "prod-bip-app")){
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")){
     response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
     access_token <- httr::content(response)$exchanged_tokens$google$access_token
     expiration <- httr::content(response)$exchanged_tokens$google$exp
