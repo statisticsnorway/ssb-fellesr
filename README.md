@@ -2,7 +2,7 @@
 
 Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Se under «Articles» [her](https://statisticsnorway.github.io/fellesr/) eller lenkene nedenfor for å velge emner.
 
-Pakken fellesr inneholder følgende funksjoner:
+Pakken `fellesr` inneholder følgende funksjoner:
 
 #### Produksjonssonen
 + [Uttrekk fra Dynarev i R](https://statisticsnorway.github.io/fellesr/articles/vignette_dynarev_uttrekk.html) (`dynarev_uttrekk`)

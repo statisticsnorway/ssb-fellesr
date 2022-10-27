@@ -14,16 +14,39 @@
 #' @param autogodkjenn How data should be approved. 0 = Manual approval, 1 = Automatic (default), 2 = Just-in-time
 #' @param timeout Length of time to wait for script to run before stopping. Default 10 (seconds)
 #' @export
-statbank_lasting <- function(laste_dbase,
+statbank_lasting <- function(lastefil,
+                             tabell_id = "",
+                             laste_dbase = "", # OBS?
                              laste_bruker,
-                             lastefilsti,
-                             lastefil,
-                             hovedtabell,
+                             lastefilsti = "",
+                             hovedtabell = "",
                              publiseringsdato,
-                             mailto,
+                             mailto = "",
                              autooverskriv = 1,
                              autogodkjenn = 1,
-                             timeout = 10){
+                             timeout = 10,
+                             validering = TRUE,
+                             ask = TRUE){
+
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+
+    if (missing(mailto)){
+      mailto <- gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER'))
+    }
+    transfer_log <- statbank_transfer(data = lastefil,
+                                      tabell_id = tabell_id,
+                                      laste_bruker = laste_bruker,
+                                      publiseringsdato = publiseringsdato,
+                                      initialer = mailto,
+                                      autooverskriv = autooverskriv,
+                                      autogodkjenn = autogodkjenn,
+                                      ask = ask)
+
+    return(transfer_log)
+
+
+  }
+
   # check laste_db
   if (!laste_dbase %in% c("PROD", "TEST", "QA")){
     stop("laste_db should be one of 'TEST', 'PROD' og 'QA")

@@ -1,0 +1,29 @@
+---
+title: "SSB fargepalett"
+author: "Sindre Mikael Haugen"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SSB fargepalett}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, eval=FALSE}
+ssb_farger <- klassR::GetKlass(614, output_style = "wide") %>%
+  dplyr::rename(farge_nummer = code3, 
+                HEX = name3, 
+                farge = name2, 
+                type = name1) %>%
+  dplyr::select(-code1, -code2)
+```
+
+# Eksempler i ggplot/Leaflet
++ kommer
