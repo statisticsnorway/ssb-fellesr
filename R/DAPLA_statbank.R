@@ -24,8 +24,10 @@ statbank_encrypt_request <- function(laste_bruker) {
 }
 
 
+##################################
+### statbank_uttaksbeskrivelse ###
+##################################
 
-# statbank_uttaksbeskrivelse #
 statbank_uttaksbeskrivelse <- function(tabell_id,
                                        laste_bruker,
                                        ask = TRUE, 
@@ -57,10 +59,9 @@ statbank_body <- function(data, tabell_id, ask = TRUE, boundary = 12345) {
   
   data_all <- ""
   
-  if (class(data) %in% c("data.frame", "tibble")) {
+  if (class(data)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
     data <- list(data)  
   }    
-  
   
   for (i in 1:length(data)) {
     
@@ -96,7 +97,7 @@ statbank_validering <- function(data,
   
   problemer_alle <- data.frame()
   
-  if (class(data) %in% c("data.frame", "tibble")) {
+  if (class(data)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
     data <- list(data)  
   }    
   
@@ -163,7 +164,8 @@ statbank_validering <- function(data,
 ### statbank_transfer ###
 #########################
 
-statbank_transfer <- function(data, 
+statbank_transfer <- function(lastefil,
+                              lastefilsti = "",
                               tabell_id,
                               laste_bruker,
                               publiseringsdato, 
@@ -174,8 +176,37 @@ statbank_transfer <- function(data,
                               ask = TRUE, 
                               validering = TRUE) {
   
+  
+  if (ask == TRUE){
+    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
+  }    
+  
+  if (weekdays(as.POSIXlt(publiseringsdato)) %in% c("Saturday", "Sunday")) {
+    print("OBS: publiseringsdato er satt til en helg")
+  }
+    
+if (class(lastefil)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
+    lastefil <- as.data.frame(lastefil)  
+}    
+  
+  if (class(lastefil) == "character" & length(lastefil)==1){
+    lastefil <- read_SSB(paste0(lastefilsti, "/", lastefil), delim = ";",  col_names = FALSE)  
+    lastefil <- list(lastefil)   
+  }
+  
+  if (class(lastefil) == "character" & length(lastefil)>1){
+    
+    lastefil_alle <- list()
+    for (i in lastefil){
+      
+      lastefil_1 <- read_SSB(paste0(lastefilsti, "/", i), delim = ";",  col_names = FALSE)    
+      lastefil_alle[[i]] <- lastefil_1    
+    }
+    lastefil <- lastefil_alle    
+  }
+  
   if (validering == TRUE) {
-    validering <- statbank_validering(data = data, 
+    validering <- statbank_validering(data = lastefil, 
                                       tabell_id = tabell_id, 
                                       laste_bruker = laste_bruker, 
                                       ask = FALSE)
@@ -188,12 +219,9 @@ statbank_transfer <- function(data,
     
   }    
   
-  if (ask == TRUE){
-    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
-  }
   
   uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE)
-  body <- statbank_body(data = data, tabell_id = tabell_id, ask = FALSE)
+  body <- statbank_body(data = lastefil, tabell_id = tabell_id, ask = FALSE)
   
   url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'), 
                          "initialier=", initialer,

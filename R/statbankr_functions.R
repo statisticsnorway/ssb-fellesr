@@ -33,7 +33,8 @@ statbank_lasting <- function(lastefil,
     if (missing(mailto)){
       mailto <- gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER'))
     }
-    transfer_log <- statbank_transfer(data = lastefil,
+    transfer_log <- statbank_transfer(lastefil = lastefil,
+                                      lastefilsti = lastefilsti,
                                       tabell_id = tabell_id,
                                       laste_bruker = laste_bruker,
                                       publiseringsdato = publiseringsdato,
