@@ -319,6 +319,72 @@ list.files <- function(bucket) {
   gcs_bucket(bucket)$ls(recursive = T)
 }
 
+#' Funksjon for å lagre sf-objekt som .parquet-fil til Google Cloud Storage bucket
+#'
+#' Funksjonen `write_sf_parquet` kan brukes til å skrive parquet-filer til Google Cloud Storage bucket.
+#'
+#' @param bucket Full sti til Google Cloud Storage bucket.
+#' @param file Navn på filen som skal skrives.
+#'
+#' @examples
+#' \dontrun{
+#' write_sf_parquet(turnrestrictions_geom, file = "ssb-prod-spesh-personell-data-kilde/turnrestrictions_geom/2021/2021.parquet")
+#' }
+#'@encoding UTF-8
+
+write_sf_parquet <- function(data, file) {
+
+# Låner funksjoner fra sfarrow #    
+create_metadata <- function(df){
+  warning(strwrap("This is an initial implementation of Parquet/Feather file support
+                  and geo metadata. This is tracking version 0.1.0 of the metadata
+                  (https://github.com/geopandas/geo-arrow-spec). This metadata
+                  specification may change and does not yet make stability promises.
+                  We do not yet recommend using this in a production setting unless
+                  you are able to rewrite your Parquet/Feather files.",
+                  prefix = "\n", initial = ""
+         ), call.=FALSE)
+
+  # reference: https://github.com/geopandas/geo-arrow-spec
+  geom_cols <- lapply(df, function(i) inherits(i, "sfc"))
+  geom_cols <- names(which(geom_cols==TRUE))
+  col_meta <- list()
+
+  for(col in geom_cols){
+    col_meta[[col]] <- list(crs = sf::st_crs(df[[col]])$wkt,
+                            encoding = "WKB",
+                            bbox = as.numeric(sf::st_bbox(df[[col]])))
+  }
+
+  geo_metadata <- list(primary_column = attr(df, "sf_column"),
+                       columns = col_meta,
+                       schema_version = "0.1.0",
+                       creator = list(library="sfarrow"))
+
+  return(jsonlite::toJSON(geo_metadata, auto_unbox=TRUE))
+}
+                      
+                      encode_wkb <- function(df){
+  geom_cols <- lapply(df, function(i) inherits(i, "sfc"))
+  geom_cols <- names(which(geom_cols==TRUE))
+
+  df <- as.data.frame(df)
+
+  for(col in geom_cols){
+    obj_geo <- sf::st_as_binary(df[[col]])
+    attr(obj_geo, "class") <- c("arrow_binary", "vctrs_vctr", attr(obj_geo, "class"), "list")
+    df[[col]] <- obj_geo
+  }
+  return(df)
+}
+                      
+geo_metadata <- create_metadata(data)
+df <- encode_wkb(data)
+tbl <- arrow::Table$create(df)
+tbl$metadata[["geo"]] <- geo_metadata    
+
+write_parquet(tbl, file)                      
+}
 
 
 #' Funksjon for å laste inn filer fra Google Cloud Storage bucket
@@ -343,10 +409,14 @@ list.files <- function(bucket) {
 #'}
 #'@encoding UTF-8
 
-read_SSB <- function(file, ...) {
+read_SSB <- function(file, sf = FALSE, ...) {
 
-  if(grepl("\\.parquet", basename(file))){
+  if(grepl("\\.parquet", basename(file)) & sf == FALSE){
     df <- read_parquet(file, ...)
+  # } else if(grepl("\\.parquet", basename(file)) & sf == TRUE){
+ } else if(sf == TRUE){
+      df <- open_dataset(file, ...) %>%
+       sfarrow::read_sf_dataset() 
   } else if(grepl("\\.feather", basename(file))){
     df <- read_feather(file, ...)
   } else if(grepl("\\.csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
@@ -375,9 +445,11 @@ read_SSB <- function(file, ...) {
 #'}
 #'@encoding UTF-8
 
-write_SSB <- function(data, file, partitioning = FALSE, ...) { # OBS: legge til mulighet for partitioning?
-  if (grepl("\\.parquet", basename(file))){
+write_SSB <- function(data, file, partitioning = FALSE, sf = FALSE, ...) { # OBS: legge til mulighet for partitioning?
+  if (grepl("\\.parquet", basename(file)) & sf == FALSE){
     write_parquet(data, file, ...)
+  } else if (grepl("\\.parquet", basename(file)) & sf == TRUE){
+    write_sf_parquet(data, file, ...)
   } else if (grepl("\\.feather", basename(file))){
     write_feather(data, file, ...)
   } else if (grepl("\\.csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
