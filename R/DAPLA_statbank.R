@@ -171,7 +171,7 @@ statbank_transfer <- function(lastefil,
                               publiseringsdato, 
                               initialer = gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER')), 
                               autooverskriv = 1, 
-                              autogodkjenn = 2, 
+                              autogodkjenn = 1, # 0: manuell, 1: automatisk (umiddelbart), 2: JIT (just-in-time)
                               boundary = 12345, 
                               ask = TRUE, 
                               validering = TRUE) {
