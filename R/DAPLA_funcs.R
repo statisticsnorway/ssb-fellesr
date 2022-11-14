@@ -1,6 +1,6 @@
-#' Funksjon for å koble til Google Cloud Storage bucket
+#' Funksjon for å koble til Google Cloud Storage bucket med arrow
 #'
-#' `gcs_bucket` er en hjelpefunksjon som kobler til en Google Cloud Storage bucket ved hjelp av access_token og expiration som er lagret som miljøvariabler i Jupyter på DAPLA.
+#' `gcs_bucket` er en hjelpefunksjon som kobler til en bucket på Google Cloud Storage med pakken `arrow`. Autentiseringen skjer via access_token og expiration som er lagret som miljøvariabler i Jupyter på DAPLA.
 #'
 #' @param bucket Full sti til Google Cloud Storage bucket.
 #'
@@ -23,6 +23,38 @@ gcs_bucket <- function(bucket) {
   bucket <- arrow::gs_bucket(bucket, access_token  = access_token, expiration = expiration)
 }
 
+#' Funksjon for å koble til Google Cloud Storage bucket med googleCloudStorageR
+#'
+#' `gcs_global_bucket` er en hjelpefunksjon som kobler til en bucket på Google Cloud Storage med pakken `googleCloudStorageR`. Autentiseringen skjer via access_token og expiration som er lagret som miljøvariabler i Jupyter på DAPLA.
+#'
+#' @param bucket Full sti til Google Cloud Storage bucket.
+#'
+#' @examples
+#' \dontrun{
+#' gcs_global_bucket("ssb-prod-spesh-personell-data-kilde")
+#' bucket
+#'}
+#'@encoding UTF-8
+
+gcs_global_bucket <- function(bucket) {
+    gcs_auth <- function() {
+manual_token <- function(scopes, ...) {
+    response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'), 
+                          httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
+    credentials <- list()
+    credentials$access_token <- httr::content(response)$exchanged_tokens$google$access_token
+    httr::oauth2.0_token(endpoint = NULL, app = gargle::gargle_app(), scope = NULL, credentials = credentials)
+}
+
+gargle::cred_funs_add(manual_token)
+
+token <- gargle::token_fetch()
+googleCloudStorageR::gcs_auth(token = token)
+    }
+
+gcs_auth()    
+googleCloudStorageR::gcs_global_bucket(bucket)
+    }
 
 #' Funksjon for å laste inn .parquet-fil fra Google Cloud Storage bucket
 #' #'
@@ -244,6 +276,41 @@ read_csv <- function(file, ...) {
   return(df)
 }
 
+#' Funksjon for å laste inn .rds-fil fra Google Cloud Storage bucket
+#'
+#' Funksjonen `read_rds` kan brukes til å lese inn .rds-filer Google Cloud Storage.
+#'
+#' @param bucket Full sti til Google Cloud Storage bucket.
+#' @param file Navn på filen som skal leses inn.
+#' @param ... Flere parametere (se: )
+#'
+#' @examples
+#' \dontrun{
+#' data <- read_rds("ssb-prod-spesh-personell-data-kilde/nodes.RDS")
+#'}
+#'@encoding UTF-8
+
+read_rds <- function(file, 
+                     # parseFunction = gcs_parse_rds, 
+                     ...) {
+    
+if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+gcs_global_bucket(dirname(file))
+df <- googleCloudStorageR::gcs_get_object(basename(file), parseFunction = gcs_parse_rds, ...)
+  }
+    
+# Jupyterlab (produksjonssonen)
+if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+df <- readRDS(file, ...)
+  }   
+ return(df)      
+                   
+    }
+
+
+
+
 #' Funksjon for å lagre .parquet-fil til Google Cloud Storage bucket
 #'
 #' Funksjonen `write_parquet` kan brukes til å skrive parquet-filer til Google Cloud Storage bucket.
@@ -296,17 +363,48 @@ write_feather <- function(data, file, ...) {
 #' }
 #'@encoding UTF-8
 
-write_csv <- function(data, bucket, file, ...) {
+write_csv <- function(data, 
+                      # bucket, 
+                      file, ...) {
   arrow::write_csv_arrow(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
 
 }
 
+#' Funksjon for å lagre .rds-fil til Google Cloud Storage bucket
+#'
+#' Funksjonen `write_rds` kan brukes til å skrive .rds-filer til en Google Cloud Storage bucket.
+#'
+#' @param bucket Full sti til Google Cloud Storage bucket.
+#' @param file Navn på filen som skal skrives.
+#' @param ... Flere parametere (se: )
+#'
+#' @examples
+#' \dontrun{
+#' write_csv(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.csv")
+#' }
+#'@encoding UTF-8
 
-#' Funksjon for å sjekke hvilke filer som finnes i en Google Cloud Storage bucket
+write_rds <- function(data, 
+                      # bucket, 
+                      file, ...) {
+    
+f <- function(input, output){
+# write.csv2(input, file = output)
+saveRDS(input, file = output)
+    }
+    
+gcs_global_bucket(dirname(file))
+googleCloudStorageR::gcs_upload(data, name = basename(file), object_function = f)
+    
+}
+
+
+
+#' Funksjon for å sjekke hvilke filer som finnes i en mappe i en Google Cloud Storage bucket
 #'
 #' Funksjonen `list.files` kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket
 #'
-#' @param bucket Full sti til Google Cloud Storage bucket.
+#' @param bucket Full sti til Google Cloud Storage bucket (med eventuelle undermapper).
 #'
 #' @examples
 #' \dontrun{
@@ -316,8 +414,53 @@ write_csv <- function(data, bucket, file, ...) {
 #'
 
 list.files <- function(bucket) {
-  gcs_bucket(bucket)$ls(recursive = T)
+gcs_bucket(bucket)$ls(recursive = T)
 }
+
+#' Funksjon for å sjekke hvilke filer som finnes i en Google Cloud Storage bucket
+#'
+#' Funksjonen `list.files` kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket. I tillegg ser man størrelsen til filene og tidspnktet filen sist ble endret.
+#'
+#' @param bucket Full sti til Google Cloud Storage bucket.
+#'
+#' @examples
+#' \dontrun{
+#' gcs_list_objects("ssb-prod-dapla-felles-data-delt/R_smoke_test")
+#' }
+#'@encoding UTF-8
+#'
+
+gcs_list_objects <- function(bucket) {
+    if (dirname(bucket) == "."){
+    gcs_global_bucket(bucket)
+    googleCloudStorageR::gcs_list_objects(bucket)
+    } else {
+    gcs_global_bucket(dirname(bucket))
+    googleCloudStorageR::gcs_list_objects(dirname(bucket))
+    }
+}
+
+
+#' Funksjon for å slette fil fra en Google Cloud Storage bucket
+#'
+#' Funksjonen `gcs_delete_object` kan brukes til å slette filer fra en Google Cloud Storage bucket.
+#'
+#' @param bucket Full sti til Google Cloud Storage bucket og filen som skal slettes.
+#'
+#' @examples
+#' \dontrun{
+#' gcs_delete_object("ssb-prod-spesh-personell-data-kilde/nodes_2.RDS")
+#' }
+#'@encoding UTF-8
+#'
+
+gcs_delete_object <- function(file) {
+# gcs_global_bucket(dirname(file))
+gcs_global_bucket(sub("/.*", "", file))
+# googleCloudStorageR::gcs_delete_object(basename(file))
+googleCloudStorageR::gcs_delete_object(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
+    }
+
 
 #' Funksjon for å lagre sf-objekt som .parquet-fil til Google Cloud Storage bucket
 #'
@@ -385,6 +528,10 @@ tbl$metadata[["geo"]] <- geo_metadata
 
 write_parquet(tbl, file)                      
 }
+                      
+                      
+                      
+                      
 
 
 #' Funksjon for å laste inn filer fra Google Cloud Storage bucket
@@ -406,6 +553,8 @@ write_parquet(tbl, file)
 #' read_SSB_csv <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv")
 #'
 #' read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json") # OBS: flytt filen til delt
+#'                      
+#' read_SSB_rds <- read_SSB("ssb-prod-spesh-personell-data-kilde/nodes.RDS")                      
 #'}
 #'@encoding UTF-8
 
@@ -423,6 +572,8 @@ read_SSB <- function(file, sf = FALSE, ...) {
     df <- read_csv(file, ...)
   } else if(grepl("\\.json", basename(file))){
     df <- read_json(file, ...)
+  } else if(grepl("\\.rds", basename(file)) | grepl("\\.RDS", basename(file))) {
+  df <- read_rds(file, ...)
   } else {
    df <- open_dataset(file, ...) %>%
        dplyr::collect()
@@ -430,7 +581,7 @@ read_SSB <- function(file, sf = FALSE, ...) {
   return(df)
 
   }
-
+      
 
 #' Funksjon for å skrive filer til Google Cloud Storage bucket
 #' #'
@@ -454,9 +605,11 @@ write_SSB <- function(data, file, partitioning = FALSE, sf = FALSE, ...) { # OBS
     write_feather(data, file, ...)
   } else if (grepl("\\.csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
     write_csv(data, file, ...)
+  } else if (grepl("\\.rds", basename(file))){
+    write_rds(data, file, ...)
   } else if (partitioning == TRUE) {
     print("OBS: mangler")
   } else {
-    print("write_SSB kan for øyeblikket kun skrive .parquet-, .feather- og .csv-filer")
+    print("write_SSB kan for øyeblikket kun skrive .parquet-, .feather-, .rds- og .csv-filer")
   }
 }

@@ -225,7 +225,8 @@ if (class(lastefil)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
   
   url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'), 
                          "initialier=", initialer,
-                         "&hovedtabell=", uttaksbeskrivelse$Huvudtabell, 
+                         # "&hovedtabell=", tabell_id, # Skal også fungere med tabell_id (men gjør ikke det i PROD)
+                         "&hovedtabell=", uttaksbeskrivelse$Huvudtabell,
                          "&publiseringsdato=", publiseringsdato, 
                          "&fagansvarlig1=", initialer, 
                          "&fagansvarlig2=", initialer, 
