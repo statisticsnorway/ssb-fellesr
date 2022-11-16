@@ -2,21 +2,21 @@
 ### statbank_encrypt_request ###
 ################################
 
-statbank_encrypt_request <- function(laste_bruker) {
+.statbank_encrypt_request <- function(laste_bruker) {
   if (Sys.getenv('CLUSTER_ID')=="staging-bip-app") {
     db <- "TEST"
   }
-  
+
   if (Sys.getenv('CLUSTER_ID')=="prod-bip-app") {
     db <- "PROD"
   }
-  
+
   encrypt_request <- httr::POST(
     Sys.getenv('STATBANK_ENCRYPT_URL'),
     httr::add_headers(
       "Content-Type" = "application/json",
-      "Authorization" = paste0("Bearer ", httr::content(httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN")))))$access_token)), 
-    body = list(message = getPass::getPass(paste0("Lastepassord (", db, "):"))), 
+      "Authorization" = paste0("Bearer ", httr::content(httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN")))))$access_token)),
+    body = list(message = getPass::getPass(paste0("Lastepassord (", db, "):"))),
     encode = "json"
   )
   username_encryptedpassword <- openssl::base64_encode(paste0(laste_bruker, ":", httr::content(encrypt_request)$message))
@@ -30,22 +30,22 @@ statbank_encrypt_request <- function(laste_bruker) {
 
 statbank_uttaksbeskrivelse <- function(tabell_id,
                                        laste_bruker,
-                                       ask = TRUE, 
+                                       ask = TRUE,
                                        boundary = 12345) {
   if (ask == TRUE){
-    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
+    username_encryptedpassword <- .statbank_encrypt_request(laste_bruker = laste_bruker)
   }
-  
+
   URL <- paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/uttaksbeskrivelse?', "tableId=", tabell_id)
-  
+
   uttaksbeksrivelse <- httr::GET(URL,
                                  httr::add_headers(
-                                   'Authorization' = paste0('Basic ', username_encryptedpassword), 
+                                   'Authorization' = paste0('Basic ', username_encryptedpassword),
                                    'Content-Type' = paste0('multipart/form-data; boundary=', boundary),
                                    'Connection' = 'keep-alive',
                                    'Accept' = '*/*'
                                  ))
-  
+
   uttaksbeksrivelse <- jsonlite::fromJSON(httr::content(uttaksbeksrivelse))
   return(uttaksbeksrivelse)
 }
@@ -56,29 +56,29 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
 #####################
 
 statbank_body <- function(data, tabell_id, ask = TRUE, boundary = 12345) {
-  
+
   data_all <- ""
-  
+
   if (class(data)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
-    data <- list(data)  
-  }    
-  
+    data <- list(data)
+  }
+
   for (i in 1:length(data)) {
-    
+
     filename <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = ask)$DeltabellTitler$Filnavn[i]
     start <- paste0("--", boundary, "\r\nContent-Disposition:form-data; filename=", filename, "\r\nContent-type:text/plain\r\n\r\n")
-    
+
     data_1 <- data.frame(data[i])
     data_1 <- data_1 %>%
       dplyr::mutate_all(~format(., decimal.mark = ',')) %>% # endrer desimaltegn til komma
       dplyr::mutate_all(., str_trim) # fjerner whitespace
     data_1 <- do.call(paste, c(data_1[colnames(data_1)], sep = ";", collapse = "\r\n"))
-    
+
     data_1 <- paste0(start, data_1)
-    
-    data_all <- paste0(data_all, data_1, sep = paste0("\r\n"))    
+
+    data_all <- paste0(data_all, data_1, sep = paste0("\r\n"))
   }
-  
+
   data_all <- paste0(data_all, "--12345--\r\n")
   return(data_all)
 }
@@ -88,64 +88,64 @@ statbank_body <- function(data, tabell_id, ask = TRUE, boundary = 12345) {
 ### statbank_validering ###
 ###########################
 
-statbank_validering <- function(data, 
-                                tabell_id, 
-                                laste_bruker, 
+statbank_validering <- function(data,
+                                tabell_id,
+                                laste_bruker,
                                 ask = FALSE) {
-  
+
   uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, laste_bruker = laste_bruker, ask = ask)
-  
+
   problemer_alle <- data.frame()
-  
+
   if (class(data)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
-    data <- list(data)  
-  }    
-  
+    data <- list(data)
+  }
+
   for (i in 1:length(data)) {
-    
+
     data_1 <- data.frame(data[i])
-    
+
     variabler <- data.frame(uttaksbeskrivelse$deltabller$variabler[i]) # OBS: kan det finnes flere i listen?
     statistikkvariabler <- data.frame(uttaksbeskrivelse$deltabller$statistikkvariabler[i])
-    
+
     # Vektor med kolonnenavn #
     Klassifikasjonsvariabel <- variabler$Klassifikasjonsvariabel
     statistikkvariabler <- statistikkvariabler$Text
     kolonnenavn <- c(Klassifikasjonsvariabel, statistikkvariabler)
-    
+
     # Fjerner uten kodeliste #
     variabler_med_kodeliste <- variabler %>%
       dplyr::filter(Kodeliste_id != "-") # OBS
-    
+
     # Legger til kolonnenavn #
     colnames(data_1) <- kolonnenavn # OBS
-    
+
     data_1$filnavn <- uttaksbeskrivelse$DeltabellTitler$Filnavn[i]
     data_1$problemer <- ""
-    
+
     for (j in variabler_med_kodeliste$Klassifikasjonsvariabel) {
-      
+
       variabler_1 <- variabler %>%
         dplyr::filter(Klassifikasjonsvariabel == j)
-      
+
       kodeliste_plassering <- which(uttaksbeskrivelse$kodelister$kodeliste == variabler_1$Kodeliste_id)
       kodeliste_navn <- uttaksbeskrivelse$kodelister$kodeliste[kodeliste_plassering]
-      
+
       koder <- data.frame(uttaksbeskrivelse$kodelister$koder[kodeliste_plassering])
-      
+
       data_1 <- data_1 %>%
         dplyr::mutate(problemer = case_when(
-          !!sym(j) %in% unique(as.character(koder$kode)) ~ "", 
+          !!sym(j) %in% unique(as.character(koder$kode)) ~ "",
           TRUE ~ j
         ))
     }
-    
+
     problemer <- data_1 %>%
       dplyr::filter(problemer != "")
-    
-    problemer_alle <- rbind(problemer_alle, problemer)    
+
+    problemer_alle <- rbind(problemer_alle, problemer)
   }
-  
+
   if (nrow(problemer_alle)>0) {
     problemer_alle <- problemer_alle %>%
       dplyr::relocate(filnavn, problemer)
@@ -153,7 +153,7 @@ statbank_validering <- function(data,
   } else {
     print("Ingen ugyldige verdier i kodeliste")
   }
-}    
+}
 
 
 
@@ -168,100 +168,100 @@ statbank_transfer <- function(lastefil,
                               lastefilsti = "",
                               tabell_id,
                               laste_bruker,
-                              publiseringsdato, 
-                              initialer = gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER')), 
-                              autooverskriv = 1, 
+                              publiseringsdato,
+                              initialer = gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER')),
+                              autooverskriv = 1,
                               autogodkjenn = 1, # 0: manuell, 1: automatisk (umiddelbart), 2: JIT (just-in-time)
-                              boundary = 12345, 
-                              ask = TRUE, 
+                              boundary = 12345,
+                              ask = TRUE,
                               validering = TRUE) {
-  
-  
+
+
   if (ask == TRUE){
-    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
-  }    
-  
+    username_encryptedpassword <- .statbank_encrypt_request(laste_bruker = laste_bruker)
+  }
+
   if (weekdays(as.POSIXlt(publiseringsdato)) %in% c("Saturday", "Sunday")) {
     print("OBS: publiseringsdato er satt til en helg")
   }
-    
+
 if (class(lastefil)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
-    lastefil <- as.data.frame(lastefil)  
-}    
-  
+    lastefil <- as.data.frame(lastefil)
+}
+
   if (class(lastefil) == "character" & length(lastefil)==1){
-    lastefil <- read_SSB(paste0(lastefilsti, "/", lastefil), delim = ";",  col_names = FALSE)  
-    lastefil <- list(lastefil)   
+    lastefil <- read_SSB(paste0(lastefilsti, "/", lastefil), delim = ";",  col_names = FALSE)
+    lastefil <- list(lastefil)
   }
-  
+
   if (class(lastefil) == "character" & length(lastefil)>1){
-    
+
     lastefil_alle <- list()
     for (i in lastefil){
-      
-      lastefil_1 <- read_SSB(paste0(lastefilsti, "/", i), delim = ";",  col_names = FALSE)    
-      lastefil_alle[[i]] <- lastefil_1    
+
+      lastefil_1 <- read_SSB(paste0(lastefilsti, "/", i), delim = ";",  col_names = FALSE)
+      lastefil_alle[[i]] <- lastefil_1
     }
-    lastefil <- lastefil_alle    
+    lastefil <- lastefil_alle
   }
-  
+
   if (validering == TRUE) {
-    validering <- statbank_validering(data = lastefil, 
-                                      tabell_id = tabell_id, 
-                                      laste_bruker = laste_bruker, 
+    validering <- statbank_validering(data = lastefil,
+                                      tabell_id = tabell_id,
+                                      laste_bruker = laste_bruker,
                                       ask = FALSE)
-    
+
     if (length(validering)>1) {
       print("Ugyldige verdier finnes i kodeliste. Lasteoppdrag ikke startet.")
       return(validering)
       stop()
     }
-    
-  }    
-  
-  
+
+  }
+
+
   uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE)
   body <- statbank_body(data = lastefil, tabell_id = tabell_id, ask = FALSE)
-  
-  url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'), 
+
+  url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'),
                          "initialier=", initialer,
                          # "&hovedtabell=", tabell_id, # Skal også fungere med tabell_id (men gjør ikke det i PROD)
                          "&hovedtabell=", uttaksbeskrivelse$Huvudtabell,
-                         "&publiseringsdato=", publiseringsdato, 
-                         "&fagansvarlig1=", initialer, 
-                         "&fagansvarlig2=", initialer, 
+                         "&publiseringsdato=", publiseringsdato,
+                         "&fagansvarlig1=", initialer,
+                         "&fagansvarlig2=", initialer,
                          "&auto_overskriv_data=", autooverskriv,
-                         "&auto_godkjenn_data=", autogodkjenn) 
-  
-  
+                         "&auto_godkjenn_data=", autogodkjenn)
+
+
   transfer_log <- httr::POST(url_transfer,
                              httr::add_headers(
-                               'Authorization' = paste0('Basic ', username_encryptedpassword), 
+                               'Authorization' = paste0('Basic ', username_encryptedpassword),
                                'Content-Type' = paste0('multipart/form-data; boundary=', boundary),
                                'Connection' = 'keep-alive',
                                'Accept-Encoding' = 'gzip, deflate, br',
                                'Accept' = '*/*'),
                              body = list(raw = body))
-  
-  
+
+
   if (httr::content(transfer_log)$TotalResult$Status == "Success") {
     print("Lasting vellykket!")
     return(transfer_log)
     stop()
-  }   
-  
+  }
+
   if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(grepl("brudd på unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
     print("Lasting mislyktes. Kan skyldes at forrige opplasting ikke er ferdig. Vent noen minutter og prøv igjen.")
     return(transfer_log)
-  }       
-  
+  }
+
   if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(!grepl("brudd på unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
     print("Lasting mislyktes")
     return(transfer_log)
-  }           
-  
+  }
+
   # return(transfer_log)
-  
+
 }
 
 

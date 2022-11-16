@@ -16,6 +16,12 @@ devtools::document()
 # usethis::use_package("getPass", type = "imports")
 # usethis::use_package("httr", type = "imports")
 
+# usethis::use_package("gargle", type = "imports")
+# googleCloudStorageR
+# jsonlite
+# sf
+# 
+
 # sfarrow?
 
 # Vignette #
