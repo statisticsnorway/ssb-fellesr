@@ -23,7 +23,7 @@ statbank_lasting <- function(lastefil,
                              publiseringsdato,
                              mailto = "",
                              autooverskriv = 1,
-                             autogodkjenn = 1,
+                             autogodkjenn = 1, # OBS: sett denne til 2 (JIT)?
                              timeout = 10,
                              validering = TRUE,
                              ask = TRUE){

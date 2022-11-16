@@ -31,7 +31,7 @@ gcs_bucket <- function(bucket) {
 #'
 #' @examples
 #' \dontrun{
-#' gcs_global_bucket("ssb-prod-spesh-personell-data-kilde")
+#' gcs_global_bucket("ssb-prod-dapla-felles-data-delt")
 #' bucket
 #'}
 #'@encoding UTF-8
@@ -60,20 +60,12 @@ googleCloudStorageR::gcs_global_bucket(bucket)
 #' #'
 #' Funksjonen `read_parquet` kan brukes til å lese inn .parquet-filer fra Google Cloud Storage.
 #'
-#' @param bucket Full sti til Google Cloud Storage bucket.
-#' @param file Navn på filen som skal leses inn.
+#' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
 #' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)
 #'
 #' @examples
 #' \dontrun{
-#' # Jupyterlab (DAPLA)
 #' data <- read_parquet("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet")
-#'
-#' # Jupyterlab (produksjonssonen)
-#' # OBS: mangler
-#'
-#' # RStudio Windows (produksjonssonen) - fra Linux
-#' # OBS: mangler
 #'}
 #'@encoding UTF-8
 
@@ -112,20 +104,12 @@ read_parquet <- function(file, ...) {
 #' #'
 #' Funksjonen `read_feather` kan brukes til å lese inn .feather-filer fra Google Cloud Storage.
 #'
-#' @param bucket Full sti til Google Cloud Storage bucket.
-#' @param file Navn på filen som skal leses inn.
+#' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
 #' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_feather.html)
 #'
 #' @examples
 #' \dontrun{
-#' # Jupyterlab (DAPLA)
 #' data <- read_feather("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.feather")
-#'
-#' # Jupyterlab (produksjonssonen)
-#' # OBS: mangler
-#'
-#' # RStudio Windows - fra Linux
-#'  # OBS: mangler
 #'}
 #'@encoding UTF-8
 
@@ -161,9 +145,8 @@ read_feather <- function(file, ...) {
 #'
 #' Funksjonen `open_dataset` kan brukes til å lese deler av datasett (bl.a. .parquet-, .feather- og .csv-filer) fra Google Cloud Storage. Det lages en forbindelse til mappen der filen ligger og deretter kan man bruke argumenter fra `dplyr`, som `filter` og `select`, før man bruker `collect` til å lese inn dataene i R. `open_dataset` kan også brukes til å lese inn sf-objekter (lagret som .parquet-fil med pakken `sfarrow`).
 #'
-#' @param bucket Full sti til Google Cloud Storage bucket.
-#' @param file Navn på filen som skal leses inn.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)
+#' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
+#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/open_dataset.html)
 #'
 #' @examples
 #' \dontrun{
@@ -172,11 +155,10 @@ read_feather <- function(file, ...) {
 #'  dplyr::select(Year, Month, DayofMonth, TailNum) %>%
 #'  dplyr::collect()
 #'
-#' # SF (OBS: legge denne på ssb-prod-dapla-felles-data-delt)
-#  data <- open_dataset(bucket = "ssb-prod-spesh-personell-data-kilde/Vegnett") %>%
-#  dplyr::filter(municipality == "301") %>%
-#  sfarrow::read_sf_dataset()
-#'}
+#' data <- open_dataset("ssb-prod-dapla-felles-data-delt/GIS/Vegnett/2022") %>%
+#'  dplyr::filter(municipality == "301") %>%
+#'  sfarrow::read_sf_dataset()
+#'  }
 #'@encoding UTF-8
 
 open_dataset <- function(file, ...) {
@@ -204,8 +186,7 @@ open_dataset <- function(file, ...) {
 #'
 #' Funksjonen `read_json` kan brukes til å lese inn JSON-filer Google Cloud Storage.
 #'
-#' @param bucket Full sti til Google Cloud Storage bucket.
-#' @param file Navn på filen som skal leses inn.
+#' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
 #' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_json_arrow.html)
 #'
 #' @examples
@@ -239,8 +220,7 @@ read_json <- function(file, ...) {
 #'
 #' Funksjonen `read_csv` kan brukes til å lese inn JSON-filer Google Cloud Storage.
 #'
-#' @param bucket Full sti til Google Cloud Storage bucket.
-#' @param file Navn på filen som skal leses inn.
+#' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
 #' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)
 #'
 #' @examples
@@ -280,9 +260,8 @@ read_csv <- function(file, ...) {
 #'
 #' Funksjonen `read_rds` kan brukes til å lese inn .rds-filer Google Cloud Storage.
 #'
-#' @param bucket Full sti til Google Cloud Storage bucket.
-#' @param file Navn på filen som skal leses inn.
-#' @param ... Flere parametere (se: )
+#' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
+#' @param ... Flere parametere (se: https://rdrr.io/cran/googleCloudStorageR/man/gcs_get_object.html)
 #'
 #' @examples
 #' \dontrun{
@@ -291,24 +270,30 @@ read_csv <- function(file, ...) {
 #'@encoding UTF-8
 
 read_rds <- function(file,
-                     # parseFunction = gcs_parse_rds,
+                     parseFunction = gcs_parse_rds,
                      ...) {
 
-if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
-gcs_global_bucket(dirname(file))
-df <- googleCloudStorageR::gcs_get_object(basename(file), parseFunction = gcs_parse_rds, ...)
-  }
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+    gcs_global_bucket(sub("/.*", "", file))
 
-# Jupyterlab (produksjonssonen)
-if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
-      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
-df <- readRDS(file, ...)
-  }
- return(df)
-
+    my_parse <- function(obj){
+      tmp <- tempfile(fileext = ".rds")
+      on.exit(unlink(tmp))
+      suppressMessages(googleCloudStorageR::gcs_get_object(obj, saveToDisk = tmp))
+      readRDS(tmp)
     }
 
+    df <- my_parse(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
+  }
 
+  # Jupyterlab (produksjonssonen)
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+    df <- readRDS(file, ...)
+  }
+  return(df)
+
+}
 
 
 #' Funksjon for å lagre .parquet-fil til Google Cloud Storage bucket
@@ -321,7 +306,7 @@ df <- readRDS(file, ...)
 #'
 #' @examples
 #' \dontrun{
-# write_parquet(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+#' write_parquet(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
 #' }
 #'@encoding UTF-8
 
@@ -336,11 +321,11 @@ write_parquet <- function(data, file, ...) {
 #'
 #' @param data Filen som skal skrives.
 #' @param file Full filsti og filnavn for hvor filen skal skrives.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_parquet.html)
+#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_dataset.html)
 #'
 #' @examples
 #' \dontrun{
-# write_parquet(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+#' write_dataset(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test")
 #' }
 #'@encoding UTF-8
 
@@ -361,6 +346,7 @@ write_dataset <- function(data, file, ...) {
 #'
 #' @examples
 #' \dontrun{
+#' write_feather(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather")
 #' }
 #'@encoding UTF-8
 
@@ -402,7 +388,7 @@ write_csv <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' write_csv(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.csv")
+#'
 #' }
 #'@encoding UTF-8
 
@@ -410,13 +396,14 @@ write_rds <- function(data,
                       # bucket,
                       file, ...) {
 
-f <- function(input, output){
-# write.csv2(input, file = output)
-saveRDS(input, file = output)
-    }
+  f <- function(input, output){
+    # write.csv2(input, file = output)
+    saveRDS(input, file = output)
+  }
 
-gcs_global_bucket(dirname(file))
-googleCloudStorageR::gcs_upload(data, name = basename(file), object_function = f)
+  # gcs_global_bucket(dirname(file))
+  gcs_global_bucket(sub("/.*", "", file))
+  googleCloudStorageR::gcs_upload(data, name = sub(paste0(".*", sub("/.*", "", file), "/"), "", file), object_function = f)
 
 }
 
@@ -471,7 +458,7 @@ gcs_list_objects <- function(bucket) {
 #'
 #' @examples
 #' \dontrun{
-#' gcs_delete_object("ssb-prod-spesh-personell-data-kilde/nodes_2.RDS")
+#' gcs_delete_object("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test")
 #' }
 #'@encoding UTF-8
 #'
@@ -493,7 +480,7 @@ googleCloudStorageR::gcs_delete_object(sub(paste0(".*", sub("/.*", "", file), "/
 #'
 #' @examples
 #' \dontrun{
-#' write_sf_parquet(turnrestrictions_geom, file = "ssb-prod-spesh-personell-data-kilde/turnrestrictions_geom/2021/2021.parquet")
+#' write_sf_parquet(data, file = "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_sf.parquet")
 #' }
 #'@encoding UTF-8
 
@@ -550,8 +537,6 @@ tbl$metadata[["geo"]] <- geo_metadata
 
 write_parquet(tbl, file)
 }
-
-
 
 
 
@@ -627,7 +612,7 @@ write_SSB <- function(data, file, partitioning = FALSE, sf = FALSE, ...) { # OBS
     write_feather(data, file, ...)
   } else if (grepl("\\.csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
     write_csv(data, file, ...)
-  } else if (grepl("\\.rds", basename(file))){
+  } else if (grepl("\\.rds", basename(file)) | grepl("\\.RDS", basename(file))){
     write_rds(data, file, ...)
   } else if (partitioning == TRUE) {
     write_dataset(data, file, ...)
