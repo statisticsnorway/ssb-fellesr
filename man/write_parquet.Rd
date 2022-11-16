@@ -8,16 +8,17 @@
 write_parquet(data, file, ...)
 }
 \arguments{
-\item{file}{Navn på filen som skal skrives.}
+\item{data}{Filen som skal skrives.}
 
-\item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)}
+\item{file}{Full filsti og filnavn for hvor filen skal skrives.}
 
-\item{bucket}{Full sti til Google Cloud Storage bucket.}
+\item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_parquet.html)}
 }
 \description{
-Funksjonen \code{write_parquet} kan brukes til å skrive parquet-filer til Google Cloud Storage bucket.
+Funksjonen \code{write_parquet} kan brukes til å skrive .parquet-filer til Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{
+write_parquet(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
 }
 }

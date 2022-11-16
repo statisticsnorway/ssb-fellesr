@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{gcs_bucket}
 \alias{gcs_bucket}
-\title{Funksjon for å koble til Google Cloud Storage bucket}
+\title{Funksjon for å koble til Google Cloud Storage bucket med arrow}
 \usage{
 gcs_bucket(bucket)
 }
@@ -11,7 +11,7 @@ gcs_bucket(bucket)
 \item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-\code{gcs_bucket} er en hjelpefunksjon som kobler til en Google Cloud Storage bucket ved hjelp av access_token og expiration som er lagret som miljøvariabler i Jupyter på DAPLA.
+\code{gcs_bucket} er en hjelpefunksjon som kobler til en bucket på Google Cloud Storage med pakken \code{arrow}. Autentiseringen skjer via access_token og expiration som er lagret som miljøvariabler i Jupyter på DAPLA.
 }
 \examples{
 \dontrun{

@@ -26,6 +26,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a>
     <a class="dropdown-item" href="../articles/vignette_renv.html">R pakkehåndtering med renv og fellesr</a>
+    <a class="dropdown-item" href="../articles/vignette_SSB_fargepalett.html">SSB fargepalett</a>
     <a class="dropdown-item" href="../articles/vignette_statbank_lasting.html">Lasting til Statbank</a>
     <a class="dropdown-item" href="../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a>
     <a class="dropdown-item" href="../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a>
@@ -69,7 +70,22 @@
           
           <code><a href="gcs_bucket.html">gcs_bucket()</a></code> 
         </dt>
-        <dd>Funksjon for å koble til Google Cloud Storage bucket</dd>
+        <dd>Funksjon for å koble til Google Cloud Storage bucket med arrow</dd>
+      </dl><dl><dt>
+          
+          <code><a href="gcs_delete_object.html">gcs_delete_object()</a></code> 
+        </dt>
+        <dd>Funksjon for å slette fil fra en Google Cloud Storage bucket</dd>
+      </dl><dl><dt>
+          
+          <code><a href="gcs_global_bucket.html">gcs_global_bucket()</a></code> 
+        </dt>
+        <dd>Funksjon for å koble til Google Cloud Storage bucket med googleCloudStorageR</dd>
+      </dl><dl><dt>
+          
+          <code><a href="gcs_list_objects.html">gcs_list_objects()</a></code> 
+        </dt>
+        <dd>Funksjon for å sjekke hvilke filer som finnes i en Google Cloud Storage bucket</dd>
       </dl><dl><dt>
           
           <code><a href="install.packages.html">install.packages()</a></code> 
@@ -80,7 +96,7 @@ Wrapper function for utils::install.packages</dd>
           
           <code><a href="list.files.html">list.files()</a></code> 
         </dt>
-        <dd>Funksjon for å sjekke hvilke filer som finnes i en Google Cloud Storage bucket</dd>
+        <dd>Funksjon for å sjekke hvilke filer som finnes i en mappe i en Google Cloud Storage bucket</dd>
       </dl><dl><dt>
           
           <code><a href="open_dataset.html">open_dataset()</a></code> 
@@ -95,9 +111,7 @@ Wrapper function for utils::install.packages</dd>
           
           <code><a href="read_feather.html">read_feather()</a></code> 
         </dt>
-        <dd>Funksjon for å laste inn .feather-fil fra Google Cloud Storage bucket
-#'
-Funksjonen <code>read_feather</code> kan brukes til å lese inn .feather-filer fra Google Cloud Storage.</dd>
+        <dd>Funksjon for å laste inn .feather-fil fra Google Cloud Storage bucket</dd>
       </dl><dl><dt>
           
           <code><a href="read_json.html">read_json()</a></code> 
@@ -107,16 +121,17 @@ Funksjonen <code>read_feather</code> kan brukes til å lese inn .feather-filer f
           
           <code><a href="read_parquet.html">read_parquet()</a></code> 
         </dt>
-        <dd>Funksjon for å laste inn .parquet-fil fra Google Cloud Storage bucket
-#'
-Funksjonen <code>read_parquet</code> kan brukes til å lese inn .parquet-filer fra Google Cloud Storage.</dd>
+        <dd>Funksjon for å laste inn .parquet-fil fra Google Cloud Storage bucket</dd>
+      </dl><dl><dt>
+          
+          <code><a href="read_rds.html">read_rds()</a></code> 
+        </dt>
+        <dd>Funksjon for å laste inn .rds-fil fra Google Cloud Storage bucket</dd>
       </dl><dl><dt>
           
           <code><a href="read_SSB.html">read_SSB()</a></code> 
         </dt>
-        <dd>Funksjon for å laste inn filer fra Google Cloud Storage bucket
-#'
-Funksjonen <code>read_SSB</code> kan brukes til å lese inn filer fra Google Cloud Storage.</dd>
+        <dd>Funksjon for å laste inn filer fra Google Cloud Storage bucket</dd>
       </dl><dl><dt>
           
           <code><a href="restore.html">restore()</a></code> 
@@ -148,6 +163,11 @@ Function for uploading a file in .dat format to the Norwegian Statistics Bank</d
         <dd>Funksjon for å lagre .csv-fil til Google Cloud Storage bucket</dd>
       </dl><dl><dt>
           
+          <code><a href="write_dataset.html">write_dataset()</a></code> 
+        </dt>
+        <dd>Funksjon for å lagre "partitioned" .parquet-fil til Google Cloud Storage bucket</dd>
+      </dl><dl><dt>
+          
           <code><a href="write_feather.html">write_feather()</a></code> 
         </dt>
         <dd>Funksjon for å lagre .feather-fil til Google Cloud Storage bucket</dd>
@@ -158,11 +178,19 @@ Function for uploading a file in .dat format to the Norwegian Statistics Bank</d
         <dd>Funksjon for å lagre .parquet-fil til Google Cloud Storage bucket</dd>
       </dl><dl><dt>
           
+          <code><a href="write_rds.html">write_rds()</a></code> 
+        </dt>
+        <dd>Funksjon for å lagre .rds-fil til Google Cloud Storage bucket</dd>
+      </dl><dl><dt>
+          
+          <code><a href="write_sf_parquet.html">write_sf_parquet()</a></code> 
+        </dt>
+        <dd>Funksjon for å lagre sf-objekt som .parquet-fil til Google Cloud Storage bucket</dd>
+      </dl><dl><dt>
+          
           <code><a href="write_SSB.html">write_SSB()</a></code> 
         </dt>
-        <dd>Funksjon for å skrive filer til Google Cloud Storage bucket
-#'
-Funksjonen <code>write_SSB</code> kan brukes til å skrive filer til Google Cloud Storage.</dd>
+        <dd>Funksjon for å skrive filer til Google Cloud Storage bucket</dd>
       </dl></div>
   </main></div>
 

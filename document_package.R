@@ -15,12 +15,10 @@ devtools::document()
 # usethis::use_package("arrow", type = "imports")
 # usethis::use_package("getPass", type = "imports")
 # usethis::use_package("httr", type = "imports")
-
 # usethis::use_package("gargle", type = "imports")
-# googleCloudStorageR
-# jsonlite
-# sf
-# 
+# usethis::use_package("googleCloudStorageR", type = "imports")
+# usethis::use_package("jsonlite", type = "imports")
+# usethis::use_package("sf", type = "imports")
 
 # sfarrow?
 

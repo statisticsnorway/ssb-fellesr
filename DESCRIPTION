@@ -22,10 +22,14 @@ Imports:
     DBI,
     renv,
     arrow,
-    httr, 
-    rstudioapi, 
-    RCurl, 
-    readr
+    httr,
+    rstudioapi,
+    RCurl,
+    readr,
+    gargle,
+    googleCloudStorageR,
+    sf,
+    jsonlite
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true

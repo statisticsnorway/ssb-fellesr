@@ -13,6 +13,9 @@
     <loc>/articles/vignette_renv.html</loc>
   </url>
   <url>
+    <loc>/articles/vignette_SSB_fargepalett.html</loc>
+  </url>
+  <url>
     <loc>/articles/vignette_statbank_lasting.html</loc>
   </url>
   <url>
@@ -49,6 +52,15 @@
     <loc>/reference/gcs_bucket.html</loc>
   </url>
   <url>
+    <loc>/reference/gcs_delete_object.html</loc>
+  </url>
+  <url>
+    <loc>/reference/gcs_global_bucket.html</loc>
+  </url>
+  <url>
+    <loc>/reference/gcs_list_objects.html</loc>
+  </url>
+  <url>
     <loc>/reference/hello.html</loc>
   </url>
   <url>
@@ -79,6 +91,9 @@
     <loc>/reference/read_parquet.html</loc>
   </url>
   <url>
+    <loc>/reference/read_rds.html</loc>
+  </url>
+  <url>
     <loc>/reference/read_SSB.html</loc>
   </url>
   <url>
@@ -100,10 +115,19 @@
     <loc>/reference/write_csv.html</loc>
   </url>
   <url>
+    <loc>/reference/write_dataset.html</loc>
+  </url>
+  <url>
     <loc>/reference/write_feather.html</loc>
   </url>
   <url>
     <loc>/reference/write_parquet.html</loc>
+  </url>
+  <url>
+    <loc>/reference/write_rds.html</loc>
+  </url>
+  <url>
+    <loc>/reference/write_sf_parquet.html</loc>
   </url>
   <url>
     <loc>/reference/write_SSB.html</loc>

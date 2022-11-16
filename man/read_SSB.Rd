@@ -3,23 +3,19 @@
 \encoding{UTF-8}
 \name{read_SSB}
 \alias{read_SSB}
-\title{Funksjon for å laste inn filer fra Google Cloud Storage bucket
-#'
-Funksjonen \code{read_SSB} kan brukes til å lese inn filer fra Google Cloud Storage.}
+\title{Funksjon for å laste inn filer fra Google Cloud Storage bucket}
 \usage{
-read_SSB(file, ...)
+read_SSB(file, sf = FALSE, ...)
 }
 \arguments{
-\item{file}{Navn på filen som skal leses inn.}
+\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
 
-\item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)}
+\item{sf}{Boolsk. Standardverdi er FALSE. Sett \code{sf = TRUE} dersom .parquet-filen er et sf-objekt.}
 
-\item{bucket}{Full sti til Google Cloud Storage bucket.}
+\item{...}{Flere parametere (se dokumentasjonen til: \code{\link[=read_parquet]{read_parquet()}}/\code{\link[=open_dataset]{open_dataset()}}/\code{\link[=read_feather]{read_feather()}}/\code{\link[=read_csv]{read_csv()}}/\code{\link[=read_rds]{read_rds()}})}
 }
 \description{
-Funksjon for å laste inn filer fra Google Cloud Storage bucket
-#'
-Funksjonen \code{read_SSB} kan brukes til å lese inn filer fra Google Cloud Storage.
+Funksjonen \code{read_SSB} kan brukes til å lese inn filer fra Google Cloud Storage. Funksjonen støtter .parquet- (inkludert sf-objekter), .feather-, .rds- og .csv- og .json-filer.
 }
 \examples{
 \dontrun{
@@ -31,6 +27,9 @@ read_SSB_feather <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.
 
 read_SSB_csv <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv")
 
-read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json") # OBS: flytt filen til delt
+read_SSB_rds <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds")
+
+read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json")
+
 }
 }

@@ -3,33 +3,20 @@
 \encoding{UTF-8}
 \name{read_parquet}
 \alias{read_parquet}
-\title{Funksjon for å laste inn .parquet-fil fra Google Cloud Storage bucket
-#'
-Funksjonen \code{read_parquet} kan brukes til å lese inn .parquet-filer fra Google Cloud Storage.}
+\title{Funksjon for å laste inn .parquet-fil fra Google Cloud Storage bucket}
 \usage{
 read_parquet(file, ...)
 }
 \arguments{
-\item{file}{Navn på filen som skal leses inn.}
+\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)}
-
-\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjon for å laste inn .parquet-fil fra Google Cloud Storage bucket
-#'
 Funksjonen \code{read_parquet} kan brukes til å lese inn .parquet-filer fra Google Cloud Storage.
 }
 \examples{
 \dontrun{
-# Jupyterlab (DAPLA)
 data <- read_parquet("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet")
-
-# Jupyterlab (produksjonssonen)
-# OBS: mangler
-
-# RStudio Windows (produksjonssonen) - fra Linux
-# OBS: mangler
 }
 }

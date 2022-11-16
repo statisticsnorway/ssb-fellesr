@@ -3,33 +3,20 @@
 \encoding{UTF-8}
 \name{read_feather}
 \alias{read_feather}
-\title{Funksjon for å laste inn .feather-fil fra Google Cloud Storage bucket
-#'
-Funksjonen \code{read_feather} kan brukes til å lese inn .feather-filer fra Google Cloud Storage.}
+\title{Funksjon for å laste inn .feather-fil fra Google Cloud Storage bucket}
 \usage{
 read_feather(file, ...)
 }
 \arguments{
-\item{file}{Navn på filen som skal leses inn.}
+\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_feather.html)}
-
-\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjon for å laste inn .feather-fil fra Google Cloud Storage bucket
-#'
 Funksjonen \code{read_feather} kan brukes til å lese inn .feather-filer fra Google Cloud Storage.
 }
 \examples{
 \dontrun{
-# Jupyterlab (DAPLA)
 data <- read_feather("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.feather")
-
-# Jupyterlab (produksjonssonen)
-# OBS: mangler
-
-# RStudio Windows - fra Linux
- # OBS: mangler
 }
 }

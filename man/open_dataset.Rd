@@ -8,11 +8,9 @@
 open_dataset(file, ...)
 }
 \arguments{
-\item{file}{Navn på filen som skal leses inn.}
+\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
 
-\item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)}
-
-\item{bucket}{Full sti til Google Cloud Storage bucket.}
+\item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/open_dataset.html)}
 }
 \description{
 Funksjonen \code{open_dataset} kan brukes til å lese deler av datasett (bl.a. .parquet-, .feather- og .csv-filer) fra Google Cloud Storage. Det lages en forbindelse til mappen der filen ligger og deretter kan man bruke argumenter fra \code{dplyr}, som \code{filter} og \code{select}, før man bruker \code{collect} til å lese inn dataene i R. \code{open_dataset} kan også brukes til å lese inn sf-objekter (lagret som .parquet-fil med pakken \code{sfarrow}).
@@ -24,6 +22,8 @@ data <- open_dataset("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dat
  dplyr::select(Year, Month, DayofMonth, TailNum) \%>\%
  dplyr::collect()
 
-# SF (OBS: legge denne på ssb-prod-dapla-felles-data-delt)
-}
+data <- open_dataset("ssb-prod-dapla-felles-data-delt/GIS/Vegnett/2022") \%>\%
+ dplyr::filter(municipality == "301") \%>\%
+ sfarrow::read_sf_dataset()
+ }
 }

@@ -3,12 +3,12 @@
 \encoding{UTF-8}
 \name{list.files}
 \alias{list.files}
-\title{Funksjon for å sjekke hvilke filer som finnes i en Google Cloud Storage bucket}
+\title{Funksjon for å sjekke hvilke filer som finnes i en mappe i en Google Cloud Storage bucket}
 \usage{
 list.files(bucket)
 }
 \arguments{
-\item{bucket}{Full sti til Google Cloud Storage bucket.}
+\item{bucket}{Full sti til Google Cloud Storage bucket (med eventuelle undermapper).}
 }
 \description{
 Funksjonen \code{list.files} kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket

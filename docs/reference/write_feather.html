@@ -26,6 +26,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a>
     <a class="dropdown-item" href="../articles/vignette_renv.html">R pakkehåndtering med renv og fellesr</a>
+    <a class="dropdown-item" href="../articles/vignette_SSB_fargepalett.html">SSB fargepalett</a>
     <a class="dropdown-item" href="../articles/vignette_statbank_lasting.html">Lasting til Statbank</a>
     <a class="dropdown-item" href="../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a>
     <a class="dropdown-item" href="../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a>
@@ -57,22 +58,23 @@
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>file</dt>
-<dd><p>Navn på filen som skal skrives.</p></dd>
+    <dl><dt>data</dt>
+<dd><p>Filen som skal skrives.</p></dd>
+
+
+<dt>file</dt>
+<dd><p>Full filsti og filnavn for hvor filen skal skrives.</p></dd>
 
 
 <dt>...</dt>
 <dd><p>Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_feather.html)</p></dd>
-
-
-<dt>bucket</dt>
-<dd><p>Full sti til Google Cloud Storage bucket.</p></dd>
 
 </dl></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu">write_feather</span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

@@ -5,17 +5,17 @@
 \alias{write_csv}
 \title{Funksjon for å lagre .csv-fil til Google Cloud Storage bucket}
 \usage{
-write_csv(data, bucket, file, ...)
+write_csv(data, file, ...)
 }
 \arguments{
-\item{bucket}{Full sti til Google Cloud Storage bucket.}
+\item{data}{Filen som skal skrives.}
 
-\item{file}{Navn på filen som skal skrives.}
+\item{file}{Full filsti og filnavn for hvor filen skal skrives.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)}
 }
 \description{
-Funksjonen \code{write_csv} kan brukes til å skrive parquet-filer til Google Cloud Storage bucket.
+Funksjonen \code{write_csv} kan brukes til å skrive .csv-filer til Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{

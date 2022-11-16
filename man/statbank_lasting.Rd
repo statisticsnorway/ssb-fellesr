@@ -6,26 +6,29 @@
 Function for uploading a file in .dat format to the Norwegian Statistics Bank}
 \usage{
 statbank_lasting(
-  laste_dbase,
-  laste_bruker,
-  lastefilsti,
   lastefil,
-  hovedtabell,
+  tabell_id = "",
+  laste_dbase = "",
+  laste_bruker,
+  lastefilsti = "",
+  hovedtabell = "",
   publiseringsdato,
-  mailto,
+  mailto = "",
   autooverskriv = 1,
   autogodkjenn = 1,
-  timeout = 10
+  timeout = 10,
+  validering = TRUE,
+  ask = TRUE
 )
 }
 \arguments{
+\item{lastefil}{Name of the .dat file for loading (case sensitive)}
+
 \item{laste_dbase}{Database for loading up file. Choose between "TEST", "QA" or "PROD"}
 
 \item{laste_bruker}{Oracle use ID for loading to StatBank}
 
 \item{lastefilsti}{Path to where the .dat file is located}
-
-\item{lastefil}{Name of the .dat file for loading (case sensitive)}
 
 \item{hovedtabell}{Name of the tabell for publication}
 

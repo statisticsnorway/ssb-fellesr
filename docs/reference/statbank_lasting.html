@@ -30,6 +30,7 @@ Function for uploading a file in .dat format to the Norwegian Statistics Bank"><
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a>
     <a class="dropdown-item" href="../articles/vignette_renv.html">R pakkehåndtering med renv og fellesr</a>
+    <a class="dropdown-item" href="../articles/vignette_SSB_fargepalett.html">SSB fargepalett</a>
     <a class="dropdown-item" href="../articles/vignette_statbank_lasting.html">Lasting til Statbank</a>
     <a class="dropdown-item" href="../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a>
     <a class="dropdown-item" href="../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a>
@@ -59,22 +60,29 @@ Function for uploading a file in .dat format to the Norwegian Statistics Bank</p
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">statbank_lasting</span><span class="op">(</span></span>
-<span>  <span class="va">laste_dbase</span>,</span>
-<span>  <span class="va">laste_bruker</span>,</span>
-<span>  <span class="va">lastefilsti</span>,</span>
 <span>  <span class="va">lastefil</span>,</span>
-<span>  <span class="va">hovedtabell</span>,</span>
+<span>  tabell_id <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  laste_dbase <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  <span class="va">laste_bruker</span>,</span>
+<span>  lastefilsti <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  hovedtabell <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  <span class="va">publiseringsdato</span>,</span>
-<span>  <span class="va">mailto</span>,</span>
+<span>  mailto <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  autooverskriv <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  autogodkjenn <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  timeout <span class="op">=</span> <span class="fl">10</span></span>
+<span>  timeout <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  validering <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  ask <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>laste_dbase</dt>
+    <dl><dt>lastefil</dt>
+<dd><p>Name of the .dat file for loading (case sensitive)</p></dd>
+
+
+<dt>laste_dbase</dt>
 <dd><p>Database for loading up file. Choose between "TEST", "QA" or "PROD"</p></dd>
 
 
@@ -84,10 +92,6 @@ Function for uploading a file in .dat format to the Norwegian Statistics Bank</p
 
 <dt>lastefilsti</dt>
 <dd><p>Path to where the .dat file is located</p></dd>
-
-
-<dt>lastefil</dt>
-<dd><p>Name of the .dat file for loading (case sensitive)</p></dd>
 
 
 <dt>hovedtabell</dt>

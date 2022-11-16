@@ -8,16 +8,17 @@
 write_feather(data, file, ...)
 }
 \arguments{
-\item{file}{Navn på filen som skal skrives.}
+\item{data}{Filen som skal skrives.}
+
+\item{file}{Full filsti og filnavn for hvor filen skal skrives.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_feather.html)}
-
-\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
 Funksjonen \code{write_feather} kan brukes til å skrive .feather-filer til Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{
+write_feather(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather")
 }
 }

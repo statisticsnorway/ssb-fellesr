@@ -8,14 +8,12 @@
 read_csv(file, ...)
 }
 \arguments{
-\item{file}{Navn på filen som skal leses inn.}
+\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)}
-
-\item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjonen \code{read_csv} kan brukes til å lese inn JSON-filer Google Cloud Storage.
+Funksjonen \code{read_csv} kan brukes til å lese inn .csv-filer Google Cloud Storage.
 }
 \examples{
 \dontrun{
