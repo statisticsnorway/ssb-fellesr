@@ -39,7 +39,7 @@ gcs_bucket <- function(bucket) {
 gcs_global_bucket <- function(bucket) {
     gcs_auth <- function() {
 manual_token <- function(scopes, ...) {
-    response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'), 
+    response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'),
                           httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
     credentials <- list()
     credentials$access_token <- httr::content(response)$exchanged_tokens$google$access_token
@@ -52,7 +52,7 @@ token <- gargle::token_fetch()
 googleCloudStorageR::gcs_auth(token = token)
     }
 
-gcs_auth()    
+gcs_auth()
 googleCloudStorageR::gcs_global_bucket(bucket)
     }
 
@@ -290,22 +290,22 @@ read_csv <- function(file, ...) {
 #'}
 #'@encoding UTF-8
 
-read_rds <- function(file, 
-                     # parseFunction = gcs_parse_rds, 
+read_rds <- function(file,
+                     # parseFunction = gcs_parse_rds,
                      ...) {
-    
+
 if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
 gcs_global_bucket(dirname(file))
 df <- googleCloudStorageR::gcs_get_object(basename(file), parseFunction = gcs_parse_rds, ...)
   }
-    
+
 # Jupyterlab (produksjonssonen)
 if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
 df <- readRDS(file, ...)
-  }   
- return(df)      
-                   
+  }
+ return(df)
+
     }
 
 
@@ -315,9 +315,9 @@ df <- readRDS(file, ...)
 #'
 #' Funksjonen `write_parquet` kan brukes til å skrive parquet-filer til Google Cloud Storage bucket.
 #'
-#' @param bucket Full sti til Google Cloud Storage bucket.
-#' @param file Navn på filen som skal skrives.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)
+#' @param data Filen som skal skrives.
+#' @param file Full filsti og filnavn for hvor filen skal skrives.
+#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_parquet.html)
 #'
 #' @examples
 #' \dontrun{
@@ -328,6 +328,28 @@ df <- readRDS(file, ...)
 write_parquet <- function(data, file, ...) {
   arrow::write_parquet(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
 }
+
+
+#' Funksjon for å lagre "partitioned" .parquet-fil til Google Cloud Storage bucket
+#'
+#' Funksjonen `write_dataset` kan brukes til å skrive parquet-filer til Google Cloud Storage bucket.
+#'
+#' @param data Filen som skal skrives.
+#' @param file Full filsti og filnavn for hvor filen skal skrives.
+#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_parquet.html)
+#'
+#' @examples
+#' \dontrun{
+# write_parquet(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+#' }
+#'@encoding UTF-8
+
+write_dataset <- function(data, file, ...) {
+  arrow::write_dataset(data, gcs_bucket(dirname(file))$path(paste0(basename(file))),
+                       partitioning = dplyr::group_vars(data))
+}
+
+
 
 #' Funksjon for å lagre .feather-fil til Google Cloud Storage bucket
 #'
@@ -363,8 +385,8 @@ write_feather <- function(data, file, ...) {
 #' }
 #'@encoding UTF-8
 
-write_csv <- function(data, 
-                      # bucket, 
+write_csv <- function(data,
+                      # bucket,
                       file, ...) {
   arrow::write_csv_arrow(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
 
@@ -384,18 +406,18 @@ write_csv <- function(data,
 #' }
 #'@encoding UTF-8
 
-write_rds <- function(data, 
-                      # bucket, 
+write_rds <- function(data,
+                      # bucket,
                       file, ...) {
-    
+
 f <- function(input, output){
 # write.csv2(input, file = output)
 saveRDS(input, file = output)
     }
-    
+
 gcs_global_bucket(dirname(file))
 googleCloudStorageR::gcs_upload(data, name = basename(file), object_function = f)
-    
+
 }
 
 
@@ -477,7 +499,7 @@ googleCloudStorageR::gcs_delete_object(sub(paste0(".*", sub("/.*", "", file), "/
 
 write_sf_parquet <- function(data, file) {
 
-# Låner funksjoner fra sfarrow #    
+# Låner funksjoner fra sfarrow #
 create_metadata <- function(df){
   warning(strwrap("This is an initial implementation of Parquet/Feather file support
                   and geo metadata. This is tracking version 0.1.0 of the metadata
@@ -506,7 +528,7 @@ create_metadata <- function(df){
 
   return(jsonlite::toJSON(geo_metadata, auto_unbox=TRUE))
 }
-                      
+
                       encode_wkb <- function(df){
   geom_cols <- lapply(df, function(i) inherits(i, "sfc"))
   geom_cols <- names(which(geom_cols==TRUE))
@@ -520,18 +542,18 @@ create_metadata <- function(df){
   }
   return(df)
 }
-                      
+
 geo_metadata <- create_metadata(data)
 df <- encode_wkb(data)
 tbl <- arrow::Table$create(df)
-tbl$metadata[["geo"]] <- geo_metadata    
+tbl$metadata[["geo"]] <- geo_metadata
 
-write_parquet(tbl, file)                      
+write_parquet(tbl, file)
 }
-                      
-                      
-                      
-                      
+
+
+
+
 
 
 #' Funksjon for å laste inn filer fra Google Cloud Storage bucket
@@ -553,8 +575,8 @@ write_parquet(tbl, file)
 #' read_SSB_csv <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv")
 #'
 #' read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json") # OBS: flytt filen til delt
-#'                      
-#' read_SSB_rds <- read_SSB("ssb-prod-spesh-personell-data-kilde/nodes.RDS")                      
+#'
+#' read_SSB_rds <- read_SSB("ssb-prod-spesh-personell-data-kilde/nodes.RDS")
 #'}
 #'@encoding UTF-8
 
@@ -565,7 +587,7 @@ read_SSB <- function(file, sf = FALSE, ...) {
   # } else if(grepl("\\.parquet", basename(file)) & sf == TRUE){
  } else if(sf == TRUE){
       df <- open_dataset(file, ...) %>%
-       sfarrow::read_sf_dataset() 
+       sfarrow::read_sf_dataset()
   } else if(grepl("\\.feather", basename(file))){
     df <- read_feather(file, ...)
   } else if(grepl("\\.csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
@@ -581,7 +603,7 @@ read_SSB <- function(file, sf = FALSE, ...) {
   return(df)
 
   }
-      
+
 
 #' Funksjon for å skrive filer til Google Cloud Storage bucket
 #' #'
@@ -608,7 +630,7 @@ write_SSB <- function(data, file, partitioning = FALSE, sf = FALSE, ...) { # OBS
   } else if (grepl("\\.rds", basename(file))){
     write_rds(data, file, ...)
   } else if (partitioning == TRUE) {
-    print("OBS: mangler")
+    write_dataset(data, file, ...)
   } else {
     print("write_SSB kan for øyeblikket kun skrive .parquet-, .feather-, .rds- og .csv-filer")
   }
