@@ -265,7 +265,7 @@ read_csv <- function(file, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' data <- read_rds("ssb-prod-spesh-personell-data-kilde/nodes.RDS")
+#' data <- read_rds("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds")
 #'}
 #'@encoding UTF-8
 
@@ -426,7 +426,12 @@ list.files <- function(bucket) {
 #'
 #' @examples
 #' \dontrun{
-#' gcs_list_objects("ssb-prod-dapla-felles-data-delt/R_smoke_test")
+#' gcs_list_objects("ssb-prod-dapla-felles-data-delt")
+#'
+#' gcs_list_objects("ssb-prod-dapla-felles-data-delt") %>%
+#' dplyr::filter(grepl("GIS", name) == T)
+#' dplyr::arrange(desc(updated))
+#'
 #' }
 #'@encoding UTF-8
 #'
@@ -587,6 +592,7 @@ read_SSB <- function(file, sf = FALSE, ...) {
 #'
 #' @param data Filen som skal skrives.
 #' @param file Full filsti og filnavn for hvor filen skal skrives.
+#' @param sf Boolsk. Standardverdi er FALSE. Sett `sf = TRUE` dersom filen som skal lagres er et sf-objekt.
 #' @param ... Flere parametere (se dokumentasjonen til: [fellesr::write_parquet()]/[fellesr::write_sf_parquet()]/[fellesr::write_feather()]/[fellesr::write_csv()]/[fellesr::write_dataset()])
 #'
 #' @examples

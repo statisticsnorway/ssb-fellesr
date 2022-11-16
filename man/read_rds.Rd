@@ -17,6 +17,6 @@ Funksjonen \code{read_rds} kan brukes til å lese inn .rds-filer fra Google Clou
 }
 \examples{
 \dontrun{
-data <- read_rds("ssb-prod-spesh-personell-data-kilde/nodes.RDS")
+data <- read_rds("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds")
 }
 }

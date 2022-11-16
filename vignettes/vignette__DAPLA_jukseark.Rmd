@@ -20,34 +20,53 @@ Her finner du en oversikt over hvordan å lese inn data fra Google Cloud Storage
 
 Siden er under arbeid og pakken er enda ikke installert i Jupyterlab. I mellomtiden kan funksjonene brukes ved å source R-scriptet som ligger her: https://github.com/statisticsnorway/fellesr/blob/main/R/DAPLA_funcs.R
 
-### Wrapper funksjoner fra arrow
+Se under ["Reference"](https://statisticsnorway.github.io/fellesr/reference/index.html) for mer dokumentasjon.
+
+### Wrapper-funksjoner fra `arrow`/`googleCloudStorageR`
 
 #### Funksjonen `read_SSB` inneholder følgende wrapper-funksjoner fra arrow:
-+ `read_parquet`:
++ `read_parquet`
 + `open_dataset`
 + `read_feather` 
 + `read_csv`
++ `read_rds`
 + `read_json`
 
 #### Funksjonen `write_SSB` inneholder følgende wrapper-funksjoner fra arrow:
 + `write_parquet`
++ `write_dataset`
 + `write_feather`
 + `write_csv`
++ `write_rds`
 
 #### Andre funksjoner
 + `list.files`
++ `gcs_list_objects`
++ `gcs_delete_object`
 + `gcs_bucket`
 
 
-### Mangler 
-+ `write_dataset`
-+ `saveRDS`
-+ `readRDS`
+## Se innholdet i buckets på Google Cloud Storage
 
+Funksjonene `list.files` og `gcs_list_objects` kan brukes til å liste opp filene som finnes i Google Cloud Storage buckets. `list.files` kan brukes på alle mapper og undermapper, mens `gcs_list_objects` kun fungerer på "bøttenivå". Til gjengjeld vises også filstørrelse og endringsdato.
+
+```{r, eval=FALSE}
+list.files("ssb-prod-dapla-felles-data-delt/R_smoke_test/")
+
+gcs_list_objects("ssb-prod-dapla-felles-data-delt/R_smoke_test") %>% dplyr::arrange(desc(updated))
+```
+
+## Slette filer fra Google Cloud Storage
+
+Funksjonen `gcs_delete_object` kan brukes til å slette filer fra en Google Cloud Storage bucket.
+
+```{r, eval=FALSE}
+gcs_delete_object("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+```
 
 ## Lese inn data fra Google Cloud Storage
 
-Funksjonen `read_SSB` kan brukes til å lese inn .parquet-, .feather-, .csv- og json-filer fra Google Cloud Storage ved å oppgi full sti til "bøtten" + filnavn. Det er også mulig å kun lese inn valgte kolonner og kolonnenavnene spesifiseres i `col_select`. Dersom filen er lagret som en "multifile dataset" (partitioned?), dvs. en fil som ser ut som en mappe, kan denne lese inn ved å skrive navnet på mappen (uten endelsen .parquet). 
+Funksjonen `read_SSB` kan brukes til å lese inn .parquet-, .feather-, .csv-, .rds- og json-filer fra Google Cloud Storage ved å oppgi full sti til "bøtten" + filnavn. Det er også mulig å kun lese inn valgte kolonner og kolonnenavnene spesifiseres i `col_select`. Dersom filen er lagret som en "multifile dataset" (partitioned), dvs. en fil som ser ut som en mappe, kan denne lese inn ved å skrive navnet på mappen (uten endelsen .parquet). 
 
 ```{r, eval=FALSE}
 # Parquet
@@ -62,7 +81,10 @@ read_SSB_feather <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.
 read_SSB_csv <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv")
 
 # JSON
-read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json") # OBS: flytt denne til ssb-prod-dapla-felles-data-delt
+read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json")
+
+# RDS
+read_SSB_rds <- read_rds("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds")
 ```
 
 
@@ -82,7 +104,7 @@ data <- open_dataset("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dat
 Funksjonen `open_dataset` kan også brukes til å lese inn sf-objekter (lagret som .parquet-fil med pakken `sfarrow`).
 
 ```{r, eval=FALSE}
- data <- open_dataset(bucket = "ssb-prod-spesh-personell-data-kilde/Vegnett") %>%
+ data <- open_dataset("ssb-prod-dapla-felles-data-delt/GIS/Vegnett/2022") %>%
  dplyr::filter(municipality == "301") %>%
  sfarrow::read_sf_dataset()
 ```
@@ -90,17 +112,23 @@ Funksjonen `open_dataset` kan også brukes til å lese inn sf-objekter (lagret s
 
 ## Skrive data til Google Cloud Storage
 
-Funksjonen `write_SSB` kan brukes til å skrive .parquet-, .feather- og .csv-filer til Google Cloud Storage.
+Funksjonen `write_SSB` kan brukes til å skrive .parquet-, .feather-, .csv og .rds-filer til Google Cloud Storage.
 
 ```{r, eval=FALSE}
 # PARQUET
 write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+
+# "Multifile" datasett
+write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test", partitioning = TRUE)
 
 # FEATHER
 write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather")
 
 # CSV
 write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.csv")
+
+# RDS
+write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
 ```
 
 

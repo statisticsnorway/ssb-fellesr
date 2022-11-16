@@ -15,6 +15,11 @@ Funksjonen \code{list.files} kan brukes til å sjekke hvilke filer som finnes i 
 }
 \examples{
 \dontrun{
-gcs_list_objects("ssb-prod-dapla-felles-data-delt/R_smoke_test")
+gcs_list_objects("ssb-prod-dapla-felles-data-delt")
+
+gcs_list_objects("ssb-prod-dapla-felles-data-delt") \%>\%
+dplyr::filter(grepl("GIS", name) == T)
+dplyr::arrange(desc(updated))
+
 }
 }
