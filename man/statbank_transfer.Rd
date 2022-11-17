@@ -47,13 +47,13 @@ Funksjonen \code{statbank_transfer} laster opp data fra DAPLA til Statistikkbank
 }
 \examples{
 \dontrun{
-transfer_log <- statbank_lasting(lastefil = roykalderkj1, 
+transfer_log <- statbank_lasting(lastefil = roykalderkj1,
                                  tabell_id = "05307",
                                  laste_bruker = "LAST330",
                                  publiseringsdato = "2022-12-31")
 transfer_log
 
-transfer_log <- statbank_lasting(lastefil = "roykalderkj1.dat", 
+transfer_log <- statbank_lasting(lastefil = "roykalderkj1.dat",
                                  lastefilsti = "ssb-prod-spesh-personell-data-kilde",
                                  tabell_id = "05307",
                                  laste_bruker = "LAST330",

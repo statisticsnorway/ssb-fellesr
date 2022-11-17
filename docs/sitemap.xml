@@ -106,10 +106,22 @@
     <loc>/reference/ssb_library.html</loc>
   </url>
   <url>
+    <loc>/reference/statbank_body.html</loc>
+  </url>
+  <url>
+    <loc>/reference/statbank_encrypt_request.html</loc>
+  </url>
+  <url>
     <loc>/reference/statbank_lasting.html</loc>
   </url>
   <url>
     <loc>/reference/statbank_transfer.html</loc>
+  </url>
+  <url>
+    <loc>/reference/statbank_uttaksbeskrivelse.html</loc>
+  </url>
+  <url>
+    <loc>/reference/statbank_validering.html</loc>
   </url>
   <url>
     <loc>/reference/try_common_library.html</loc>
