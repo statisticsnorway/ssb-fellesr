@@ -2,7 +2,7 @@
 ### statbank_encrypt_request ###
 ################################
 
-.statbank_encrypt_request <- function(laste_bruker) {
+statbank_encrypt_request <- function(laste_bruker) {
   if (Sys.getenv('CLUSTER_ID')=="staging-bip-app") {
     db <- "TEST"
   }
@@ -33,7 +33,7 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
                                        ask = TRUE,
                                        boundary = 12345) {
   if (ask == TRUE){
-    username_encryptedpassword <- .statbank_encrypt_request(laste_bruker = laste_bruker)
+    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
   }
 
   URL <- paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/uttaksbeskrivelse?', "tableId=", tabell_id)
@@ -160,9 +160,38 @@ statbank_validering <- function(data,
 
 
 
-#########################
-### statbank_transfer ###
-#########################
+#' Funksjon for å laste opp data fra DAPLA til Statistikkbanken
+#'
+#' Funksjonen `statbank_transfer` laster opp data fra DAPLA til Statistikkbanken. Det er mulig å laste opp objekter direkte eller ved å oppgi filsti til .dat-filer som er lagret i en Google Cloud Storage bucket.
+#'
+#' @param lastefil Objekt eller en liste med objekter som inneholder dataene som skal lastes opp. Det er også mulig å oppgi en karaktervektor med filnavn til .dat-filer lagret i en Google Cloud Storage bucket. Filstien oppgis under `lastefilsti`.
+#' @param lastefilsti Karaktervektor med filsti til en Google Cloud Storage bucket hvor lastefilene (.dat) er plassert. Dersom man laster opp objekter direkte kan denne stå blank. 
+#' @param tabell_id Karaktervektor med tabell ID til tabellen som det skal lastes opp data til.
+#' @param laste_bruker Karaktervektor med seksjonens lastebruker.
+#' @param publiseringsdato Karaktervektor med publiseringsdato. Formatet skal være "ÅÅÅÅ-MM-DD".
+#' @param initialer Karaktervektor med initialer til personen som laster opp dataene (og som mottar e-post med lastelogg). Standverdi hentes fra miljøvariabel i Jupyter så dersom det ikke er en annen person enn brukeren som kjører programmet som skal motta e-post kan denne stå blank.
+#' @param autooverskriv Numerisk vektor. Standardverdi er satt til 1.
+#' @param autogodkjenn Numerisk vektor. 0: manuell, 1: automatisk (umiddelbart), 2: JIT (just-in-time). Standardverdi er satt til 2.
+#' @param boundary Numerisk vektor med tallverdien som skiller de ulike filene i opplastningen. Trenger ikke å endres.
+#' @param ask Boolsk. Hvis `TRUE` blir man spurt om passord til lastebrukeren. Hvis `FALSE` må `username_encryptedpassword` først være laget med funksjonen `statbank_encrypt_request`.
+#' @param validering
+#'
+#' @examples
+#' \dontrun{
+#' transfer_log <- statbank_lasting(lastefil = roykalderkj1, 
+#'                                  tabell_id = "05307",
+#'                                  laste_bruker = "LAST330",
+#'                                  publiseringsdato = "2022-12-31")
+#' transfer_log
+#'
+#' transfer_log <- statbank_lasting(lastefil = "roykalderkj1.dat", 
+#'                                  lastefilsti = "ssb-prod-spesh-personell-data-kilde",
+#'                                  tabell_id = "05307",
+#'                                  laste_bruker = "LAST330",
+#'                                  publiseringsdato = "2022-12-31")
+#' transfer_log
+#'}
+#'@encoding UTF-8
 
 statbank_transfer <- function(lastefil,
                               lastefilsti = "",
@@ -171,14 +200,14 @@ statbank_transfer <- function(lastefil,
                               publiseringsdato,
                               initialer = gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER')),
                               autooverskriv = 1,
-                              autogodkjenn = 1, # 0: manuell, 1: automatisk (umiddelbart), 2: JIT (just-in-time)
+                              autogodkjenn = 2,
                               boundary = 12345,
                               ask = TRUE,
                               validering = TRUE) {
 
 
   if (ask == TRUE){
-    username_encryptedpassword <- .statbank_encrypt_request(laste_bruker = laste_bruker)
+    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
   }
 
   if (weekdays(as.POSIXlt(publiseringsdato)) %in% c("Saturday", "Sunday")) {

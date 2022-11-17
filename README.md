@@ -28,10 +28,12 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 ### Annet
 + SSB fargepallet i R (kommer)
 + R jukseark (kommer)
++ [Veiledning til R programmering i SSB](https://wiki.ssb.no/display/s880/Veiledning+til+R+programmering+i+SSB)
 
 
 ### Kursmateriell
-+ (kommer)
++ [R grunnkurs](https://github.com/statisticsnorway/R_grunnkurs)
++ [R for viderekomne](https://github.com/statisticsnorway/R_for_viderekomne)
 
 ### Eksempler på produksjonsløp i R
 + (kommer)
