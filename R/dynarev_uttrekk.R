@@ -96,7 +96,7 @@ dynarev_uttrekk <- function(delregnr,
           con <- SetUpOracleConnection()
         }
         # Henter skjemadata fra alle skjema i delreg
-        if (skjema == TRUE & skjema_cols != FALSE) {
+        if (skjema[1] == TRUE & skjema_cols[1] != FALSE) {
           # Reviderte data
           if (raadata == FALSE) {
 
@@ -370,7 +370,7 @@ dynarev_uttrekk <- function(delregnr,
           skjema_data  <- dplyr::full_join(karakter, numerisk, by = c("SKJEMA", "ENHETS_ID", "ENHETS_TYPE", "DELREG_NR", "LOPENR", "RAD_NR"))
         }
         # Dublettsjekk (etter ENHETS_ID)
-        if (dublettsjekk == TRUE) {
+        if (dublettsjekk[1] == TRUE) {
           dublett_test <- skjema_data %>%
             dplyr::group_by(ENHETS_ID) %>%
             dplyr::tally() %>%
@@ -399,7 +399,7 @@ dynarev_uttrekk <- function(delregnr,
           return(list(skjema_data, dublett_test))
         }
         # Inkluder SFU-data (alle skjema og alle kolonner)
-        if (skjema == TRUE & sfu_cols != FALSE) {
+        if (skjema[1] == TRUE & sfu_cols[1] != FALSE) {
           if (grepl("FW-XAPROD", nodename)){
             sfu <- RODBC::sqlQuery(
               channel = con,
@@ -415,7 +415,7 @@ dynarev_uttrekk <- function(delregnr,
           }
         }
         # Inkluder SFU-data (utvalgte skjema)
-        if (class(skjema) == "character" & sfu_cols != FALSE){
+        if (class(skjema) == "character" & sfu_cols[1] != FALSE){
           if (grepl("FW-XAPROD", nodename)){
             sfu_skjema <-
               RODBC::sqlQuery(
@@ -451,61 +451,61 @@ dynarev_uttrekk <- function(delregnr,
           }
         }
         # Lager SFU-subset
-        if (class(sfu_cols) == "character" & (dublettsjekk == F)) {
+        if (class(sfu_cols) == "character" & (dublettsjekk[1] == F)) {
           sfu_subset <- sfu %>%
             dplyr::select(ENHETS_ID, ENHETS_TYPE, DELREG_NR, all_of(sfu_cols))
         }
 
         ### Output:
         # Både sfu_cols og skjema_cols
-        if ((sfu_cols == T) & (skjema_sfu_merge == F) & (skjema_cols == T) & (dublettsjekk == F)) {
+        if ((sfu_cols[1] == T) & (skjema_sfu_merge == F) & (skjema_cols[1] == T) & (dublettsjekk[1] == F)) {
           return(list(skjema_data, sfu))
         }
         # Både sfu_cols og skjema_cols - MERGE
-        if ((sfu_cols == T) & (skjema_sfu_merge == T) & (skjema_cols == T) & (dublettsjekk == F)) {
+        if ((sfu_cols[1] == T) & (skjema_sfu_merge == T) & (skjema_cols[1] == T) & (dublettsjekk[1] == F)) {
           skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
         # Kun sfu_cols
-        if ((sfu_cols == T) & (skjema_cols == F) & (dublettsjekk == F)) {
+        if ((sfu_cols[1] == T) & (skjema_cols[1] == F) & (dublettsjekk[1] == F)) {
           return(sfu)
         }
         # Både sfu_cols (utvalgte variabler) og skjema_cols
-        if ((class(sfu_cols) == "character") & (skjema_sfu_merge == F) & (skjema_cols == T) & (dublettsjekk == F)) {
+        if ((class(sfu_cols) == "character") & (skjema_sfu_merge == F) & (skjema_cols[1] == T) & (dublettsjekk[1] == F)) {
           return(list(skjema_data, sfu_subset))
         }
         # Både sfu_cols (utvalgte variabler) og skjema_cols - MERGE
-        if ((class(sfu_cols) == "character") & (skjema_sfu_merge == T) & (skjema_cols == T) & (dublettsjekk == F)) {
+        if ((class(sfu_cols) == "character") & (skjema_sfu_merge == T) & (skjema_cols[1] == T) & (dublettsjekk[1] == F)) {
           skjema_data <- dplyr::left_join(skjema_data, sfu_subset, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
         # Kun sfu_cols, utvalgte variabler
-        if ((class(sfu_cols) == "character") & (skjema_cols == F) & (dublettsjekk == F)) {
+        if ((class(sfu_cols) == "character") & (skjema_cols[1] == F) & (dublettsjekk[1] == F)) {
           return(sfu_subset)
         }
         # Både sfu_cols og skjema_cols (utvalgte variabler)
-        if ((class(skjema_cols) == "character") & (sfu_cols == T) & (skjema_sfu_merge == F) & (dublettsjekk == F)) {
+        if ((class(skjema_cols) == "character") & (sfu_cols[1] == T) & (skjema_sfu_merge == F) & (dublettsjekk[1] == F)) {
           return(list(skjema_data, sfu))
         }
         # Både sfu_cols og skjema_cols (utvalgte variabler) - MERGE
-        if ((class(skjema_cols) == "character") & (sfu_cols == T) & (skjema_sfu_merge == T) & (dublettsjekk == F)) {
+        if ((class(skjema_cols) == "character") & (sfu_cols[1] == T) & (skjema_sfu_merge == T) & (dublettsjekk[1] == F)) {
           skjema_data <- dplyr::left_join(skjema_data, sfu, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
         # Kun skjema_cols
-        if ((sfu_cols == F) & (skjema_cols == T) & (dublettsjekk == F)) {
+        if ((sfu_cols[1] == F) & (skjema_cols[1] == T) & (dublettsjekk[1] == F)) {
           return(skjema_data)
         }
         # Kun skjema_cols, utvalgte variabler
-        if ((sfu_cols == F) & (class(skjema_cols) == "character") & (dublettsjekk == F)) {
+        if ((sfu_cols[1] == F) & (class(skjema_cols) == "character") & (dublettsjekk[1] == F)) {
           return(skjema_data)
         }
         # Både sfu_cols (utvalgte variabler) og skjema_cols (utvalgte variabler)
-        if ((class(sfu_cols) == "character") & (class(skjema_cols) == "character") & (skjema_sfu_merge == F) & (dublettsjekk == F)) {
+        if ((class(sfu_cols) == "character") & (class(skjema_cols) == "character") & (skjema_sfu_merge == F) & (dublettsjekk[1] == F)) {
           return(list(skjema_data, sfu_subset))
         }
         # Både sfu_cols (utvalgte variabler) og skjema_cols (utvalgte variabler) - MERGE
-        if ((class(sfu_cols) == "character") & (class(skjema_cols) == "character") & (skjema_sfu_merge == T) & (dublettsjekk == F)) {
+        if ((class(sfu_cols) == "character") & (class(skjema_cols) == "character") & (skjema_sfu_merge == T) & (dublettsjekk[1] == F)) {
           skjema_data <- dplyr::left_join(skjema_data, sfu_subset, by = c("ENHETS_ID", "ENHETS_TYPE", "DELREG_NR"))
           return(skjema_data)
         }
@@ -524,7 +524,7 @@ dynarev_uttrekk <- function(delregnr,
             return(SkjemaData)
           }
 
-          if (class(SkjemaData)[1] %in% c("tbl_df", "data.frame")) {
+          if (class(SkjemaData)[1] %in% c("tbl_df", "tbl", "data.frame")) {
             if (nrow(SkjemaData) == 0) {
               return(print(paste0("Ingen data i delregister: ", delregnr, ". Sjekk om delregisternummeret er skrevet riktig eller sjekk tilgangen med LDA")))
             } else {
@@ -545,11 +545,11 @@ dynarev_uttrekk <- function(delregnr,
         if (TestIfNlsLangIsSet() == 0)
           SkjemaData <- GetTheDataFromOracle()
 
-        if (class(SkjemaData)=="RODBC" | class(SkjemaData)=="OraConnection") {
+        if (class(SkjemaData)[1]=="RODBC" | class(SkjemaData)[1]=="OraConnection") {
           return(SkjemaData)
         }
 
-        if (class(SkjemaData)[1] %in% c("tbl_df", "data.frame")) {
+        if (class(SkjemaData)[1] %in% c("tbl_df", "tbl,", "data.frame")) {
           if (nrow(SkjemaData) == 0) {
             return(print(paste0("Ingen data i delregister: ", delregnr, ". Sjekk om delregisternummeret er skrevet riktig eller sjekk tilgangen med LDA")))
           } else {
@@ -573,11 +573,11 @@ dynarev_uttrekk <- function(delregnr,
         SkjemaData <- GetTheDataFromOracle()
         DeleteRenviron()
 
-        if (class(SkjemaData)=="RODBC" | class(SkjemaData)=="OraConnection") {
+        if (class(SkjemaData[1])=="RODBC" | class(SkjemaData[1])=="OraConnection") {
           return(SkjemaData)
         }
 
-        if (class(SkjemaData)[1] %in% c("tbl_df", "data.frame")) {
+        if (class(SkjemaData)[1] %in% c("tbl_df", "tbl", "data.frame")) {
           if (nrow(SkjemaData) == 0) {
             return(print(paste0("Ingen data i delregister: ", delregnr, ". Sjekk om delregisternummeret er skrevet riktig eller sjekk tilgangen med LDA")))
           } else {
