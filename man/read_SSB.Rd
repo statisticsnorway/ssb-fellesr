@@ -12,10 +12,10 @@ read_SSB(file, sf = FALSE, ...)
 
 \item{sf}{Boolsk. Standardverdi er FALSE. Sett \code{sf = TRUE} dersom .parquet-filen er et sf-objekt.}
 
-\item{...}{Flere parametere (se dokumentasjonen til: \code{\link[=read_parquet]{read_parquet()}}/\code{\link[=open_dataset]{open_dataset()}}/\code{\link[=read_feather]{read_feather()}}/\code{\link[=read_csv]{read_csv()}}/\code{\link[=read_rds]{read_rds()}})}
+\item{...}{Flere parametere (se dokumentasjonen til: \code{\link[=read_parquet]{read_parquet()}}/\code{\link[=open_dataset]{open_dataset()}}/\code{\link[=read_feather]{read_feather()}}/\code{\link[=read_csv]{read_csv()}}/\code{\link[=read_rds]{read_rds()}}/\code{\link[=read_parquet]{read_parquet()}})}
 }
 \description{
-Funksjonen \code{read_SSB} kan brukes til å lese inn filer fra Google Cloud Storage. Funksjonen støtter .parquet- (inkludert sf-objekter), .feather-, .rds- og .csv- og .json-filer.
+Funksjonen \code{read_SSB} kan brukes til å lese inn filer fra Google Cloud Storage. Funksjonen støtter .parquet- (inkludert sf-objekter), .feather-, .rds- og .csv-, .xml- og .json-filer.
 }
 \examples{
 \dontrun{
@@ -30,6 +30,8 @@ read_SSB_csv <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv"
 read_SSB_rds <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds")
 
 read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json")
+
+read_SSB_xml <- read_SSB("ssb-prod-spesh-personell-data-kilde/XXX.xml")
 
 }
 }

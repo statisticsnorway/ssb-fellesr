@@ -19,6 +19,7 @@ devtools::document()
 # usethis::use_package("googleCloudStorageR", type = "imports")
 # usethis::use_package("jsonlite", type = "imports")
 # usethis::use_package("sf", type = "imports")
+# usethis::use_package("XML", type = "imports")
 
 # sfarrow?
 
@@ -28,4 +29,5 @@ devtools::load_all()
 detach_package(fellesr)
 # usethis::use_pkgdown() # OBS: docs legges i .gitignore (må fjernes)
 pkgdown::build_site()
+
 

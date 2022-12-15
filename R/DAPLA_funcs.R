@@ -290,7 +290,37 @@ read_rds <- function(file, ...) {
     df <- readRDS(file, ...)
   }
   return(df)
+}
 
+
+#' Funksjon for å laste inn .xml-fil fra Google Cloud Storage bucket
+#'
+#' Funksjonen `read_xml` kan brukes til å lese inn .xml-filer fra Google Cloud Storage.
+#'
+#' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
+#' @param ... Flere parametere (se: https://rdrr.io/cran/googleCloudStorageR/man/gcs_get_object.html)
+#'
+#' @examples
+#' \dontrun{
+#' data <- read_xml("ssb-prod-dapla-felles-data-delt/R_smoke_test/XXX.xml")
+#'}
+#'@encoding UTF-8
+
+read_xml <- function(file, ...) {
+
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+    suppressMessages(gcs_global_bucket(sub("/.*", "", file)))
+
+    my_parse <- function(obj){
+      tmp <- tempfile(fileext = ".xml")
+      on.exit(unlink(tmp))
+      suppressMessages(googleCloudStorageR::gcs_get_object(obj, saveToDisk = tmp))
+      XML::xmlToDataFrame(tmp)
+    }
+
+    df <- my_parse(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
+  }
+  return(df)
 }
 
 
@@ -539,11 +569,11 @@ write_sf_parquet <- function(data, file) {
 
 #' Funksjon for å laste inn filer fra Google Cloud Storage bucket
 #'
-#' Funksjonen `read_SSB` kan brukes til å lese inn filer fra Google Cloud Storage. Funksjonen støtter .parquet- (inkludert sf-objekter), .feather-, .rds- og .csv- og .json-filer.
+#' Funksjonen `read_SSB` kan brukes til å lese inn filer fra Google Cloud Storage. Funksjonen støtter .parquet- (inkludert sf-objekter), .feather-, .rds- og .csv-, .xml- og .json-filer.
 #'
 #' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
 #' @param sf Boolsk. Standardverdi er FALSE. Sett `sf = TRUE` dersom .parquet-filen er et sf-objekt.
-#' @param ... Flere parametere (se dokumentasjonen til: [fellesr::read_parquet()]/[fellesr::open_dataset()]/[fellesr::read_feather()]/[fellesr::read_csv()]/[fellesr::read_rds()])
+#' @param ... Flere parametere (se dokumentasjonen til: [fellesr::read_parquet()]/[fellesr::open_dataset()]/[fellesr::read_feather()]/[fellesr::read_csv()]/[fellesr::read_rds()]/[fellesr::read_parquet()])
 #'
 #' @examples
 #' \dontrun{
@@ -558,6 +588,8 @@ write_sf_parquet <- function(data, file) {
 #' read_SSB_rds <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds")
 #'
 #' read_SSB_json <- read_SSB("ssb-prod-spesh-personell-data-kilde/example_1.json")
+#'
+#' read_SSB_xml <- read_SSB("ssb-prod-spesh-personell-data-kilde/XXX.xml")
 #'
 #'}
 #'@encoding UTF-8
@@ -575,6 +607,8 @@ read_SSB <- function(file, sf = FALSE, ...) {
     df <- read_csv(file, ...)
   } else if(grepl("\\.json", basename(file))){
     df <- read_json(file, ...)
+  } else if(grepl("\\.xml", basename(file))){
+    df <- read_xml(file, ...)
   } else if(grepl("\\.rds", basename(file)) | grepl("\\.RDS", basename(file))) {
     df <- read_rds(file, ...)
   } else {
