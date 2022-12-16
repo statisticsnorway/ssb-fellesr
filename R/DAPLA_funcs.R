@@ -77,7 +77,7 @@ read_parquet <- function(file, ...) {
   }
 
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- arrow::read_parquet(file, ...)
   }
@@ -120,7 +120,7 @@ read_feather <- function(file, ...) {
   }
 
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- arrow::read_feather(file, ...)
   }
@@ -169,7 +169,7 @@ open_dataset <- function(file, ...) {
   }
 
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     ds <- arrow::open_dataset(file, ...)
   }
@@ -201,7 +201,7 @@ read_json <- function(file, ...) {
   }
 
   # Jupyterlab (produksjonssonen) + lokale filer fra RStudio Windows (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- arrow::read_json_arrow(file, ...)
   }
@@ -235,7 +235,7 @@ read_csv <- function(file, ...) {
   }
 
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- readr::read_delim(file, ...)
   }
@@ -285,7 +285,7 @@ read_rds <- function(file, ...) {
   }
 
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) |
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- readRDS(file, ...)
   }
