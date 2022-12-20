@@ -13,6 +13,12 @@ Pakken `fellesr` inneholder følgende funksjoner:
 + [Lese inn og skrive filer på DAPLA](https://statisticsnorway.github.io/fellesr/articles/vignette__DAPLA_jukseark.html) (`read_SSB`, `write_SSB`, `gcs_bucket`, `list.files`) 
 + [R pakkehåndtering med renv](https://statisticsnorway.github.io/fellesr/articles/vignette_renv.html) (`create_dependencies`, `install.packages`, `restore`, `snapshot`, `ssb_library`)
 
+
+#### Visualisering
++ [SSB theme for ggplot](https://statisticsnorway.github.io/fellesr/articles/vignette_SSB_theme.html)
++ SSB fargepallet i R (kommer)
+
+
 ### Andre pakker laget for bruk i SSB
 
 I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under følger en foreløpig oversikt. Dersom du har laget en funksjon eller en pakke og ønsker å få lagt den til i `fellesr` eller i listen under er det bare å ta kontakt. 
@@ -25,15 +31,14 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 + [GISSB – Nettverksanalyse i R](https://statisticsnorway.github.io/GISSB/articles/GISSB_vignette.html)
 
 
-### Annet
-+ SSB fargepallet i R (kommer)
-+ R jukseark (kommer)
-+ [Veiledning til R programmering i SSB](https://wiki.ssb.no/display/s880/Veiledning+til+R+programmering+i+SSB)
-
-
-### Kursmateriell
+### Kursmateriell og veiledning
 + [R grunnkurs](https://github.com/statisticsnorway/R_grunnkurs)
 + [R for viderekomne](https://github.com/statisticsnorway/R_for_viderekomne)
++ R i produksjon (kommer)
++ [Hvordan å bygge en tilleggspakke](https://statisticsnorway.github.io/fellesr/articles/web_only/bygge-en-r-tilleggspakke.html)
++ [Generelle veiledning til R programmering i SSB](https://wiki.ssb.no/display/s880/Veiledning+til+R+programmering+i+SSB)
++ R jukseark (kommer)
+
 
 ### Eksempler på produksjonsløp i R
 + (kommer)
