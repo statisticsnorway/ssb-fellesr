@@ -42,6 +42,7 @@ Suggests:
     knitr,
     rmarkdown,
     RODBC,
-    ROracle
+    ROracle,
+    testthat
 URL: https://statisticsnorway.github.io/fellesr/
 VignetteBuilder: knitr
