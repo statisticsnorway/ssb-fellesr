@@ -1,12 +1,13 @@
 pandoc: 2.19.2
-pkgdown: 2.0.6
+pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   vignette_dynarev_uttrekk: vignette_dynarev_uttrekk.html
   vignette_renv: vignette_renv.html
   vignette_SSB_fargepalett: vignette_SSB_fargepalett.html
+  vignette_SSB_theme: vignette_SSB_theme.html
   vignette_statbank_lasting: vignette_statbank_lasting.html
   vignette__DAPLA_jukseark: vignette__DAPLA_jukseark.html
   bygge-en-r-tilleggspakke: web_only/bygge-en-r-tilleggspakke.html
-last_built: 2022-12-15T14:09Z
+last_built: 2022-12-20T12:37Z
 

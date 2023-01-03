@@ -13,13 +13,14 @@ devtools::document()
 # usethis::use_package("DBI", type = "imports")
 # usethis::use_package("renv", type = "imports")
 # usethis::use_package("arrow", type = "imports")
-# usethis::use_package("getPass", type = "imports")
 # usethis::use_package("httr", type = "imports")
 # usethis::use_package("gargle", type = "imports")
 # usethis::use_package("googleCloudStorageR", type = "imports")
 # usethis::use_package("jsonlite", type = "imports")
 # usethis::use_package("sf", type = "imports")
 # usethis::use_package("XML", type = "imports")
+# usethis::use_package("klassR", type = "imports")
+# usethis::use_package("ggplot2", type = "imports")
 
 # sfarrow?
 
