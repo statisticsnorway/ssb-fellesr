@@ -13,7 +13,7 @@ Pakken `fellesr` inneholder følgende funksjoner:
 + [Lese inn og skrive filer på DAPLA](https://statisticsnorway.github.io/fellesr/articles/vignette__DAPLA_jukseark.html) (`read_SSB`, `write_SSB`, `gcs_bucket`, `list.files`) 
 + [R pakkehåndtering med renv](https://statisticsnorway.github.io/fellesr/articles/vignette_renv.html) (`create_dependencies`, `install.packages`, `restore`, `snapshot`, `ssb_library`)
 
-
+    
 #### Visualisering
 + [SSB theme for ggplot](https://statisticsnorway.github.io/fellesr/articles/vignette_SSB_theme.html)
 + SSB fargepallet i R (kommer)
@@ -32,6 +32,7 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 
 
 ### Kursmateriell og veiledning
++ [Metodebiblioteket](https://statisticsnorway.github.io/metodebibliotek/catalogue_edit.html)
 + [R grunnkurs](https://github.com/statisticsnorway/R_grunnkurs)
 + [R for viderekomne](https://github.com/statisticsnorway/R_for_viderekomne)
 + R i produksjon (kommer)
