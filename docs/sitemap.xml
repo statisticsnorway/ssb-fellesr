@@ -16,6 +16,9 @@
     <loc>/articles/vignette_SSB_fargepalett.html</loc>
   </url>
   <url>
+    <loc>/articles/vignette_SSB_theme.html</loc>
+  </url>
+  <url>
     <loc>/articles/vignette_statbank_lasting.html</loc>
   </url>
   <url>
@@ -103,10 +106,22 @@
     <loc>/reference/restore.html</loc>
   </url>
   <url>
+    <loc>/reference/scale_colour_ssb.html</loc>
+  </url>
+  <url>
+    <loc>/reference/scale_fill_ssb.html</loc>
+  </url>
+  <url>
     <loc>/reference/snapshot.html</loc>
   </url>
   <url>
+    <loc>/reference/ssb_colours.html</loc>
+  </url>
+  <url>
     <loc>/reference/ssb_library.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ssb_palettes.html</loc>
   </url>
   <url>
     <loc>/reference/statbank_body.html</loc>
@@ -125,6 +140,9 @@
   </url>
   <url>
     <loc>/reference/statbank_validering.html</loc>
+  </url>
+  <url>
+    <loc>/reference/theme_ssb.html</loc>
   </url>
   <url>
     <loc>/reference/try_common_library.html</loc>

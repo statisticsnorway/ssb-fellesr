@@ -20,9 +20,9 @@ statbank_transfer(
 )
 }
 \arguments{
-\item{lastefil}{Objekt eller en liste med objekter som inneholder dataene som skal lastes opp. Det er også mulig å oppgi en karaktervektor med filnavn til .dat-filer lagret i en Google Cloud Storage bucket. Filstien oppgis under \code{lastefilsti}.}
+\item{lastefil}{Objekt eller en liste med objekter som inneholder dataene som skal lastes opp. Det er også mulig å oppgi en karaktervektor med filnavn til .parquet-filer lagret i en Google Cloud Storage bucket. Filstien oppgis under \code{lastefilsti}.}
 
-\item{lastefilsti}{Karaktervektor med filsti til en Google Cloud Storage bucket hvor lastefilene (.dat) er plassert. Dersom man laster opp objekter direkte kan denne stå blank.}
+\item{lastefilsti}{Karaktervektor med filsti til en Google Cloud Storage bucket hvor lastefilene (.parquet) er plassert. Dersom man laster opp objekter direkte kan denne stå blank.}
 
 \item{tabell_id}{Karaktervektor med tabell ID til tabellen som det skal lastes opp data til.}
 
@@ -43,17 +43,17 @@ statbank_transfer(
 \item{validering}{}
 }
 \description{
-Funksjonen \code{statbank_transfer} laster opp data fra DAPLA til Statistikkbanken. Det er mulig å laste opp objekter direkte eller ved å oppgi filsti til .dat-filer som er lagret i en Google Cloud Storage bucket.
+Funksjonen \code{statbank_transfer} laster opp data fra DAPLA til Statistikkbanken. Det er mulig å laste opp objekter direkte eller ved å oppgi filsti til .parquet-filer som er lagret i en Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{
-transfer_log <- statbank_lasting(lastefil = roykalderkj1,
+transfer_log <- statbank_transfer(lastefil = roykalderkj1,
                                  tabell_id = "05307",
                                  laste_bruker = "LAST330",
                                  publiseringsdato = "2022-12-31")
 transfer_log
 
-transfer_log <- statbank_lasting(lastefil = "roykalderkj1.dat",
+transfer_log <- statbank_transfer(lastefil = "roykalderkj1.parquet",
                                  lastefilsti = "ssb-prod-spesh-personell-data-kilde",
                                  tabell_id = "05307",
                                  laste_bruker = "LAST330",
