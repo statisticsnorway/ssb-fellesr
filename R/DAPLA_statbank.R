@@ -6,19 +6,33 @@ statbank_encrypt_request <- function(laste_bruker) {
   if (Sys.getenv('CLUSTER_ID')=="staging-bip-app") {
     db <- "TEST"
   }
-
-  if (Sys.getenv('CLUSTER_ID')=="prod-bip-app") {
+  
+  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app", "")) { # OBS
     db <- "PROD"
   }
-
-  encrypt_request <- httr::POST(
-    Sys.getenv('STATBANK_ENCRYPT_URL'),
-    httr::add_headers(
-      "Content-Type" = "application/json",
-      "Authorization" = paste0("Bearer ", httr::content(httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN")))))$access_token)),
-    body = list(message = getPass::getPass(paste0("Lastepassord (", db, "):"))),
-    encode = "json"
-  )
+  
+  # Prodsonen    
+  if (Sys.getenv('LOCAL_USER_PATH') == "") {
+    encrypt_request <- httr::POST(
+      Sys.getenv('STATBANK_ENCRYPT_URL'),
+      httr::add_headers(
+        "Content-Type" = "application/json"),
+      body = list(message = getPass::getPass(paste0("Lastepassord (", db, "):"))),
+      encode = "json"
+    )
+    
+  # DAPLA    
+  } else {
+    encrypt_request <- httr::POST(
+      Sys.getenv('STATBANK_ENCRYPT_URL'),
+      httr::add_headers(
+        "Content-Type" = "application/json",
+        "Authorization" = paste0("Bearer ", httr::content(httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN")))))$access_token)),
+      body = list(message = getPass::getPass(paste0("Lastepassord (", db, "):"))),
+      encode = "json"
+    )
+  }
+  
   username_encryptedpassword <- openssl::base64_encode(paste0(laste_bruker, ":", httr::content(encrypt_request)$message))
   return(username_encryptedpassword)
 }

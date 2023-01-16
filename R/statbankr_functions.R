@@ -28,7 +28,7 @@ statbank_lasting <- function(lastefil,
                              validering = TRUE,
                              ask = TRUE){
 
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
 
     if (missing(mailto)){
       mailto <- gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER'))
