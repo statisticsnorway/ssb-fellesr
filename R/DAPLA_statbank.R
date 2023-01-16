@@ -224,7 +224,7 @@ statbank_transfer <- function(lastefil,
   }
 
   if (class(lastefil) == "character" & length(lastefil)==1){
-    lastefil <- read_SSB(paste0(lastefilsti, "/", lastefil), delim = ";",  col_names = FALSE)
+    lastefil <- read_SSB(paste0(lastefilsti, "/", lastefil))
     lastefil <- list(lastefil)
   }
 
@@ -233,7 +233,7 @@ statbank_transfer <- function(lastefil,
     lastefil_alle <- list()
     for (i in lastefil){
 
-      lastefil_1 <- read_SSB(paste0(lastefilsti, "/", i), delim = ";",  col_names = FALSE)
+      lastefil_1 <- read_SSB(paste0(lastefilsti, "/", i))
       lastefil_alle[[i]] <- lastefil_1
     }
     lastefil <- lastefil_alle
@@ -293,8 +293,6 @@ statbank_transfer <- function(lastefil,
     print("Lasting mislyktes")
     return(transfer_log)
   }
-
-  # return(transfer_log)
 
 }
 
