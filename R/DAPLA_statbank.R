@@ -183,13 +183,13 @@ statbank_validering <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' transfer_log <- statbank_lasting(lastefil = roykalderkj1,
+#' transfer_log <- statbank_transfer(lastefil = roykalderkj1,
 #'                                  tabell_id = "05307",
 #'                                  laste_bruker = "LAST330",
 #'                                  publiseringsdato = "2022-12-31")
 #' transfer_log
 #'
-#' transfer_log <- statbank_lasting(lastefil = "roykalderkj1.parquet",
+#' transfer_log <- statbank_transfer(lastefil = "roykalderkj1.parquet",
 #'                                  lastefilsti = "ssb-prod-spesh-personell-data-kilde",
 #'                                  tabell_id = "05307",
 #'                                  laste_bruker = "LAST330",
