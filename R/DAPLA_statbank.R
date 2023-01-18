@@ -99,60 +99,68 @@ statbank_validering <- function(data,
                                 tabell_id,
                                 laste_bruker,
                                 ask = FALSE) {
-
+  
   uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, laste_bruker = laste_bruker, ask = ask)
-
+  
   problemer_alle <- data.frame()
-
+  
   if (class(data)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
     data <- list(data)
   }
-
+  
   for (i in 1:length(data)) {
-
+    
     data_1 <- data.frame(data[i])
-
+    
     variabler <- data.frame(uttaksbeskrivelse$deltabller$variabler[i]) # OBS: kan det finnes flere i listen?
     statistikkvariabler <- data.frame(uttaksbeskrivelse$deltabller$statistikkvariabler[i])
-
+    
     # Vektor med kolonnenavn #
     Klassifikasjonsvariabel <- variabler$Klassifikasjonsvariabel
     statistikkvariabler <- statistikkvariabler$Text
+    
     kolonnenavn <- c(Klassifikasjonsvariabel, statistikkvariabler)
-
+    
+    if (!is.null(uttaksbeskrivelse$deltabller$null_prikk_missing)) {
+      null_prikk_missing <-  data.frame(uttaksbeskrivelse$deltabller$null_prikk_missing[1])
+      null_prikk_missing_kolonner <- paste0("kolonnenummer_", null_prikk_missing$kolonnenummer)   
+      kolonnenavn <- c(Klassifikasjonsvariabel, statistikkvariabler, null_prikk_missing_kolonner)
+    }
+    
+    
     # Fjerner uten kodeliste #
     variabler_med_kodeliste <- variabler %>%
       dplyr::filter(Kodeliste_id != "-") # OBS
-
+    
     # Legger til kolonnenavn #
     colnames(data_1) <- kolonnenavn # OBS
-
+    
     data_1$filnavn <- uttaksbeskrivelse$DeltabellTitler$Filnavn[i]
     data_1$problemer <- ""
-
+    
     for (j in variabler_med_kodeliste$Klassifikasjonsvariabel) {
-
+      
       variabler_1 <- variabler %>%
         dplyr::filter(Klassifikasjonsvariabel == j)
-
+      
       kodeliste_plassering <- which(uttaksbeskrivelse$kodelister$kodeliste == variabler_1$Kodeliste_id)
       kodeliste_navn <- uttaksbeskrivelse$kodelister$kodeliste[kodeliste_plassering]
-
+      
       koder <- data.frame(uttaksbeskrivelse$kodelister$koder[kodeliste_plassering])
-
+      
       data_1 <- data_1 %>%
         dplyr::mutate(problemer = case_when(
           !!sym(j) %in% unique(as.character(koder$kode)) ~ "",
           TRUE ~ j
         ))
     }
-
+    
     problemer <- data_1 %>%
       dplyr::filter(problemer != "")
-
+    
     problemer_alle <- rbind(problemer_alle, problemer)
   }
-
+  
   if (nrow(problemer_alle)>0) {
     problemer_alle <- problemer_alle %>%
       dplyr::relocate(filnavn, problemer)
@@ -161,7 +169,6 @@ statbank_validering <- function(data,
     print("Ingen ugyldige verdier i kodeliste")
   }
 }
-
 
 
 
