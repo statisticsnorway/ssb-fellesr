@@ -216,6 +216,14 @@ statbank_transfer <- function(lastefil,
                               boundary = 12345,
                               ask = TRUE,
                               validering = TRUE) {
+    
+      if (Sys.getenv('CLUSTER_ID')=="staging-bip-app") {
+    user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
+  }
+  
+  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app", "")) { # OBS
+    user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
+  }
 
 
   if (ask == TRUE){
@@ -282,6 +290,7 @@ statbank_transfer <- function(lastefil,
                                'Connection' = 'keep-alive',
                                'Accept-Encoding' = 'gzip, deflate, br',
                                'Accept' = '*/*'),
+                               'User-Agent' = user_agent,
                              body = list(raw = body))
 
 
