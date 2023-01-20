@@ -1,10 +1,10 @@
 ---
-title: "SSB fargepalett"
+title: "SSB fargepallet fra KLASS"
 author: "Sindre Mikael Haugen"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{SSB fargepalett}
+  %\VignetteIndexEntry{SSB fargepallet fra KLASS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,14 +16,21 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r, eval=FALSE}
+SSBs fargepalett, hentet fra SSBs Designhåndbok, er tilgjengelig fra KLASS ([Kodeliste for SSB fargepalett](https://www.ssb.no/klass/klassifikasjoner/614)). Denne kan lastes inn i R med funksjonen `klassR`:
+
+```{r, include=FALSE}
+library(dplyr)
+library(klassR)
+```
+
+```{r, eval=TRUE}
 ssb_farger <- klassR::GetKlass(614, output_style = "wide") %>%
   dplyr::rename(farge_nummer = code3, 
                 HEX = name3, 
                 farge = name2, 
                 type = name1) %>%
   dplyr::select(-code1, -code2)
+
+ssb_farger
 ```
 
-# Eksempler i ggplot/Leaflet
-+ kommer

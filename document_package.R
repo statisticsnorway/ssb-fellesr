@@ -32,3 +32,4 @@ detach_package(fellesr)
 pkgdown::build_site()
 
 
+
