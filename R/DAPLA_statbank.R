@@ -193,11 +193,11 @@ statbank_validering <- function(data,
 
 
 
-#' Funksjon for å laste opp data fra DAPLA til Statistikkbanken
+#' Funksjon for å laste opp data fra Jupyterlab til Statistikkbanken
 #'
-#' Funksjonen `statbank_transfer` laster opp data fra DAPLA til Statistikkbanken. Det er mulig å laste opp objekter direkte eller ved å oppgi filsti til .parquet-filer som er lagret i en Google Cloud Storage bucket.
+#' Funksjonen `statbank_lasting` laster opp data fra Jupyterlab til Statistikkbanken. Det er mulig å laste opp objekter direkte eller ved å oppgi filsti til en eller flere .parquet-filer som er lagret i en Google Cloud Storage bucket (DAPLA) eller på Linux (produksjonssonen).
 #'
-#' @param lastefil Objekt eller en liste med objekter som inneholder dataene som skal lastes opp. Det er også mulig å oppgi en karaktervektor med filnavn til .parquet-filer lagret i en Google Cloud Storage bucket. Filstien oppgis under `lastefilsti`.
+#' @param lastefil Objekt eller en liste med objekter som inneholder dataene som skal lastes opp. Det er også mulig å oppgi en karaktervektor med filnavn til .parquet-filer lagret i en Google Cloud Storage bucket (DAPLA) eller på Linux (produksjonssonen). Filstien oppgis under `lastefilsti`.
 #' @param lastefilsti Karaktervektor med filsti til en Google Cloud Storage bucket hvor lastefilene (.parquet) er plassert. Dersom man laster opp objekter direkte kan denne stå blank.
 #' @param tabell_id Karaktervektor med tabell ID til tabellen som det skal lastes opp data til.
 #' @param laste_bruker Karaktervektor med seksjonens lastebruker.
@@ -211,13 +211,13 @@ statbank_validering <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' transfer_log <- statbank_transfer(lastefil = roykalderkj1,
+#' transfer_log <- statbank_lasting(lastefil = roykalderkj1,
 #'                                  tabell_id = "05307",
 #'                                  laste_bruker = "LAST330",
 #'                                  publiseringsdato = "2022-12-31")
 #' transfer_log
 #'
-#' transfer_log <- statbank_transfer(lastefil = "roykalderkj1.parquet",
+#' transfer_log <- statbank_lasting(lastefil = "roykalderkj1.parquet",
 #'                                  lastefilsti = "ssb-prod-spesh-personell-data-kilde",
 #'                                  tabell_id = "05307",
 #'                                  laste_bruker = "LAST330",
@@ -226,7 +226,7 @@ statbank_validering <- function(data,
 #'}
 #'@encoding UTF-8
 
-statbank_transfer <- function(lastefil,
+statbank_lasting <- function(lastefil,
                               lastefilsti = "",
                               tabell_id,
                               laste_bruker,
