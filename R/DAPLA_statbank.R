@@ -1,4 +1,18 @@
-
+# user_agent
+user_agent <- function() {
+if (Sys.getenv('CLUSTER_ID')=="staging-bip-app") {
+    user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
+  }
+  
+  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app")) { # OBS
+    user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
+  }
+    
+  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) { # OBS
+    user_agent <- paste0("BakkeProd-R-", httr:::default_ua())
+  }
+    return(user_agent)
+    }
 
 # statbank_encrypt_request
 
@@ -43,6 +57,7 @@ statbank_encrypt_request <- function(laste_bruker) {
 statbank_uttaksbeskrivelse <- function(tabell_id,
                                        laste_bruker,
                                        ask = TRUE,
+                                       username_encryptedpassword = "",
                                        boundary = 12345) {
   if (ask == TRUE){
     username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
@@ -55,7 +70,8 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
                                    'Authorization' = paste0('Basic ', username_encryptedpassword),
                                    'Content-Type' = paste0('multipart/form-data; boundary=', boundary),
                                    'Connection' = 'keep-alive',
-                                   'Accept' = '*/*'
+                                   'Accept' = '*/*', 
+                                'User-Agent' = user_agent() 
                                  ))
 
   uttaksbeksrivelse <- jsonlite::fromJSON(httr::content(uttaksbeksrivelse))
@@ -64,7 +80,11 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
 
 # statbank_body
 
-statbank_body <- function(data, tabell_id, ask = TRUE, boundary = 12345) {
+statbank_body <- function(data, 
+                          tabell_id, 
+                          ask = TRUE, 
+                          username_encryptedpassword = "",
+                          boundary = 12345) {
 
   data_all <- ""
 
@@ -74,7 +94,7 @@ statbank_body <- function(data, tabell_id, ask = TRUE, boundary = 12345) {
 
   for (i in 1:length(data)) {
 
-    filename <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = ask)$DeltabellTitler$Filnavn[i]
+    filename <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = ask, username_encryptedpassword = username_encryptedpassword)$DeltabellTitler$Filnavn[i]
     start <- paste0("--", boundary, "\r\nContent-Disposition:form-data; filename=", filename, "\r\nContent-type:text/plain\r\n\r\n")
 
     data_1 <- data.frame(data[i])
@@ -98,9 +118,10 @@ statbank_body <- function(data, tabell_id, ask = TRUE, boundary = 12345) {
 statbank_validering <- function(data,
                                 tabell_id,
                                 laste_bruker,
+                                username_encryptedpassword = "",
                                 ask = FALSE) {
   
-  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, laste_bruker = laste_bruker, ask = ask)
+  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, laste_bruker = laste_bruker, ask = ask, username_encryptedpassword = username_encryptedpassword)
   
   problemer_alle <- data.frame()
   
@@ -215,16 +236,8 @@ statbank_transfer <- function(lastefil,
                               autogodkjenn = 2,
                               boundary = 12345,
                               ask = TRUE,
+                              username_encryptedpassword = "",
                               validering = TRUE) {
-    
-      if (Sys.getenv('CLUSTER_ID')=="staging-bip-app") {
-    user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
-  }
-  
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app", "")) { # OBS
-    user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
-  }
-
 
   if (ask == TRUE){
     username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
@@ -258,6 +271,7 @@ statbank_transfer <- function(lastefil,
     validering <- statbank_validering(data = lastefil,
                                       tabell_id = tabell_id,
                                       laste_bruker = laste_bruker,
+                                      username_encryptedpassword = username_encryptedpassword,
                                       ask = FALSE)
 
     if (length(validering)>1) {
@@ -269,8 +283,8 @@ statbank_transfer <- function(lastefil,
   }
 
 
-  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE)
-  body <- statbank_body(data = lastefil, tabell_id = tabell_id, ask = FALSE)
+  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
+  body <- statbank_body(data = lastefil, tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
 
   url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'),
                          "initialier=", initialer,
@@ -290,8 +304,8 @@ statbank_transfer <- function(lastefil,
                                'Connection' = 'keep-alive',
                                'Accept-Encoding' = 'gzip, deflate, br',
                                'Accept' = '*/*'),
-                               'User-Agent' = user_agent,
-                             body = list(raw = body))
+                               'User-Agent' = user_agent(),
+                               body = list(raw = body))
 
 
   if (httr::content(transfer_log)$TotalResult$Status == "Success") {
@@ -311,9 +325,3 @@ statbank_transfer <- function(lastefil,
   }
 
 }
-
-
-
-
-
-
