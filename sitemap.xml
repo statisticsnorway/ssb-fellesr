@@ -34,12 +34,6 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/call_perl.html</loc>
-  </url>
-  <url>
-    <loc>/reference/call_shell.html</loc>
-  </url>
-  <url>
     <loc>/reference/create_dependencies.html</loc>
   </url>
   <url>
@@ -119,9 +113,6 @@
   </url>
   <url>
     <loc>/reference/statbank_lasting.html</loc>
-  </url>
-  <url>
-    <loc>/reference/statbank_transfer.html</loc>
   </url>
   <url>
     <loc>/reference/theme_ssb.html</loc>
