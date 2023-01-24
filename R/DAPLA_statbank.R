@@ -1,28 +1,37 @@
 # user_agent
 user_agent <- function() {
-if (Sys.getenv('CLUSTER_ID')=="staging-bip-app") {
+  
+  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app")) { 
+    user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
+  }
+  
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app")) {
     user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
   }
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app")) { # OBS
-    user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
-  }
-    
-  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) { # OBS
+  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) { 
     user_agent <- paste0("BakkeProd-R-", httr:::default_ua())
   }
-    return(user_agent)
-    }
+  
+  if (Sys.getenv('CLUSTER_ID') %in% c("")) { # OBS, det finnes ingen måte å identifisere staging på bakken?
+    user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
+  }
+  return(user_agent)
+}
 
 # statbank_encrypt_request
 
 statbank_encrypt_request <- function(laste_bruker) {
-  if (Sys.getenv('CLUSTER_ID')=="staging-bip-app") {
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app")) {
     db <- "TEST"
   }
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app", "")) { # OBS
+  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
     db <- "PROD"
+  }
+  
+  if (Sys.getenv('CLUSTER_ID') %in% c("")) {
+    db <- "UKJENT"
   }
   
   # Prodsonen    
@@ -35,7 +44,7 @@ statbank_encrypt_request <- function(laste_bruker) {
       encode = "json"
     )
     
-  # DAPLA    
+    # DAPLA    
   } else {
     encrypt_request <- httr::POST(
       Sys.getenv('STATBANK_ENCRYPT_URL'),
@@ -62,18 +71,18 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
   if (ask == TRUE){
     username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
   }
-
+  
   URL <- paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/uttaksbeskrivelse?', "tableId=", tabell_id)
-
+  
   uttaksbeksrivelse <- httr::GET(URL,
                                  httr::add_headers(
                                    'Authorization' = paste0('Basic ', username_encryptedpassword),
                                    'Content-Type' = paste0('multipart/form-data; boundary=', boundary),
                                    'Connection' = 'keep-alive',
                                    'Accept' = '*/*', 
-                                'User-Agent' = user_agent() 
+                                   'User-Agent' = user_agent() 
                                  ))
-
+  
   uttaksbeksrivelse <- jsonlite::fromJSON(httr::content(uttaksbeksrivelse))
   return(uttaksbeksrivelse)
 }
@@ -85,29 +94,29 @@ statbank_body <- function(data,
                           ask = TRUE, 
                           username_encryptedpassword = "",
                           boundary = 12345) {
-
+  
   data_all <- ""
-
+  
   if (class(data)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
     data <- list(data)
   }
-
+  
   for (i in 1:length(data)) {
-
+    
     filename <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = ask, username_encryptedpassword = username_encryptedpassword)$DeltabellTitler$Filnavn[i]
     start <- paste0("--", boundary, "\r\nContent-Disposition:form-data; filename=", filename, "\r\nContent-type:text/plain\r\n\r\n")
-
+    
     data_1 <- data.frame(data[i])
     data_1 <- data_1 %>%
       dplyr::mutate_all(~format(., decimal.mark = ',')) %>% # endrer desimaltegn til komma
       dplyr::mutate_all(., str_trim) # fjerner whitespace
     data_1 <- do.call(paste, c(data_1[colnames(data_1)], sep = ";", collapse = "\r\n"))
-
+    
     data_1 <- paste0(start, data_1)
-
+    
     data_all <- paste0(data_all, data_1, sep = paste0("\r\n"))
   }
-
+  
   data_all <- paste0(data_all, "--12345--\r\n")
   return(data_all)
 }
@@ -227,65 +236,65 @@ statbank_validering <- function(data,
 #'@encoding UTF-8
 
 statbank_lasting <- function(lastefil,
-                              lastefilsti = "",
-                              tabell_id,
-                              laste_bruker,
-                              publiseringsdato,
-                              initialer = gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER')),
-                              autooverskriv = 1,
-                              autogodkjenn = 2,
-                              boundary = 12345,
-                              ask = TRUE,
-                              username_encryptedpassword = "",
-                              validering = TRUE) {
-
+                             lastefilsti = "",
+                             tabell_id,
+                             laste_bruker,
+                             publiseringsdato,
+                             initialer = gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER')),
+                             autooverskriv = 1,
+                             autogodkjenn = 2,
+                             boundary = 12345,
+                             ask = TRUE,
+                             username_encryptedpassword = "",
+                             validering = TRUE) {
+  
   if (ask == TRUE){
     username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
   }
-
+  
   if (weekdays(as.POSIXlt(publiseringsdato)) %in% c("Saturday", "Sunday")) {
     print("OBS: publiseringsdato er satt til en helg")
   }
-
+  
   if (class(lastefil)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
     lastefil <- as.data.frame(lastefil)
   }
-
+  
   if (class(lastefil) == "character" & length(lastefil)==1){
     lastefil <- read_SSB(paste0(lastefilsti, "/", lastefil))
     lastefil <- list(lastefil)
   }
-
+  
   if (class(lastefil) == "character" & length(lastefil)>1){
-
+    
     lastefil_alle <- list()
     for (i in lastefil){
-
+      
       lastefil_1 <- read_SSB(paste0(lastefilsti, "/", i))
       lastefil_alle[[i]] <- lastefil_1
     }
     lastefil <- lastefil_alle
   }
-
+  
   if (validering == TRUE) {
     validering <- statbank_validering(data = lastefil,
                                       tabell_id = tabell_id,
                                       laste_bruker = laste_bruker,
                                       username_encryptedpassword = username_encryptedpassword,
                                       ask = FALSE)
-
+    
     if (length(validering)>1) {
       print("Ugyldige verdier finnes i kodeliste. Lasteoppdrag ikke startet.")
       return(validering)
       stop()
     }
-
+    
   }
-
-
+  
+  
   uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
   body <- statbank_body(data = lastefil, tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
-
+  
   url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'),
                          "initialier=", initialer,
                          # "&hovedtabell=", tabell_id, # Skal også fungere med tabell_id (men gjør ikke det i PROD)
@@ -295,8 +304,8 @@ statbank_lasting <- function(lastefil,
                          "&fagansvarlig2=", initialer,
                          "&auto_overskriv_data=", autooverskriv,
                          "&auto_godkjenn_data=", autogodkjenn)
-
-
+  
+  
   transfer_log <- httr::POST(url_transfer,
                              httr::add_headers(
                                'Authorization' = paste0('Basic ', username_encryptedpassword),
@@ -304,24 +313,24 @@ statbank_lasting <- function(lastefil,
                                'Connection' = 'keep-alive',
                                'Accept-Encoding' = 'gzip, deflate, br',
                                'Accept' = '*/*'),
-                               'User-Agent' = user_agent(),
-                               body = list(raw = body))
-
-
+                             'User-Agent' = user_agent(),
+                             body = list(raw = body))
+  
+  
   if (httr::content(transfer_log)$TotalResult$Status == "Success") {
     print("Lasting vellykket!")
     return(transfer_log)
     stop()
   }
-
+  
   if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(grepl("brudd på unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
     print("Lasting mislyktes. Kan skyldes at forrige opplasting ikke er ferdig. Vent noen minutter og prøv igjen.")
     return(transfer_log)
   }
-
+  
   if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(!grepl("brudd på unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
     print("Lasting mislyktes")
     return(transfer_log)
   }
-
+  
 }
