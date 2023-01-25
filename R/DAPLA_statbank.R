@@ -5,7 +5,7 @@ user_agent <- function() {
     user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
   }
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app")) {
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) & Sys.getenv('CLUSTER_ID') %in% c("")) {
     user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
   }
   
@@ -30,9 +30,9 @@ statbank_encrypt_request <- function(laste_bruker) {
     db <- "PROD"
   }
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("")) {
-    db <- "UKJENT"
-  }
+  #   if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) & Sys.getenv('CLUSTER_ID') %in% c("")) {
+  #     db <- "UKJENT"
+  #   }
   
   # Prodsonen    
   if (Sys.getenv('LOCAL_USER_PATH') == "") {
@@ -97,7 +97,7 @@ statbank_body <- function(data,
   
   data_all <- ""
   
-  if (class(data)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
+  if (any(class(data) %in% c("data.frame", "tibble", "tbl_df", "tbl", "spec_tbl_df"))) {
     data <- list(data)
   }
   
@@ -163,6 +163,9 @@ statbank_validering <- function(data,
       dplyr::filter(Kodeliste_id != "-") # OBS
     
     # Legger til kolonnenavn #
+    if (length(colnames(data_1)) != length(kolonnenavn)){
+      print(paste0("OBS: antall kolonner i filen er ikke det samme som i uttaksbeskrivelsen: ", paste0(kolonnenavn, collapse = ", ")))
+    }
     colnames(data_1) <- kolonnenavn # OBS
     
     data_1$filnavn <- uttaksbeskrivelse$DeltabellTitler$Filnavn[i]
@@ -248,15 +251,20 @@ statbank_lasting <- function(lastefil,
                              username_encryptedpassword = "",
                              validering = TRUE) {
   
-  if (ask == TRUE){
-    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
+  if (class(tabell_id) == "numeric"){
+    print("OBS: tabell-ID er numerisk, denne må ha en karakterverdi (legg til fnutter)")
   }
   
   if (weekdays(as.POSIXlt(publiseringsdato)) %in% c("Saturday", "Sunday")) {
-    print("OBS: publiseringsdato er satt til en helg")
+    print("OBS: publiseringsdato er satt til en helg. Er dette med vilje?")
   }
   
-  if (class(lastefil)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
+  if (as.POSIXlt(publiseringsdato)-as.POSIXlt(Sys.Date()) > 120) {
+    print("OBS: publiseringsdato kan ikke settes mer enn 120 dager frem i tid")
+  }
+  
+  
+  if (any(class(lastefil) %in% c("data.frame", "tibble", "tbl_df", "tbl", "spec_tbl_df"))) {
     lastefil <- as.data.frame(lastefil)
   }
   
@@ -275,6 +283,11 @@ statbank_lasting <- function(lastefil,
     }
     lastefil <- lastefil_alle
   }
+  
+  if (ask == TRUE){
+    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
+  }
+  
   
   if (validering == TRUE) {
     validering <- statbank_validering(data = lastefil,
