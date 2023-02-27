@@ -7,7 +7,8 @@ articles:
   vignette__DAPLA_jukseark: vignette__DAPLA_jukseark.html
   vignette_dynarev_uttrekk: vignette_dynarev_uttrekk.html
   vignette_renv: vignette_renv.html
+  vignette_shiny_ssb: vignette_shiny_ssb.html
   vignette_statbank_lasting: vignette_statbank_lasting.html
   bygge-en-r-tilleggspakke: web_only/bygge-en-r-tilleggspakke.html
-last_built: 2023-01-25T11:27Z
+last_built: 2023-02-27T09:34Z
 
