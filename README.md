@@ -7,12 +7,12 @@ Pakken `fellesr` inneholder følgende funksjoner:
 #### Produksjonssonen
 + [Uttrekk fra Dynarev i R](https://statisticsnorway.github.io/fellesr/articles/vignette_dynarev_uttrekk.html) (`dynarev_uttrekk`)
 + [Laste opp data til Statistikkbanken](https://statisticsnorway.github.io/fellesr/articles/vignette_statbank_lasting.html) (`statbank_lasting`)
-+ [R pakkehåndtering med renv](https://statisticsnorway.github.io/fellesr/articles/vignette_renv.html) (`create_dependencies`, `install.packages`, `restore`, `snapshot`, `ssb_library`)
++ [Kjøre shiny og esquisse](https://statisticsnorway.github.io/fellesr/articles/vignette_shiny_ssb.html) (`runApp_ssb`, `runExample_ssb`, `esquisser_ssb`)
 
 #### DAPLA
 + [Lese inn og skrive filer på DAPLA](https://statisticsnorway.github.io/fellesr/articles/vignette__DAPLA_jukseark.html) (`read_SSB`, `write_SSB`, `gcs_bucket`, `list.files`) 
 + [Laste opp data til Statistikkbanken](https://statisticsnorway.github.io/fellesr/articles/vignette_statbank_lasting.html) (`statbank_lasting`)
-+ [R pakkehåndtering med renv](https://statisticsnorway.github.io/fellesr/articles/vignette_renv.html) (`create_dependencies`, `install.packages`, `restore`, `snapshot`, `ssb_library`)
++ [Kjøre shiny og esquisse](https://statisticsnorway.github.io/fellesr/articles/vignette_shiny_ssb.html) (`runApp_ssb`, `runExample_ssb`, `esquisser_ssb`)
 
     
 #### Visualisering
@@ -20,8 +20,8 @@ Pakken `fellesr` inneholder følgende funksjoner:
 + [SSB fargepallet fra KLASS](https://statisticsnorway.github.io/fellesr/articles/vignette_SSB_fargepalett.html)
 
 
-### Andre pakker laget for bruk i SSB
 
+### Andre pakker laget for bruk i SSB
 I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under følger en foreløpig oversikt. Dersom du har laget en funksjon eller en pakke og ønsker å få lagt den til i `fellesr` eller i listen under er det bare å ta kontakt. 
 
 + [struktuR](https://github.com/statisticsnorway/struktuR)
@@ -37,6 +37,7 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 + [R grunnkurs](https://github.com/statisticsnorway/R_grunnkurs)
 + [R for viderekomne](https://github.com/statisticsnorway/R_for_viderekomne)
 + R i produksjon (kommer)
++ [Bruk av renv for pakke installering](https://manual.dapla.ssb.no/pakke-install.html#r)
 + [Hvordan å bygge en tilleggspakke](https://statisticsnorway.github.io/fellesr/articles/web_only/bygge-en-r-tilleggspakke.html)
 + [Generelle veiledning til R programmering i SSB](https://wiki.ssb.no/display/s880/Veiledning+til+R+programmering+i+SSB)
 + R jukseark (kommer)
