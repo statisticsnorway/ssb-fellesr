@@ -13,6 +13,9 @@
     <loc>/articles/vignette_renv.html</loc>
   </url>
   <url>
+    <loc>/articles/vignette_shiny_ssb.html</loc>
+  </url>
+  <url>
     <loc>/articles/vignette_SSB_fargepalett.html</loc>
   </url>
   <url>
@@ -44,6 +47,9 @@
   </url>
   <url>
     <loc>/reference/dynarev_uttrekk.html</loc>
+  </url>
+  <url>
+    <loc>/reference/esquisser_ssb.html</loc>
   </url>
   <url>
     <loc>/reference/fellesr-package.html</loc>
@@ -104,6 +110,12 @@
   </url>
   <url>
     <loc>/reference/restore.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runApp_ssb.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runExample_ssb.html</loc>
   </url>
   <url>
     <loc>/reference/scale_colour_ssb.html</loc>
