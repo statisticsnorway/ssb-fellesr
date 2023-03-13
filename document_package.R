@@ -1,4 +1,5 @@
 
+
 # Roxygen documentation
 devtools::document()
 

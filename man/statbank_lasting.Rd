@@ -41,7 +41,7 @@ statbank_lasting(
 
 \item{ask}{Boolsk. Hvis \code{TRUE} blir man spurt om passord til lastebrukeren. Hvis \code{FALSE} må \code{username_encryptedpassword} først være laget med funksjonen \code{statbank_encrypt_request}.}
 
-\item{validering}{}
+\item{validering}{Boolsk. Valideringssjekk for å oppdage vanlige lastefeil før tabellen lastes opp.}
 }
 \description{
 Funksjonen \code{statbank_lasting} laster opp data fra Jupyterlab til Statistikkbanken. Det er mulig å laste opp objekter direkte eller ved å oppgi filsti til en eller flere .parquet-filer som er lagret i en Google Cloud Storage bucket (DAPLA) eller på Linux (produksjonssonen).
