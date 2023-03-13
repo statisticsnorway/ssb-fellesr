@@ -9,7 +9,7 @@ user_agent <- function() {
     user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
   }
 
-  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
+  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
     user_agent <- paste0("BakkeProd-R-", httr:::default_ua())
   }
 
@@ -26,7 +26,7 @@ statbank_encrypt_request <- function(laste_bruker) {
     db <- "TEST"
   }
 
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
+  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
     db <- "PROD"
   }
 
