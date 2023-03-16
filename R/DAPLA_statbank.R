@@ -22,13 +22,15 @@ user_agent <- function() {
 # statbank_encrypt_request
 
 statbank_encrypt_request <- function(laste_bruker) {
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app") | Sys.getenv("RSTUDIO") == 1) {
-    db <- "TEST"
-  }
-
+    
   if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
     db <- "PROD"
   }
+
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app") | grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
+    db <- "TEST"
+  }
+
 
   #   if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) & Sys.getenv('CLUSTER_ID') %in% c("")) {
   #     db <- "UKJENT"
