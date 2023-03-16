@@ -5,15 +5,15 @@ user_agent <- function() {
     user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
   }
 
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) & Sys.getenv('CLUSTER_ID') %in% c("")) {
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app")){
     user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
   }
 
-  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
+  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
     user_agent <- paste0("BakkeProd-R-", httr:::default_ua())
   }
 
-  if (Sys.getenv('CLUSTER_ID') %in% c("")) { # OBS, det finnes ingen måte å identifisere staging på bakken?
+  if (grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) { # OBS, det finnes ingen måte å identifisere staging på bakken?
     user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
   }
   return(user_agent)
@@ -22,11 +22,11 @@ user_agent <- function() {
 # statbank_encrypt_request
 
 statbank_encrypt_request <- function(laste_bruker) {
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app")) {
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app") | Sys.getenv("RSTUDIO") == 1) {
     db <- "TEST"
   }
 
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
+  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
     db <- "PROD"
   }
 
