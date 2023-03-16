@@ -33,6 +33,8 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 
 
 ### Kursmateriell og veiledning
++ [kurs-r-nybegynner-jupyter](https://github.com/statisticsnorway/kurs-r-nybegynner-jupyter)
++ [kurs-r-viderekomne](kurs-r-viderekomne)
 + [Metodebiblioteket](https://statisticsnorway.github.io/metodebibliotek/catalogue_edit.html)
 + [R grunnkurs](https://github.com/statisticsnorway/R_grunnkurs)
 + [R for viderekomne](https://github.com/statisticsnorway/R_for_viderekomne)

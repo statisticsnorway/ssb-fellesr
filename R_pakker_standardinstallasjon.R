@@ -28,4 +28,4 @@ c("DBI",
   "struktuR",
   "SSBpris",
   "SdcForetakPerson",
-  "GISS")
+  "GISSB")
