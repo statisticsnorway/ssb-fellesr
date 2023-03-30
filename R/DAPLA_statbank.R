@@ -9,25 +9,25 @@ user_agent <- function() {
     user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
   }
 
-  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
+  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
     user_agent <- paste0("BakkeProd-R-", httr:::default_ua())
   }
 
-  if (grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) { # OBS, det finnes ingen måte å identifisere staging på bakken?
-    user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
-  }
+  # if (grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC"))) { # OBS, det finnes ingen måte å identifisere staging på bakken?
+  #   user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
+  # }
   return(user_agent)
 }
 
 # statbank_encrypt_request
 
 statbank_encrypt_request <- function(laste_bruker) {
-    
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
+
+  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
     db <- "PROD"
   }
 
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app") | grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app") | grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
     db <- "TEST"
   }
 
@@ -42,7 +42,7 @@ statbank_encrypt_request <- function(laste_bruker) {
       Sys.getenv('STATBANK_ENCRYPT_URL'),
       httr::add_headers(
         "Content-Type" = "application/json"),
-      body = list(message = getPass::getPass(paste0("Lastepassord (", db, "):"))),
+      body = list(message = getPass::getPass(paste0("Lastepassord for ",  laste_bruker, " (", db, "):"))),
       encode = "json"
     )
 
@@ -53,7 +53,7 @@ statbank_encrypt_request <- function(laste_bruker) {
       httr::add_headers(
         "Content-Type" = "application/json",
         "Authorization" = paste0("Bearer ", httr::content(httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN")))))$access_token)),
-      body = list(message = getPass::getPass(paste0("Lastepassord (", db, "):"))),
+      body = list(message = getPass::getPass(paste0("Lastepassord for ",  laste_bruker, " (", db, "):"))),
       encode = "json"
     )
   }
@@ -233,7 +233,7 @@ statbank_validering <- function(data,
       dplyr::relocate(filnavn, problemer)
     return(problemer_alle)
   } else {
-    print("Ingen ugyldige verdier i kodeliste")
+    print(paste0("Ingen ugyldige verdier i kodeliste for tabell ", tabell_id))
   }
 }
 
@@ -333,7 +333,7 @@ statbank_lasting <- function(lastefil,
                                       ask = FALSE)
 
     if (length(validering)>1) {
-      print("Ugyldige verdier finnes i kodeliste. Lasteoppdrag ikke startet.")
+      print(paste0("Ugyldige verdier finnes i kodeliste for tabell ", tabell_id, ". Lasteoppdrag ikke startet."))
       return(validering)
       stop()
     }
