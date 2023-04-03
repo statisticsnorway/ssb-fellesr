@@ -274,12 +274,22 @@ statbank_validering <- function(data,
 #'}
 #'@encoding UTF-8
 
+initialer_funk <- function(lastefil) {
+  if (grepl("Bakke", user_agent())) {
+    initialer <- Sys.getenv('USER')
+  }
+  if (grepl("Dapla", user_agent())) {
+    initialer <- gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER'))
+
+  }
+  return(initialer)
+}
 statbank_lasting <- function(lastefil,
                              lastefilsti = "",
                              tabell_id,
                              laste_bruker,
                              publiseringsdato,
-                             initialer = gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER')),
+                             initialer = initialer_funk(),
                              autooverskriv = 1,
                              autogodkjenn = 2,
                              boundary = 12345,

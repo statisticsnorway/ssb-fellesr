@@ -24,6 +24,8 @@ Pakken `fellesr` inneholder følgende funksjoner:
 ### Andre pakker laget for bruk i SSB
 I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under følger en foreløpig oversikt. Dersom du har laget en funksjon eller en pakke og ønsker å få lagt den til i `fellesr` eller i listen under er det bare å ta kontakt. 
 
++ [PxWebApiData](https://cran.r-project.org/web/packages/PxWebApiData/vignettes/Introduction.html) (statistikkbankens API)
++ [klassR](https://statisticsnorway.github.io/klassR/articles/klassR-vignette.html) (KLASS API)
 + [struktuR](https://github.com/statisticsnorway/struktuR)
 + [SSBpris](https://github.com/statisticsnorway/SSBpris)
 + [SmallCountRounding](https://cran.r-project.org/web/packages/SmallCountRounding/vignettes/Introduction_to_SmallCountRounding.html)
@@ -46,4 +48,5 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 
 
 ### Eksempler på produksjonsløp i R
-+ (kommer)
++ [Spesialisthelsetjenesten - Personell](https://github.com/statisticsnorway/spesh-personell/tree/master/Personelltabeller)
++ [Verdsettelsesmodell-fritidsbolig](https://github.com/statisticsnorway/Verdsettelsesmodell-fritidsbolig)
