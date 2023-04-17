@@ -1,3 +1,4 @@
+
 c("DBI",
   "renv",
   "tidyverse",
@@ -25,8 +26,10 @@ c("DBI",
   "simputation",
   "SSBtools",
   "SmallCountRounding",
-  "struktuR",
-  "SSBpris",
-  "SdcForetakPerson",
   "GaussSuppression",
-  "GISSB")
+  "GISSB",
+  "struktuR", # Github
+  "SSBpris", # Github
+  "SdcForetakPerson", # Github
+  "Kostra" # Github
+)
