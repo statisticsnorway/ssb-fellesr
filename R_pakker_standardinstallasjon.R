@@ -28,4 +28,5 @@ c("DBI",
   "struktuR",
   "SSBpris",
   "SdcForetakPerson",
+  "GaussSuppression",
   "GISSB")
