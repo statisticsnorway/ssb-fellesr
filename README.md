@@ -31,6 +31,7 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 + [SmallCountRounding](https://cran.r-project.org/web/packages/SmallCountRounding/vignettes/Introduction_to_SmallCountRounding.html)
 + [SSBtools](https://github.com/statisticsnorway/SSBtools)
 + [SdcForetakPerson](https://github.com/statisticsnorway/SdcForetakPerson)
++ [GaussSuppression](https://cran.r-project.org/web/packages/GaussSuppression/vignettes/define_tables.html)
 + [GISSB – Nettverksanalyse i R](https://statisticsnorway.github.io/GISSB/articles/GISSB_vignette.html)
 
 
