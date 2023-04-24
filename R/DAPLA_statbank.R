@@ -352,6 +352,13 @@ statbank_lasting <- function(lastefil,
 
 
   uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
+    
+        if (length(uttaksbeskrivelse$DeltabellTitler$Filnavn) != length(lastefil)){
+    print(paste0("Antall lastefiler er ikke korrekt. I tabell ", tabell_id, " må følgende lastefiler spesifiseres: ", 
+          paste0(uttaksbeskrivelse$DeltabellTitler$Filnavn, collapse = ", ")))
+            stop()
+} 
+    
   body <- statbank_body(data = lastefil, tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
 
   url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'),

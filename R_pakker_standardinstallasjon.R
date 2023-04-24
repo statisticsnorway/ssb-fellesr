@@ -1,5 +1,4 @@
-
-c("DBI",
+pakker <- c("DBI",
   "renv",
   "tidyverse",
   "PxWebApiData",
@@ -19,7 +18,7 @@ c("DBI",
   "knitr",
   "rmarkdown",
   "fellesr",
-  "Rcurl",
+  "RCurl",
   "here",
   "esquisse",
   "dcmodify",
@@ -33,3 +32,5 @@ c("DBI",
   "SdcForetakPerson", # Github
   "Kostra" # Github
 )
+
+setdiff(pakker, rownames(installed.packages()))
