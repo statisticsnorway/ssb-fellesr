@@ -3,7 +3,7 @@
 #' `gcs_bucket` er en hjelpefunksjon som kobler til en bucket på Google Cloud Storage med pakken `arrow`. Autentiseringen skjer via access_token og expiration som er lagret som miljøvariabler i Jupyter på DAPLA.
 #'
 #' @param bucket Full sti til Google Cloud Storage bucket.
-#'
+#' @export
 #' @examples
 #' \dontrun{
 #' bucket <- gcs_bucket("ssb-prod-dapla-felles-data-delt")
@@ -437,6 +437,8 @@ write_rds <- function(data,
 #'
 #' @param bucket Full sti til Google Cloud Storage bucket (med eventuelle undermapper).
 #'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' list.files("ssb-prod-dapla-felles-data-delt/R_smoke_test")
@@ -574,7 +576,8 @@ write_sf_parquet <- function(data, file) {
 #' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
 #' @param sf Boolsk. Standardverdi er FALSE. Sett `sf = TRUE` dersom .parquet-filen er et sf-objekt.
 #' @param ... Flere parametere (se dokumentasjonen til: [fellesr::read_parquet()]/[fellesr::open_dataset()]/[fellesr::read_feather()]/[fellesr::read_csv()]/[fellesr::read_rds()]/[fellesr::read_parquet()])
-#'
+#' 
+#' @export
 #' @examples
 #' \dontrun{
 #' read_SSB_parquet <- read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet")
@@ -628,6 +631,8 @@ read_SSB <- function(file, sf = FALSE, ...) {
 #' @param file Full filsti og filnavn for hvor filen skal skrives.
 #' @param sf Boolsk. Standardverdi er FALSE. Sett `sf = TRUE` dersom filen som skal lagres er et sf-objekt.
 #' @param ... Flere parametere (se dokumentasjonen til: [fellesr::write_parquet()]/[fellesr::write_sf_parquet()]/[fellesr::write_feather()]/[fellesr::write_csv()]/[fellesr::write_dataset()])
+#' 
+#' @export
 #'
 #' @examples
 #' \dontrun{

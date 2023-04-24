@@ -1,6 +1,18 @@
 # Fellesfunksjoner i R for SSB (`fellesr`)
 
-Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Se under «Articles» [her](https://statisticsnorway.github.io/fellesr/) eller lenkene nedenfor for å velge emner.
+Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Pakken kan installere i et renv-miljø på DAPLA og i prod sone i Jupyter og den nye RStudio. Følgende kode vil sette opp et renv-miljø og installere `fellesr` pakken. Dette skal kun gjøres en gang per prosjekt.  
+
+```
+renv::init()
+renv::install("statisticsnorway/fellesr")
+```
+For å ta i bruk funksjoner i `fellesr` må du kalle biblioteket med
+
+```
+library(fellesr)
+```
+
+Se under «Articles» på [fellesr nettsiden](https://statisticsnorway.github.io/fellesr/) eller finner du en oppsummering nedenfor med linker for å velge emner.
 
 Pakken `fellesr` inneholder følgende funksjoner:
 
@@ -14,7 +26,6 @@ Pakken `fellesr` inneholder følgende funksjoner:
 + [Laste opp data til Statistikkbanken](https://statisticsnorway.github.io/fellesr/articles/vignette_statbank_lasting.html) (`statbank_lasting`)
 + [Kjøre shiny og esquisse](https://statisticsnorway.github.io/fellesr/articles/vignette_shiny_ssb.html) (`runApp_ssb`, `runExample_ssb`, `esquisser_ssb`)
 
-    
 #### Visualisering
 + [SSB theme for ggplot](https://statisticsnorway.github.io/fellesr/articles/vignette_SSB_theme.html)
 + [SSB fargepallet fra KLASS](https://statisticsnorway.github.io/fellesr/articles/vignette_SSB_fargepalett.html)
