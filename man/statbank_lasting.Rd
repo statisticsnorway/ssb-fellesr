@@ -11,7 +11,7 @@ statbank_lasting(
   tabell_id,
   laste_bruker,
   publiseringsdato,
-  initialer = gsub("@ssb.no", "", Sys.getenv("JUPYTERHUB_USER")),
+  initialer = initialer_funk(),
   autooverskriv = 1,
   autogodkjenn = 2,
   boundary = 12345,

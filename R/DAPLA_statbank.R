@@ -238,6 +238,16 @@ statbank_validering <- function(data,
 }
 
 
+initialer_funk <- function(lastefil) {
+  if (grepl("Bakke", user_agent())) {
+    initialer <- Sys.getenv('USER')
+  }
+  if (grepl("Dapla", user_agent())) {
+    initialer <- gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER'))
+
+  }
+  return(initialer)
+}
 
 
 #' Funksjon for å laste opp data fra Jupyterlab til Statistikkbanken
@@ -272,18 +282,7 @@ statbank_validering <- function(data,
 #'                                  publiseringsdato = "2022-12-31")
 #' transfer_log
 #'}
-#'@encoding UTF-8
-
-initialer_funk <- function(lastefil) {
-  if (grepl("Bakke", user_agent())) {
-    initialer <- Sys.getenv('USER')
-  }
-  if (grepl("Dapla", user_agent())) {
-    initialer <- gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER'))
-
-  }
-  return(initialer)
-}
+#' @encoding UTF-8
 statbank_lasting <- function(lastefil,
                              lastefilsti = "",
                              tabell_id,
@@ -352,13 +351,13 @@ statbank_lasting <- function(lastefil,
 
 
   uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
-    
+
         if (length(uttaksbeskrivelse$DeltabellTitler$Filnavn) != length(lastefil)){
-    print(paste0("Antall lastefiler er ikke korrekt. I tabell ", tabell_id, " må følgende lastefiler spesifiseres: ", 
+    print(paste0("Antall lastefiler er ikke korrekt. I tabell ", tabell_id, " må følgende lastefiler spesifiseres: ",
           paste0(uttaksbeskrivelse$DeltabellTitler$Filnavn, collapse = ", ")))
             stop()
-} 
-    
+}
+
   body <- statbank_body(data = lastefil, tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
 
   url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'),
