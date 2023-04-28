@@ -45,13 +45,13 @@ gcs_global_bucket <- function(bucket) {
       credentials$access_token <- httr::content(response)$exchanged_tokens$google$access_token
       httr::oauth2.0_token(endpoint = NULL, app = gargle::gargle_app(), scope = NULL, credentials = credentials)
     }
-
+    
     gargle::cred_funs_add(manual_token)
-
+    
     token <- gargle::token_fetch()
     googleCloudStorageR::gcs_auth(token = token)
   }
-
+  
   gcs_auth()
   googleCloudStorageR::gcs_global_bucket(bucket)
 }
@@ -70,21 +70,21 @@ gcs_global_bucket <- function(bucket) {
 #'@encoding UTF-8
 
 read_parquet <- function(file, ...) {
-
+  
   # Jupyterlab (DAPLA)
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
     df <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
-
+  
   # Jupyterlab (produksjonssonen)
   if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- arrow::read_parquet(file, ...)
   }
-
+  
   # RStudio Windows (produksjonssonen) - fra Linux
   if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){
-
+    
     # Brukernavn og passord (Windows) #
     options(usr = Sys.info()[["user"]])
     options(passwd = rstudioapi::askForPassword("Windows passord:"))
@@ -95,7 +95,57 @@ read_parquet <- function(file, ...) {
       )
     )
   }
+  
+  return(df)
+}
 
+#' Funksjon for å laste inn .parquet-fil (i sf-format) fra Google Cloud Storage bucket
+#'
+#' Funksjonen `read_parquet_sf` kan brukes til å lese inn .parquet-filer (i sf-format) fra Google Cloud Storage.
+#'
+#' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
+#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)
+#'
+#' @examples
+#' \dontrun{
+#' data <- read_parquet_sf("ssb-prod-dapla-felles-data-delt/GIS/testdata/veger_oslo.parquet")
+#'}
+#'@encoding UTF-8
+
+read_parquet_sf <- function(file, ...) {
+  
+  # Jupyterlab (DAPLA)
+  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+    
+    ds <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), as_data_frame = FALSE, ...)
+    
+    metadata <- ds$metadata
+    geo <- jsonlite::fromJSON(metadata$geo)
+    crs <- geo$columns$geometry$crs
+    sfarrow:::validate_metadata(geo)
+    df <- dplyr::collect(ds)
+    df <- as.data.frame(df)
+    primary_geom <- geo$primary_column
+    df[[primary_geom]] <- sf::st_as_sfc(df[[primary_geom]], crs = sf::st_crs(geo$columns$geometry$crs), EWKB=TRUE)
+    df <- sf::st_sf(df, sf_column_name = primary_geom)
+    
+  }
+  
+  # Jupyterlab (produksjonssonen)
+  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
+      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+    ds <- arrow::read_parquet(file, as_data_frame = FALSE, ...)
+    metadata <- ds$metadata
+    geo <- jsonlite::fromJSON(metadata$geo)
+    crs <- geo$columns$geometry$crs
+    sfarrow:::validate_metadata(geo)
+    df <- dplyr::collect(ds)
+    df <- as.data.frame(df)
+    primary_geom <- geo$primary_column
+    df[[primary_geom]] <- sf::st_as_sfc(df[[primary_geom]], crs = sf::st_crs(geo$columns$geometry$crs), EWKB=TRUE)
+    df <- sf::st_sf(df, sf_column_name = primary_geom)
+  }
+  
   return(df)
 }
 
@@ -118,13 +168,13 @@ read_feather <- function(file, ...) {
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
     df <- arrow::read_feather(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
-
+  
   # Jupyterlab (produksjonssonen)
   if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- arrow::read_feather(file, ...)
   }
-
+  
   # RStudio Windows - fra Linux
   if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){
     # Brukernavn og passord (Windows) #
@@ -136,7 +186,7 @@ read_feather <- function(file, ...) {
         userpwd = paste0(getOption("usr"), ":",  getOption("passwd"))
       ))
   }
-
+  
   return(df)
 }
 
@@ -147,7 +197,7 @@ read_feather <- function(file, ...) {
 #'
 #' @param file Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.
 #' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/open_dataset.html)
-#'
+#' @export
 #' @examples
 #' \dontrun{
 #' data <- open_dataset("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dataset") %>%
@@ -162,23 +212,23 @@ read_feather <- function(file, ...) {
 #'@encoding UTF-8
 
 open_dataset <- function(file, ...) {
-
+  
   # Jupyterlab (DAPLA)
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
     ds <- arrow::open_dataset(gcs_bucket(file), ...)
   }
-
+  
   # Jupyterlab (produksjonssonen)
   if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     ds <- arrow::open_dataset(file, ...)
   }
-
+  
   # Windows (produksjonssonen) - fra Linux
   if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
     # OBS: mangler
   }
-
+  
   return(ds)
 }
 
@@ -199,20 +249,20 @@ read_json <- function(file, ...) {
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
-
+  
   # Jupyterlab (produksjonssonen) + lokale filer fra RStudio Windows (produksjonssonen)
   if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- arrow::read_json_arrow(file, ...)
   }
-
+  
   # RStudio Windows (produksjonssonen) - fra Linux
   if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (RStudio Windows)
     # OBS: mangler
   }
-
+  
   return(df)
-
+  
 }
 
 
@@ -233,18 +283,18 @@ read_csv <- function(file, ...) {
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
     df <- arrow::read_delim_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
-
+  
   # Jupyterlab (produksjonssonen)
   if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- readr::read_delim(file, ...)
   }
-
+  
   if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
     # OBS: test med ulike typer separator!
     options(usr = Sys.info()[["user"]])
     options(passwd = rstudioapi::askForPassword("Windows passord:"))
-
+    
     df <- readr::read_delim(
       RCurl::getBinaryURL(
         url = paste0("sftp://sl-sas-work-1", file),
@@ -252,7 +302,7 @@ read_csv <- function(file, ...) {
       ),
     )
   }
-
+  
   return(df)
 }
 
@@ -270,20 +320,20 @@ read_csv <- function(file, ...) {
 #'@encoding UTF-8
 
 read_rds <- function(file, ...) {
-
+  
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
     gcs_global_bucket(sub("/.*", "", file))
-
+    
     my_parse <- function(obj){
       tmp <- tempfile(fileext = ".rds")
       on.exit(unlink(tmp))
       suppressMessages(googleCloudStorageR::gcs_get_object(obj, saveToDisk = tmp))
       readRDS(tmp)
     }
-
+    
     df <- my_parse(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
   }
-
+  
   # Jupyterlab (produksjonssonen)
   if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
@@ -307,17 +357,17 @@ read_rds <- function(file, ...) {
 #'@encoding UTF-8
 
 read_xml <- function(file, ...) {
-
+  
   if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
     suppressMessages(gcs_global_bucket(sub("/.*", "", file)))
-
+    
     my_parse <- function(obj){
       tmp <- tempfile(fileext = ".xml")
       on.exit(unlink(tmp))
       suppressMessages(googleCloudStorageR::gcs_get_object(obj, saveToDisk = tmp))
       XML::xmlToDataFrame(tmp)
     }
-
+    
     df <- my_parse(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
   }
   return(df)
@@ -380,7 +430,7 @@ write_dataset <- function(data, file, ...) {
 
 write_feather <- function(data, file, ...) {
   arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-
+  
 }
 
 
@@ -402,7 +452,7 @@ write_feather <- function(data, file, ...) {
 write_csv <- function(data,
                       file, ...) {
   arrow::write_csv_arrow(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-
+  
 }
 
 #' Funksjon for å lagre .rds-fil til Google Cloud Storage bucket
@@ -420,14 +470,14 @@ write_csv <- function(data,
 
 write_rds <- function(data,
                       file, ...) {
-
+  
   f <- function(input, output){
     saveRDS(input, file = output)
   }
-
+  
   gcs_global_bucket(sub("/.*", "", file))
   googleCloudStorageR::gcs_upload(data, name = sub(paste0(".*", sub("/.*", "", file), "/"), "", file), object_function = f)
-
+  
 }
 
 
@@ -513,56 +563,12 @@ gcs_delete_object <- function(file) {
 #'
 
 write_sf_parquet <- function(data, file) {
-
-  # Låner funksjoner fra sfarrow #
-  create_metadata <- function(df){
-    warning(strwrap("This is an initial implementation of Parquet/Feather file support
-                  and geo metadata. This is tracking version 0.1.0 of the metadata
-                  (https://github.com/geopandas/geo-arrow-spec). This metadata
-                  specification may change and does not yet make stability promises.
-                  We do not yet recommend using this in a production setting unless
-                  you are able to rewrite your Parquet/Feather files.",
-                    prefix = "\n", initial = ""
-    ), call.=FALSE)
-
-    # reference: https://github.com/geopandas/geo-arrow-spec
-    geom_cols <- lapply(df, function(i) inherits(i, "sfc"))
-    geom_cols <- names(which(geom_cols==TRUE))
-    col_meta <- list()
-
-    for(col in geom_cols){
-      col_meta[[col]] <- list(crs = sf::st_crs(df[[col]])$wkt,
-                              encoding = "WKB",
-                              bbox = as.numeric(sf::st_bbox(df[[col]])))
-    }
-
-    geo_metadata <- list(primary_column = attr(df, "sf_column"),
-                         columns = col_meta,
-                         schema_version = "0.1.0",
-                         creator = list(library="sfarrow"))
-
-    return(jsonlite::toJSON(geo_metadata, auto_unbox=TRUE))
-  }
-
-  encode_wkb <- function(df){
-    geom_cols <- lapply(df, function(i) inherits(i, "sfc"))
-    geom_cols <- names(which(geom_cols==TRUE))
-
-    df <- as.data.frame(df)
-
-    for(col in geom_cols){
-      obj_geo <- sf::st_as_binary(df[[col]])
-      attr(obj_geo, "class") <- c("arrow_binary", "vctrs_vctr", attr(obj_geo, "class"), "list")
-      df[[col]] <- obj_geo
-    }
-    return(df)
-  }
-
-  geo_metadata <- create_metadata(data)
-  df <- encode_wkb(data)
+  
+  geo_metadata <- sfarrow:::create_metadata(data)
+  df <- sfarrow::encode_wkb(data)
   tbl <- arrow::Table$create(df)
   tbl$metadata[["geo"]] <- geo_metadata
-
+  
   write_parquet(tbl, file)
 }
 
@@ -598,12 +604,11 @@ write_sf_parquet <- function(data, file) {
 #'@encoding UTF-8
 
 read_SSB <- function(file, sf = FALSE, ...) {
-
+  
   if(grepl("\\.parquet", basename(file)) & sf == FALSE){
     df <- read_parquet(file, ...)
   } else if(sf == TRUE){
-    df <- open_dataset(file, ...) %>%
-      sfarrow::read_sf_dataset()
+    df <- read_parquet_sf(file, ...)
   } else if(grepl("\\.feather", basename(file))){
     df <- read_feather(file, ...)
   } else if(grepl("\\.csv", basename(file)) | grepl(".txt", basename(file)) | grepl(".dat", basename(file))){
@@ -619,7 +624,7 @@ read_SSB <- function(file, sf = FALSE, ...) {
       dplyr::collect()
   }
   return(df)
-
+  
 }
 
 

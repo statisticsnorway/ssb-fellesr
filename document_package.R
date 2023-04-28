@@ -1,9 +1,9 @@
-
-
+# -*- coding: utf-8 -*-
 # Roxygen documentation
 devtools::document()
 
-# Add imports
+# +
+# # Add imports
 # usethis::use_pipe()
 # usethis::use_package("dplyr", type = "imports")
 # usethis::use_package("RODBC", type = "suggests") # OBS: kun installert i RStudio Windows
@@ -22,6 +22,7 @@ devtools::document()
 # usethis::use_package("XML", type = "imports")
 # usethis::use_package("klassR", type = "imports")
 # usethis::use_package("ggplot2", type = "imports")
+# -
 
 # sfarrow?
 
