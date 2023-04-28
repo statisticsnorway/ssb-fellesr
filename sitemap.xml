@@ -91,6 +91,9 @@
     <loc>/reference/read_parquet.html</loc>
   </url>
   <url>
+    <loc>/reference/read_parquet_sf.html</loc>
+  </url>
+  <url>
     <loc>/reference/read_rds.html</loc>
   </url>
   <url>
