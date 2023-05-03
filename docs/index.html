@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,12 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="fellesfunksjoner-i-r-for-ssb-fellesr">Fellesfunksjoner i R for SSB (<code>fellesr</code>)<a class="anchor" aria-label="anchor" href="#fellesfunksjoner-i-r-for-ssb-fellesr"></a>
 </h1></div>
-<p>Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Se under «Articles» <a href="https://statisticsnorway.github.io/fellesr/" class="external-link">her</a> eller lenkene nedenfor for å velge emner.</p>
+<p>Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Pakken kan installere i et renv-miljø på DAPLA og i prod sone i Jupyter og den nye RStudio. Følgende kode vil sette opp et renv-miljø og installere <code>fellesr</code> pakken. Dette skal kun gjøres en gang per prosjekt.</p>
+<pre><code><span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/init.html" class="external-link">init</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"statisticsnorway/fellesr"</span><span class="op">)</span></span></code></pre>
+<p>For å ta i bruk funksjoner i <code>fellesr</code> må du kalle biblioteket med</p>
+<pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr</a></span><span class="op">)</span></span></code></pre>
+<p>Se under «Articles» på <a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr nettsiden</a> eller finner du en oppsummering nedenfor med linker for å velge emner.</p>
 <p>Pakken <code>fellesr</code> inneholder følgende funksjoner:</p>
 <div class="section level4">
 <h4 id="produksjonssonen">Produksjonssonen<a class="anchor" aria-label="anchor" href="#produksjonssonen"></a>
@@ -105,18 +110,26 @@
 </h3>
 <p>I tillegg til <code>fellesr</code> har det blitt laget flere pakker for bruk i SSB. Under følger en foreløpig oversikt. Dersom du har laget en funksjon eller en pakke og ønsker å få lagt den til i <code>fellesr</code> eller i listen under er det bare å ta kontakt.</p>
 <ul>
+<li>
+<a href="https://cran.r-project.org/web/packages/PxWebApiData/vignettes/Introduction.html" class="external-link">PxWebApiData</a> (statistikkbankens API)</li>
+<li>
+<a href="https://statisticsnorway.github.io/klassR/articles/klassR-vignette.html" class="external-link">klassR</a> (KLASS API)</li>
+<li><a href="https://github.com/statisticsnorway/SSBtools" class="external-link">SSBtools</a></li>
+<li><a href="https://cran.r-project.org/web/packages/SmallCountRounding/vignettes/Introduction_to_SmallCountRounding.html" class="external-link">SmallCountRounding</a></li>
+<li><a href="https://cran.r-project.org/web/packages/GaussSuppression/vignettes/define_tables.html" class="external-link">GaussSuppression</a></li>
+<li><a href="https://statisticsnorway.github.io/GISSB/articles/GISSB_vignette.html" class="external-link">GISSB – Nettverksanalyse i R</a></li>
+<li><a href="https://github.com/statisticsnorway/Kostra/" class="external-link">Kostra</a></li>
 <li><a href="https://github.com/statisticsnorway/struktuR" class="external-link">struktuR</a></li>
 <li><a href="https://github.com/statisticsnorway/SSBpris" class="external-link">SSBpris</a></li>
-<li><a href="https://cran.r-project.org/web/packages/SmallCountRounding/vignettes/Introduction_to_SmallCountRounding.html" class="external-link">SmallCountRounding</a></li>
-<li><a href="https://github.com/statisticsnorway/SSBtools" class="external-link">SSBtools</a></li>
 <li><a href="https://github.com/statisticsnorway/SdcForetakPerson" class="external-link">SdcForetakPerson</a></li>
-<li><a href="https://statisticsnorway.github.io/GISSB/articles/GISSB_vignette.html" class="external-link">GISSB – Nettverksanalyse i R</a></li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="kursmateriell-og-veiledning">Kursmateriell og veiledning<a class="anchor" aria-label="anchor" href="#kursmateriell-og-veiledning"></a>
 </h3>
 <ul>
+<li><a href="https://github.com/statisticsnorway/kurs-r-nybegynner-jupyter" class="external-link">kurs-r-nybegynner-jupyter</a></li>
+<li><a href="kurs-r-viderekomne">kurs-r-viderekomne</a></li>
 <li><a href="https://statisticsnorway.github.io/metodebibliotek/catalogue_edit.html" class="external-link">Metodebiblioteket</a></li>
 <li><a href="https://github.com/statisticsnorway/R_grunnkurs" class="external-link">R grunnkurs</a></li>
 <li><a href="https://github.com/statisticsnorway/R_for_viderekomne" class="external-link">R for viderekomne</a></li>
@@ -131,7 +144,8 @@
 <h3 id="eksempler-på-produksjonsløp-i-r">Eksempler på produksjonsløp i R<a class="anchor" aria-label="anchor" href="#eksempler-p%C3%A5-produksjonsl%C3%B8p-i-r"></a>
 </h3>
 <ul>
-<li>(kommer)</li>
+<li><a href="https://github.com/statisticsnorway/spesh-personell/tree/master/Personelltabeller" class="external-link">Spesialisthelsetjenesten - Personell</a></li>
+<li><a href="https://github.com/statisticsnorway/Verdsettelsesmodell-fritidsbolig" class="external-link">Verdsettelsesmodell-fritidsbolig</a></li>
 </ul>
 </div>
 </div>
