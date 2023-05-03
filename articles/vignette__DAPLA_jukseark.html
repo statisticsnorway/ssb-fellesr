@@ -81,39 +81,48 @@ Haugen</h4>
     
     
 <p>Her finner du en oversikt over hvordan å lese inn data fra Google
-Cloud Storage (DAPLA) til R.</p>
-<p>Siden er under arbeid og pakken er enda ikke installert i Jupyterlab.
-I mellomtiden kan funksjonene brukes ved å source R-scriptet som ligger
-her: <a href="https://github.com/statisticsnorway/fellesr/blob/main/R/DAPLA_funcs.R" class="external-link uri">https://github.com/statisticsnorway/fellesr/blob/main/R/DAPLA_funcs.R</a></p>
-<p>Se under <a href="https://statisticsnorway.github.io/fellesr/reference/index.html" class="external-link">“Reference”</a>
-for mer dokumentasjon.</p>
+Cloud Storage (DAPLA) til R. Se under <a href="https://statisticsnorway.github.io/fellesr/reference/index.html" class="external-link">“Reference”</a>
+for mer dokumentasjon av funksjonene.</p>
+<p>For å ta i bruk funksjonene i <code>fellesr</code> må du kalle
+biblioteket med:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr</a></span><span class="op">)</span></span></code></pre></div>
+<p>Pakken er installert i Jupyterlab (DAPLA og produksjonssonen) og i
+RStudio Server (produksjonssonen). Dersom du bruker et virtuelt miljø
+med <code>renv</code> kan pakken installeres slik:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/init.html" class="external-link">init</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"statisticsnorway/fellesr"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="wrapper-funksjoner-fra-arrowgooglecloudstorager">Wrapper-funksjoner fra
 <code>arrow</code>/<code>googleCloudStorageR</code><a class="anchor" aria-label="anchor" href="#wrapper-funksjoner-fra-arrowgooglecloudstorager"></a>
 </h3>
 <div class="section level4">
-<h4 id="funksjonen-read_ssb-inneholder-følgende-wrapper-funksjoner-fra-arrow">Funksjonen <code>read_SSB</code> inneholder følgende
-wrapper-funksjoner fra arrow:<a class="anchor" aria-label="anchor" href="#funksjonen-read_ssb-inneholder-f%C3%B8lgende-wrapper-funksjoner-fra-arrow"></a>
+<h4 id="funksjonen-read_ssb-inneholder-følgende-wrapper-funksjoner">Funksjonen <code>read_SSB</code> inneholder følgende
+wrapper-funksjoner:<a class="anchor" aria-label="anchor" href="#funksjonen-read_ssb-inneholder-f%C3%B8lgende-wrapper-funksjoner"></a>
 </h4>
 <ul>
 <li><code>read_parquet</code></li>
-<li><code>open_dataset</code></li>
+<li><code>read_parquet_sf</code></li>
 <li><code>read_feather</code></li>
 <li><code>read_csv</code></li>
 <li><code>read_rds</code></li>
+<li><code>read_xml</code></li>
 <li><code>read_json</code></li>
+<li><code>open_dataset</code></li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="funksjonen-write_ssb-inneholder-følgende-wrapper-funksjoner-fra-arrow">Funksjonen <code>write_SSB</code> inneholder følgende
-wrapper-funksjoner fra arrow:<a class="anchor" aria-label="anchor" href="#funksjonen-write_ssb-inneholder-f%C3%B8lgende-wrapper-funksjoner-fra-arrow"></a>
+<h4 id="funksjonen-write_ssb-inneholder-følgende-wrapper-funksjoner">Funksjonen <code>write_SSB</code> inneholder følgende
+wrapper-funksjoner:<a class="anchor" aria-label="anchor" href="#funksjonen-write_ssb-inneholder-f%C3%B8lgende-wrapper-funksjoner"></a>
 </h4>
 <ul>
 <li><code>write_parquet</code></li>
-<li><code>write_dataset</code></li>
+<li><code>write_sf_parquet</code></li>
 <li><code>write_feather</code></li>
 <li><code>write_csv</code></li>
 <li><code>write_rds</code></li>
+<li><code>write_dataset</code></li>
 </ul>
 </div>
 <div class="section level4">
@@ -135,7 +144,7 @@ kan brukes til å liste opp filene som finnes i Google Cloud Storage
 buckets. <code>list.files</code> kan brukes på alle mapper og
 undermapper, mens <code>gcs_list_objects</code> kun fungerer på
 “bøttenivå”. Til gjengjeld vises også filstørrelse og endringsdato.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/list.files.html">list.files</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/gcs_list_objects.html">gcs_list_objects</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">updated</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -145,36 +154,49 @@ undermapper, mens <code>gcs_list_objects</code> kun fungerer på
 </h2>
 <p>Funksjonen <code>gcs_delete_object</code> kan brukes til å slette
 filer fra en Google Cloud Storage bucket.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/gcs_delete_object.html">gcs_delete_object</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="lese-inn-data-fra-google-cloud-storage">Lese inn data fra Google Cloud Storage<a class="anchor" aria-label="anchor" href="#lese-inn-data-fra-google-cloud-storage"></a>
 </h2>
 <p>Funksjonen <code>read_SSB</code> kan brukes til å lese inn .parquet-,
-.feather-, .csv-, .rds- og json-filer fra Google Cloud Storage ved å
-oppgi full sti til “bøtten” + filnavn. Det er også mulig å kun lese inn
-valgte kolonner og kolonnenavnene spesifiseres i
+.feather-, .csv-, .rds-, .xml- og json-filer fra Google Cloud Storage
+ved å oppgi full sti til “bøtten” + filnavn. Det er også mulig å kun
+lese inn valgte kolonner og kolonnenavnene spesifiseres i
 <code>col_select</code>. Dersom filen er lagret som en “multifile
 dataset” (partitioned), dvs. en fil som ser ut som en mappe, kan denne
 lese inn ved å skrive navnet på mappen (uten endelsen .parquet).</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Parquet</span></span>
-<span><span class="va">read_SSB_parquet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet"</span><span class="op">)</span></span>
-<span><span class="va">read_SSB_parquet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet"</span>, col_select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Year"</span>, <span class="st">"Month"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">read_SSB_mfd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-spesh-personell-data-kilde/enda_en_ny_mappe"</span><span class="op">)</span></span>
+<span><span class="va">read_SSB_parquet</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet"</span><span class="op">)</span></span>
+<span><span class="va">read_SSB_parquet</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet"</span>, col_select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Year"</span>, <span class="st">"Month"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">read_SSB_mfd</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/enda_en_ny_mappe"</span><span class="op">)</span> <span class="co"># OBS: mangler eksempeldata</span></span>
 <span></span>
 <span><span class="co"># Feather</span></span>
-<span><span class="va">read_SSB_feather</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.feather"</span><span class="op">)</span></span>
+<span><span class="va">read_SSB_feather</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.feather"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># CSV</span></span>
-<span><span class="va">read_SSB_csv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv"</span><span class="op">)</span></span>
+<span><span class="va">read_SSB_csv</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># JSON</span></span>
-<span><span class="va">read_SSB_json</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-spesh-personell-data-kilde/example_1.json"</span><span class="op">)</span></span>
+<span><span class="va">read_SSB_json</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/XXX.json"</span><span class="op">)</span> <span class="co"># OBS: mangler eksempeldata</span></span>
+<span></span>
+<span><span class="co"># XML</span></span>
+<span><span class="va">read_SSB_xml</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/XXX.xml"</span><span class="op">)</span> <span class="co"># OBS: mangler eksempeldata</span></span>
 <span></span>
 <span><span class="co"># RDS</span></span>
-<span><span class="va">read_SSB_rds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_rds.html">read_rds</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">read_SSB_rds</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="lese-inn-kartdata-lagret-som--parquet-filer">Lese inn kartdata lagret som .parquet-filer<a class="anchor" aria-label="anchor" href="#lese-inn-kartdata-lagret-som--parquet-filer"></a>
+</h3>
+<p>For å laste inn kartdata lagret som .parquet-filer må man spesifisere
+<code>sf = TRUE</code> i funksjonen <code>read_SSB</code>. For mer
+informasjon om hvordan å jobbe med kartdata på DAPLA, se <a href="https://manual.dapla.ssb.no/kartdata.html#r" class="external-link">Kartdata i
+DAPLA-manualen</a>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/read_SSB.html">read_SSB</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/GIS/testdata/veger_oslo.parquet"</span>, sf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="lese-inn-deler-av-datasett--parquet-filer-m-m-">Lese inn deler av datasett (.parquet-filer m.m.)<a class="anchor" aria-label="anchor" href="#lese-inn-deler-av-datasett--parquet-filer-m-m-"></a>
 </h3>
@@ -187,44 +209,44 @@ deretter kan man bruke argumenter fra <code>dplyr</code>, som f.eks.
 ikke mulig å kun lese inn én fil som ligger i en mappe så dersom dataene
 ikke er “partitioned” må filen ligge i en egen undermappe dersom den
 skal lese inn alene.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/open_dataset.html">open_dataset</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dataset"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/open_dataset.html">open_dataset</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dataset"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Year</span> <span class="op">==</span> <span class="fl">1996</span> <span class="op">&amp;</span> <span class="va">TailNum</span> <span class="op">==</span> <span class="st">"N2823W"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Year</span>, <span class="va">Month</span>, <span class="va">DayofMonth</span>, <span class="va">TailNum</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="lese-inn-sf-objekt-lagret-som--parquet-fil">Lese inn sf-objekt lagret som .parquet-fil<a class="anchor" aria-label="anchor" href="#lese-inn-sf-objekt-lagret-som--parquet-fil"></a>
-</h3>
 <p>Funksjonen <code>open_dataset</code> kan også brukes til å lese inn
-sf-objekter (lagret som .parquet-fil med pakken
-<code>sfarrow</code>).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span> <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/open_dataset.html">open_dataset</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/GIS/Vegnett/2022"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">municipality</span> <span class="op">==</span> <span class="st">"301"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span> <span class="fu">sfarrow</span><span class="fu">::</span><span class="fu">read_sf_dataset</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+deler av kartdata lagret som .parquet-filer. På samme måte som vanlige
+.parquet-filer må filen som leses inn ligge i en mappe der det kun
+ligger én fil. Filstien peker til mappen der filen ligger. Deretter kan
+man bruke <code>dplyr</code>-verb for å filtrere rader og selektere
+kolonner før man til slutt leser inn filene med
+<code>sfarrow::read_sf_dataset()</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/open_dataset.html">open_dataset</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/GIS/Kart/2023/ABAS_grunnkrets_flate_2023/"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">KOMMUNENR</span> <span class="op">==</span> <span class="st">"0301"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">sfarrow</span><span class="fu">::</span><span class="fu">read_sf_dataset</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="skrive-data-til-google-cloud-storage">Skrive data til Google Cloud Storage<a class="anchor" aria-label="anchor" href="#skrive-data-til-google-cloud-storage"></a>
 </h2>
 <p>Funksjonen <code>write_SSB</code> kan brukes til å skrive .parquet-,
-.feather-, .csv og .rds-filer til Google Cloud Storage.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+.feather-, .csv- og .rds-filer til Google Cloud Storage.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># PARQUET</span></span>
-<span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet"</span><span class="op">)</span></span>
+<span><span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># "Multifile" datasett</span></span>
-<span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test"</span>, partitioning <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test"</span>, partitioning <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># FEATHER</span></span>
-<span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather"</span><span class="op">)</span></span>
+<span><span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># CSV</span></span>
-<span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.csv"</span><span class="op">)</span></span>
+<span><span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.csv"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># RDS</span></span>
-<span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/write_SSB.html">write_SSB</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds"</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
