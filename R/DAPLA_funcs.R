@@ -20,7 +20,7 @@ gcs_bucket <- function(bucket) {
     access_token <- getPass::getPass("Skriv inn access_token")
     expiration <- as.numeric(getPass::getPass("Skriv inn expiration"))
   }
-  bucket <- arrow::gs_bucket(bucket, access_token  = access_token, expiration = expiration)
+  bucket <- arrow::gs_bucket(bucket, access_token  = access_token, expiration = as.POSIXct(expiration))
 }
 
 #' Funksjon for å koble til Google Cloud Storage bucket med googleCloudStorageR
