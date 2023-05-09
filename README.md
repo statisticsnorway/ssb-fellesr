@@ -1,6 +1,6 @@
 # Fellesfunksjoner i R for SSB (`fellesr`)
 
-Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Pakken kan installere i et renv-miljø på DAPLA og i prod sone i Jupyter og den nye RStudio. Følgende kode vil sette opp et renv-miljø og installere `fellesr` pakken. Dette skal kun gjøres en gang per prosjekt.  
+Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Pakken kan installeres i et renv-miljø i Jupyterlab (på DAPLA og i prodsonen) og i RStudio Server (prodsonen). Følgende kode vil sette opp et `renv`-miljø og installere `fellesr`-pakken. Dette skal kun gjøres én gang per prosjekt. Les mer om hvordan å opprette et virtuelt miljø med `renv` i [Dapla-manualen](https://manual.dapla.ssb.no/pakke-install.html#r)  
 
 ```
 renv::init()

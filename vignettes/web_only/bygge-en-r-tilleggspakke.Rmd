@@ -28,8 +28,8 @@ Har du en laget en funksjon som du tror andre kan få nytte av? Den beste løsni
 [R Packages](https://r-pkgs.org/index.html) skrevet av Hadley Wickham er en veldig god referanse for pakke-bygging. Denne bloggen gir en kort intro og referere til forkjellige uvsnitt i boken for videre lesing.
 
 
-## Tekniske oppsetting
-Det er anbefalt å bygge R-pakke i RStudio. Det er lettest å gjøre dette i admin/på PC eller på linux. På linux er alle nødvendig tilleggsverktøy og pakker installerte. **Det er for tida tekniske problemer med å lage pakker i windows i prod. sone.**  
+## Teknisk oppsett
+Det er anbefalt å bygge R-pakke i RStudio. Det er lettest å gjøre dette i admin/på PC eller på linux. På linux er alle nødvendig tilleggsverktøy og pakker installerte.
 
 For å bygge en pakke i admin/på PC:
 
@@ -94,7 +94,7 @@ Det er mye annet som kan inkludere i en pakke. For eksempel kan det være nyttig
 ## Testing
 Det er ikke strengt nødvendig å lage noen formelle tester (enhetstester) til funksjoner i en pakke men det er anbefalt. Det kan ofte bidra til færre bugs og bedre struktur i koden. Pakken [testthat](https://testthat.r-lib.org) gi et rammeverk for å lage og kjøre tester. En typisk test er å sjekke at en funksjon returnere en forventet verdi. For eksempel kan vi bruke vectoren `x` nede for å teste at funksjonen `mean` returnerer den riktige verdien:
 
-```{r, warnings=FALSE}
+```{r, warnings=FALSE, eval = FALSE}
 x <- c(3, 4, 5)
 test_that("The function mean returns a correct value",{
   expect_equal(mean(x), 4)
@@ -103,7 +103,7 @@ test_that("The function mean returns a correct value",{
 
 Her bruker vi `expect_equal` og gir to verdier som vi forventer er like. Mer hjelp og eksempler for tester ligger [her](https://r-pkgs.org/tests.html#expectations).
 
-Koden for tester skal ligger i .R filer og skal ligge i pakken under [/tests/testthat/](https://r-pkgs.org/tests.html#test-organisation).Fil-navn skal starte med `test`. I tillegg til fil(ene) som inneholder tester skal det være en fil som heter `testthat.R`. Dette lagres i mappen `/tests/` og gir instruks om det som skal testes. For eksempel vil det vanligvis ligne på dette:
+Koden for tester skal ligger i .R filer og skal ligge i pakken under [/tests/testthat/](https://r-pkgs.org/tests.html#test-organisation).Filnavn skal starte med `test`. I tillegg til fil(ene) som inneholder tester skal det være en fil som heter `testthat.R`. Dette lagres i mappen `/tests/` og gir instruks om det som skal testes. For eksempel vil det vanligvis ligne på dette:
 
 
 ```{r, eval=F, echo = T}

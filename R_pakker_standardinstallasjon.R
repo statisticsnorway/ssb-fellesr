@@ -24,10 +24,11 @@ pakker <- c("DBI",
   "dcmodify",
   "simputation",
   "SSBtools",
-  "easySdcTable",          
+  "easySdcTable",
   "SmallCountRounding",
   "GaussSuppression",
   "GISSB",
+  "ReGenesees", # Github (fork)
   "struktuR", # Github
   "SSBpris", # Github
   "SdcForetakPerson", # Github

@@ -31,6 +31,8 @@ devtools::load_all()
 
 detach_package(fellesr)
 # usethis::use_pkgdown() # OBS: docs legges i .gitignore (må fjernes)
+
+options(pkgdown.internet = FALSE) # OBS: denne må kjøres i prodsonen for at byggingen av pakken ikke feiler
 pkgdown::build_site()
 
 
