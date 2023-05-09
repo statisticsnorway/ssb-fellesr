@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,6 @@
     <a class="dropdown-item" href="../../articles/vignette_SSB_theme.html">SSB ggplot theme</a>
     <a class="dropdown-item" href="../../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a>
     <a class="dropdown-item" href="../../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a>
-    <a class="dropdown-item" href="../../articles/vignette_renv.html">R pakkehåndtering med renv og fellesr</a>
     <a class="dropdown-item" href="../../articles/vignette_shiny_ssb.html">Kjøre shiny og Esquisse i Jupyter</a>
     <a class="dropdown-item" href="../../articles/vignette_statbank_lasting.html">Lasting til statistikkbanken</a>
     <a class="dropdown-item" href="../../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a>
@@ -100,12 +99,11 @@ bloggen gir en kort intro og referere til forkjellige uvsnitt i boken
 for videre lesing.</p>
 </div>
 <div class="section level2">
-<h2 id="tekniske-oppsetting">Tekniske oppsetting<a class="anchor" aria-label="anchor" href="#tekniske-oppsetting"></a>
+<h2 id="teknisk-oppsett">Teknisk oppsett<a class="anchor" aria-label="anchor" href="#teknisk-oppsett"></a>
 </h2>
 <p>Det er anbefalt å bygge R-pakke i RStudio. Det er lettest å gjøre
 dette i admin/på PC eller på linux. På linux er alle nødvendig
-tilleggsverktøy og pakker installerte. <strong>Det er for tida tekniske
-problemer med å lage pakker i windows i prod. sone.</strong></p>
+tilleggsverktøy og pakker installerte.</p>
 <p>For å bygge en pakke i admin/på PC:</p>
 <ul>
 <li>Installere <a href="https://www.r-project.org/" class="external-link">R</a> og <a href="https://www.rstudio.com/products/rstudio/" class="external-link">RStudio</a> hvis ikke
@@ -196,16 +194,15 @@ returnerer den riktige verdien:</p>
 <span><span class="fu">test_that</span><span class="op">(</span><span class="st">"The function mean returns a correct value"</span>,<span class="op">{</span></span>
 <span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre>
 <p>Her bruker vi <code>expect_equal</code> og gir to verdier som vi
 forventer er like. Mer hjelp og eksempler for tester ligger <a href="https://r-pkgs.org/tests.html#expectations" class="external-link">her</a>.</p>
 <p>Koden for tester skal ligger i .R filer og skal ligge i pakken under
-<a href="https://r-pkgs.org/tests.html#test-organisation" class="external-link">/tests/testthat/</a>.Fil-navn
+<a href="https://r-pkgs.org/tests.html#test-organisation" class="external-link">/tests/testthat/</a>.Filnavn
 skal starte med <code>test</code>. I tillegg til fil(ene) som inneholder
 tester skal det være en fil som heter <code>testthat.R</code>. Dette
 lagres i mappen <code>/tests/</code> og gir instruks om det som skal
 testes. For eksempel vil det vanligvis ligne på dette:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">minpakke</span><span class="op">)</span></span>
 <span></span>
