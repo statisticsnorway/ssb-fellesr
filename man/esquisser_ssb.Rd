@@ -11,6 +11,9 @@ esquisser_ssb(data, ...)
 
 \item{...}{Additional parameters for send to esquisser()}
 }
+\value{
+None
+}
 \description{
 Wrapper function for running esquisse in Jupyter at SSB
 }
