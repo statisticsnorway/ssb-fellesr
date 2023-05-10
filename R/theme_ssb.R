@@ -76,6 +76,7 @@ scale_color_ssb <- scale_colour_ssb
 #' @export
 #'
 #' @examples
+#' library(ggplot2)
 #' ggplot(mtcars, aes(x=cyl, fill=as.factor(cyl))) +
 #' geom_bar( ) +
 #' theme_ssb()

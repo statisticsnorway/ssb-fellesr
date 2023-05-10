@@ -20,7 +20,6 @@ Imports:
     tidyr,
     dbplyr,
     DBI,
-    renv,
     arrow,
     httr,
     rstudioapi,

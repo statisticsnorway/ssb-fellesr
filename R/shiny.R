@@ -56,7 +56,7 @@ runExample_ssb <- function(example, ...){
 #' @param data Data frame to use for plotting
 #' @param ... Additional parameters for send to esquisser()
 #'
-#' @return
+#' @return None
 #' @export
 esquisser_ssb <- function(data, ...){
   port <- getport()
