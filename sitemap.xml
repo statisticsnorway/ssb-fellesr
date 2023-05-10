@@ -34,16 +34,10 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/create_dependencies.html</loc>
-  </url>
-  <url>
     <loc>/reference/dynarev_uttrekk.html</loc>
   </url>
   <url>
     <loc>/reference/esquisser_ssb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/find_problem.html</loc>
   </url>
   <url>
     <loc>/reference/gcs_bucket.html</loc>
@@ -59,9 +53,6 @@
   </url>
   <url>
     <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/install.packages.html</loc>
   </url>
   <url>
     <loc>/reference/list.files.html</loc>
@@ -97,9 +88,6 @@
     <loc>/reference/read_xml.html</loc>
   </url>
   <url>
-    <loc>/reference/restore.html</loc>
-  </url>
-  <url>
     <loc>/reference/runApp_ssb.html</loc>
   </url>
   <url>
@@ -112,13 +100,7 @@
     <loc>/reference/scale_fill_ssb.html</loc>
   </url>
   <url>
-    <loc>/reference/snapshot.html</loc>
-  </url>
-  <url>
     <loc>/reference/ssb_colours.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ssb_library.html</loc>
   </url>
   <url>
     <loc>/reference/ssb_palettes.html</loc>
@@ -131,9 +113,6 @@
   </url>
   <url>
     <loc>/reference/theme_ssb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/try_common_library.html</loc>
   </url>
   <url>
     <loc>/reference/write_SSB.html</loc>
