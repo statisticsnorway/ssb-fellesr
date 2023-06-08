@@ -104,8 +104,7 @@ read_parquet <- function(file, ...) {
   }
   
   # Jupyterlab (produksjonssonen)
-  if (env_check() %in% c("BakkeProd", "BakkeTest")) |
-      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- arrow::read_parquet(file, ...)
   }
   
