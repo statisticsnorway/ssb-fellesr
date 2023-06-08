@@ -24,19 +24,16 @@ user_agent <- function() {
 # statbank_encrypt_request
 
 statbank_encrypt_request <- function(laste_bruker) {
+  prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
+  if (prod == TRUE | Sys.getenv("RSTUDIO") == 1) {
     db <- "PROD"
   }
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app") | grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
+  if (prod == FALSE) {
     db <- "TEST"
   }
   
-  
-  #   if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) & Sys.getenv('CLUSTER_ID') %in% c("")) {
-  #     db <- "UKJENT"
-  #   }
   
   # Prodsonen
   if (Sys.getenv('LOCAL_USER_PATH') == "") {
