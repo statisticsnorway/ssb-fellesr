@@ -1,3 +1,30 @@
+#' Funksjon for å sjekke hvilket miljø man er i
+#'
+#' `env_check` er en hjelpefunksjon som sjekker hvilket miljø man er i (DaplaProd, DaplaTest, BakkeProd eller BakkeTest).
+#'
+
+env_check <- function() { 
+  dapla <- stringr::str_detect(Sys.getenv('STATBANK_ENCRYPT_URL'), "^http://dapla")
+  bakke <- any(list.files("/ssb/") %in% "stamme01")
+  prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
+  
+  if ((dapla == TRUE & prod == TRUE)) {
+    env <- "DaplaProd"
+  }
+  if ((dapla == TRUE & prod == FALSE)) {
+    env <- "DaplaTest"
+  }
+  if ((bakke == TRUE & prod == TRUE) | Sys.getenv("RSTUDIO") == 1) {
+    env <- "BakkeProd"
+  }  
+  if ((bakke == TRUE & prod == FALSE)) {
+    env <- "BakkeTest"    
+  }   
+  return(env)
+}
+
+
+
 #' Funksjon for å koble til Google Cloud Storage bucket med arrow
 #'
 #' `gcs_bucket` er en hjelpefunksjon som kobler til en bucket på Google Cloud Storage med pakken `arrow`. Autentiseringen skjer via access_token og expiration som er lagret som miljøvariabler i Jupyter på DAPLA.
@@ -12,7 +39,7 @@
 #'@encoding UTF-8
 
 gcs_bucket <- function(bucket) {
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")){
+  if (env_check() %in% c("DaplaProd", "DaplaTest")){
     response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
     access_token <- httr::content(response)$exchanged_tokens$google$access_token
     expiration <- httr::content(response)$exchanged_tokens$google$exp
@@ -72,12 +99,12 @@ gcs_global_bucket <- function(bucket) {
 read_parquet <- function(file, ...) {
   
   # Jupyterlab (DAPLA)
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
     df <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
+  if (env_check() %in% c("BakkeProd", "BakkeTest")) |
       (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
     df <- arrow::read_parquet(file, ...)
   }
@@ -115,7 +142,7 @@ read_parquet <- function(file, ...) {
 read_parquet_sf <- function(file, ...) {
   
   # Jupyterlab (DAPLA)
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
     
     ds <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), as_data_frame = FALSE, ...)
     
@@ -132,8 +159,7 @@ read_parquet_sf <- function(file, ...) {
   }
   
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
-      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
     ds <- arrow::read_parquet(file, as_data_frame = FALSE, ...)
     metadata <- ds$metadata
     geo <- jsonlite::fromJSON(metadata$geo)
@@ -165,13 +191,12 @@ read_parquet_sf <- function(file, ...) {
 
 read_feather <- function(file, ...) {
   # Jupyterlab (DAPLA)
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
     df <- arrow::read_feather(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
-      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- arrow::read_feather(file, ...)
   }
   
@@ -214,13 +239,12 @@ read_feather <- function(file, ...) {
 open_dataset <- function(file, ...) {
   
   # Jupyterlab (DAPLA)
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
     ds <- arrow::open_dataset(gcs_bucket(file), ...)
   }
   
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
-      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
     ds <- arrow::open_dataset(file, ...)
   }
   
@@ -246,13 +270,12 @@ open_dataset <- function(file, ...) {
 #'@encoding UTF-8
 
 read_json <- function(file, ...) {
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Jupyterlab (produksjonssonen) + lokale filer fra RStudio Windows (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
-      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- arrow::read_json_arrow(file, ...)
   }
   
@@ -280,13 +303,12 @@ read_json <- function(file, ...) {
 #'@encoding UTF-8
 
 read_csv <- function(file, ...) {
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
     df <- arrow::read_delim_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
-      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- readr::read_delim(file, ...)
   }
   
@@ -321,7 +343,7 @@ read_csv <- function(file, ...) {
 
 read_rds <- function(file, ...) {
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
     gcs_global_bucket(sub("/.*", "", file))
     
     my_parse <- function(obj){
@@ -335,8 +357,7 @@ read_rds <- function(file, ...) {
   }
   
   # Jupyterlab (produksjonssonen)
-  if (grepl("sl-stata-p3", Sys.info()["nodename"]) | grepl("sl-python-03", Sys.info()["nodename"]) | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) |
-      (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("[A-Za-z]:", file))){
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- readRDS(file, ...)
   }
   return(df)
@@ -358,7 +379,7 @@ read_rds <- function(file, ...) {
 
 read_xml <- function(file, ...) {
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app", "prod-bip-app")) {
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
     suppressMessages(gcs_global_bucket(sub("/.*", "", file)))
     
     my_parse <- function(obj){
@@ -483,7 +504,7 @@ write_rds <- function(data,
 
 #' Funksjon for å sjekke hvilke filer som finnes i en mappe i en Google Cloud Storage bucket
 #'
-#' Funksjonen `list.files` kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket
+#' Funksjonen `gcs.list.files` kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket
 #'
 #' @param bucket Full sti til Google Cloud Storage bucket (med eventuelle undermapper).
 #'
@@ -491,18 +512,18 @@ write_rds <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' list.files("ssb-prod-dapla-felles-data-delt/R_smoke_test")
+#' gcs.list.files("ssb-prod-dapla-felles-data-delt/R_smoke_test")
 #' }
 #'@encoding UTF-8
 #'
 
-list.files <- function(bucket) {
+gcs.list.files <- function(bucket) {
   gcs_bucket(bucket)$ls(recursive = T)
 }
 
 #' Funksjon for å sjekke hvilke filer som finnes i en Google Cloud Storage bucket
 #'
-#' Funksjonen `list.files` kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket. I tillegg ser man størrelsen til filene og tidspnktet filen sist ble endret.
+#' Funksjonen `gcs_list_objects` kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket. I tillegg ser man størrelsen til filene og tidspnktet filen sist ble endret.
 #'
 #' @param bucket Full sti til Google Cloud Storage bucket.
 #'

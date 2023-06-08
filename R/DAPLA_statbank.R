@@ -1,21 +1,23 @@
+# -*- coding: utf-8 -*-
 # user_agent
 user_agent <- function() {
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app")) {
+  dapla <- stringr::str_detect(Sys.getenv('STATBANK_ENCRYPT_URL'), "^http://dapla")
+  bakke <- any(base::list.files("/ssb/") %in% "stamme01")
+  prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
+  
+  if ((dapla == TRUE & prod == TRUE)) {
     user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
   }
-  
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app")){
+  if ((dapla == TRUE & prod == FALSE)) {
     user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
   }
-  
-  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
+  if ((bakke == TRUE & prod == TRUE) | Sys.getenv("RSTUDIO") == 1) {
     user_agent <- paste0("BakkeProd-R-", httr:::default_ua())
   }
-  
-  # if (grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC"))) { # OBS, det finnes ingen måte å identifisere staging på bakken?
-  #   user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
-  # }
+  if ((bakke == TRUE & prod == FALSE)) {
+    user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
+  }
   return(user_agent)
 }
 
@@ -92,8 +94,8 @@ statbank_encrypt_request <- function(laste_bruker) {
 #' uttaksbeskrivelse$kodelister$kodeliste
 #' uttaksbeskrivelse$kodelister$SumIALtTotalKode
 #' uttaksbeskrivelse$kodelister$koder
-#'}
-#'@encoding UTF-8
+#' }
+#' @encoding UTF-8
 
 statbank_uttaksbeskrivelse <- function(tabell_id,
                                        laste_bruker,
@@ -281,7 +283,7 @@ initialer_funk <- function(lastefil) {
 #'                                  laste_bruker = "LAST330",
 #'                                  publiseringsdato = "2022-12-31")
 #' transfer_log
-#'}
+#' }
 #' @encoding UTF-8
 statbank_lasting <- function(lastefil,
                              lastefilsti = "",
@@ -398,5 +400,4 @@ statbank_lasting <- function(lastefil,
     print("Lasting mislyktes")
     return(transfer_log)
   }
-  
 }
