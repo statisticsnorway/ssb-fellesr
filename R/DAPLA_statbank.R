@@ -1,40 +1,39 @@
+# -*- coding: utf-8 -*-
 # user_agent
 user_agent <- function() {
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app")) {
+  dapla <- stringr::str_detect(Sys.getenv('STATBANK_ENCRYPT_URL'), "^http://dapla")
+  bakke <- any(base::list.files("/ssb/") %in% "stamme01")
+  prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
+  
+  if ((dapla == TRUE & prod == TRUE)) {
     user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
   }
-  
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app")){
+  if ((dapla == TRUE & prod == FALSE)) {
     user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
   }
-  
-  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
+  if ((bakke == TRUE & prod == TRUE) | Sys.getenv("RSTUDIO") == 1) {
     user_agent <- paste0("BakkeProd-R-", httr:::default_ua())
   }
-  
-  # if (grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC"))) { # OBS, det finnes ingen måte å identifisere staging på bakken?
-  #   user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
-  # }
+  if ((bakke == TRUE & prod == FALSE)) {
+    user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
+  }
   return(user_agent)
 }
 
 # statbank_encrypt_request
 
 statbank_encrypt_request <- function(laste_bruker) {
+  prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("prod-bip-app") | grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) | Sys.getenv("RSTUDIO") == 1) {
+  if (prod == TRUE | Sys.getenv("RSTUDIO") == 1) {
     db <- "PROD"
   }
   
-  if (Sys.getenv('CLUSTER_ID') %in% c("staging-bip-app") | grepl("onprem:latest", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
+  if (prod == FALSE) {
     db <- "TEST"
   }
   
-  
-  #   if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC")) & Sys.getenv('CLUSTER_ID') %in% c("")) {
-  #     db <- "UKJENT"
-  #   }
   
   # Prodsonen
   if (Sys.getenv('LOCAL_USER_PATH') == "") {
@@ -92,8 +91,8 @@ statbank_encrypt_request <- function(laste_bruker) {
 #' uttaksbeskrivelse$kodelister$kodeliste
 #' uttaksbeskrivelse$kodelister$SumIALtTotalKode
 #' uttaksbeskrivelse$kodelister$koder
-#'}
-#'@encoding UTF-8
+#' }
+#' @encoding UTF-8
 
 statbank_uttaksbeskrivelse <- function(tabell_id,
                                        laste_bruker,
@@ -141,7 +140,7 @@ statbank_body <- function(data,
     data_1 <- data.frame(data[i])
     data_1 <- data_1 %>%
       dplyr::mutate_all(~format(., decimal.mark = ',')) %>% # endrer desimaltegn til komma
-      dplyr::mutate_all(., str_trim) # fjerner whitespace
+      dplyr::mutate_all(., stringr::str_trim) # fjerner whitespace
     data_1 <- do.call(paste, c(data_1[colnames(data_1)], sep = ";", collapse = "\r\n"))
     
     data_1 <- paste0(start, data_1)
@@ -214,8 +213,8 @@ statbank_validering <- function(data,
       koder <- data.frame(uttaksbeskrivelse$kodelister$koder[kodeliste_plassering])
       
       data_1 <- data_1 %>%
-        dplyr::mutate(problemer_2 = case_when(
-          !!sym(j) %in% unique(as.character(koder$kode)) ~ "",
+        dplyr::mutate(problemer_2 = dplyr::case_when(
+          !!rlang::sym(j) %in% unique(as.character(koder$kode)) ~ "",
           TRUE ~ j
         ),
         problemer = paste0(problemer, problemer_2)) %>%
@@ -281,7 +280,7 @@ initialer_funk <- function(lastefil) {
 #'                                  laste_bruker = "LAST330",
 #'                                  publiseringsdato = "2022-12-31")
 #' transfer_log
-#'}
+#' }
 #' @encoding UTF-8
 statbank_lasting <- function(lastefil,
                              lastefilsti = "",
@@ -398,5 +397,4 @@ statbank_lasting <- function(lastefil,
     print("Lasting mislyktes")
     return(transfer_log)
   }
-  
 }
