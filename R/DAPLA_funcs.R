@@ -465,7 +465,7 @@ write_dataset <- function(data, file, ...) {
 
 write_feather <- function(data, file, ...) {
     
-      # Jupyterlab (DAPLA)
+    # Jupyterlab (DAPLA)
   if (env_check() %in% c("DaplaProd", "DaplaTest")) {
   arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
@@ -616,14 +616,14 @@ gcs_delete_object <- function(file) {
 #'@encoding UTF-8
 #'
 
-write_sf_parquet <- function(data, file) {
+write_sf_parquet <- function(data, file, ...) {
   
   geo_metadata <- sfarrow:::create_metadata(data)
   df <- sfarrow::encode_wkb(data)
   tbl <- arrow::Table$create(df)
   tbl$metadata[["geo"]] <- geo_metadata
   
-  write_parquet(tbl, file)
+  write_parquet(tbl, file, ...)
 }
 
 
