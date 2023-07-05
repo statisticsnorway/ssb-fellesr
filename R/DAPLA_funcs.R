@@ -409,8 +409,23 @@ read_xml <- function(file, ...) {
 #'@encoding UTF-8
 
 write_parquet <- function(data, file, ...) {
+    
+  # Jupyterlab (DAPLA)
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
   arrow::write_parquet(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
+  }
+    
+  # Jupyterlab (produksjonssonen)
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+    arrow::write_parquet(data, file, ...)
+  }
+    
+    
 }
+
+
+  
+
 
 
 #' Funksjon for å lagre "partitioned" .parquet-fil til Google Cloud Storage bucket
@@ -449,7 +464,16 @@ write_dataset <- function(data, file, ...) {
 #'@encoding UTF-8
 
 write_feather <- function(data, file, ...) {
+    
+    # Jupyterlab (DAPLA)
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
   arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
+  }
+    
+  # Jupyterlab (produksjonssonen)
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+    arrow::write_feather(data, file, ...)
+  }
   
 }
 
@@ -471,7 +495,17 @@ write_feather <- function(data, file, ...) {
 
 write_csv <- function(data,
                       file, ...) {
+    
+          # Jupyterlab (DAPLA)
+  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
   arrow::write_csv_arrow(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
+  }
+    
+  # Jupyterlab (produksjonssonen)
+  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+    arrow::write_csv_arrow(data, file, ...)
+  }
+    
   
 }
 
@@ -582,14 +616,14 @@ gcs_delete_object <- function(file) {
 #'@encoding UTF-8
 #'
 
-write_sf_parquet <- function(data, file) {
+write_sf_parquet <- function(data, file, ...) {
   
   geo_metadata <- sfarrow:::create_metadata(data)
   df <- sfarrow::encode_wkb(data)
   tbl <- arrow::Table$create(df)
   tbl$metadata[["geo"]] <- geo_metadata
   
-  write_parquet(tbl, file)
+  write_parquet(tbl, file, ...)
 }
 
 
