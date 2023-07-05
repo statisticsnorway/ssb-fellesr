@@ -164,6 +164,7 @@ statbank_validering <- function(data,
   uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, laste_bruker = laste_bruker, ask = ask, username_encryptedpassword = username_encryptedpassword)
   
   problemer_alle <- data.frame()
+  dubletter_alle <- data.frame()
   
   if (class(data)[1] %in% c("data.frame", "tibble", "tbl_df", "tbl")) {
     data <- list(data)
@@ -199,13 +200,26 @@ statbank_validering <- function(data,
     }
     colnames(data_1) <- kolonnenavn # OBS
     
+    # Dublettsjekk 
+    grupperingsvariabler <- c()
+    for (j in 1:length(Klassifikasjonsvariabel)) {
+      grupperingsvariabler <- c(grupperingsvariabler, colnames(data_1)[j])
+    }
+    
+    dubletter <- data_1 %>%
+      dplyr::group_by_at(grupperingsvariabler) %>%
+      dplyr::filter(n()>1) %>%
+      dplyr::mutate(across(everything(), as.character), 
+                    filnavn = uttaksbeskrivelse$DeltabellTitler$Filnavn[i], 
+                    problemer = "Dublett")
+    
     data_1$filnavn <- uttaksbeskrivelse$DeltabellTitler$Filnavn[i]
     data_1$problemer <- ""
     
-    for (j in variabler_med_kodeliste$Klassifikasjonsvariabel) {
+    for (k in variabler_med_kodeliste$Klassifikasjonsvariabel) {
       
       variabler_1 <- variabler %>%
-        dplyr::filter(Klassifikasjonsvariabel == j)
+        dplyr::filter(Klassifikasjonsvariabel == k)
       
       kodeliste_plassering <- which(uttaksbeskrivelse$kodelister$kodeliste == variabler_1$Kodeliste_id)
       kodeliste_navn <- uttaksbeskrivelse$kodelister$kodeliste[kodeliste_plassering]
@@ -213,9 +227,9 @@ statbank_validering <- function(data,
       koder <- data.frame(uttaksbeskrivelse$kodelister$koder[kodeliste_plassering])
       
       data_1 <- data_1 %>%
-        dplyr::mutate(problemer_2 = dplyr::case_when(
-          !!rlang::sym(j) %in% unique(as.character(koder$kode)) ~ "",
-          TRUE ~ j
+        dplyr::mutate(problemer_2 = case_when(
+          !!sym(k) %in% unique(as.character(koder$kode)) ~ "",
+          TRUE ~ k
         ),
         problemer = paste0(problemer, problemer_2)) %>%
         dplyr::select(-problemer_2)
@@ -225,14 +239,19 @@ statbank_validering <- function(data,
       dplyr::filter(problemer != "")
     
     problemer_alle <- rbind(problemer_alle, problemer)
+    dubletter_alle <- rbind(dubletter_alle, dubletter)
+    
   }
+  
+  problemer_alle <- rbind(problemer_alle, dubletter_alle)  
   
   if (nrow(problemer_alle)>0) {
     problemer_alle <- problemer_alle %>%
-      dplyr::relocate(filnavn, problemer)
+      dplyr::relocate(filnavn, problemer) %>%
+      dplyr::distinct()
     return(problemer_alle)
   } else {
-    print(paste0("Ingen ugyldige verdier i kodeliste for tabell ", tabell_id))
+    print(paste0("Ingen ugyldige verdier eller dubletter for tabell ", tabell_id))
   }
 }
 
@@ -341,7 +360,7 @@ statbank_lasting <- function(lastefil,
                                       ask = FALSE)
     
     if (length(validering)>1) {
-      print(paste0("Ugyldige verdier finnes i kodeliste for tabell ", tabell_id, ". Lasteoppdrag ikke startet."))
+      print(paste0("Ugyldige verdier eller dubletter finnes for tabell ", tabell_id, ". Lasteoppdrag ikke startet."))
       return(validering)
       stop()
     }
