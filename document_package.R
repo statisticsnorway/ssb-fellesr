@@ -22,6 +22,8 @@ devtools::document()
 # usethis::use_package("XML", type = "imports")
 # usethis::use_package("klassR", type = "imports")
 # usethis::use_package("ggplot2", type = "imports")
+# usethis::use_package("rlang", type = "imports")
+# usethis::use_package("stringr", type = "imports")
 # -
 
 # sfarrow?
