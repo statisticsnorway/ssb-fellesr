@@ -27,7 +27,7 @@ runApp_ssb <- function(...){
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
   }
   message(paste("App launching at:", appUrl))
-  supressMessages(shiny::runApp(port = port, ...))
+  suppressMessages(shiny::runApp(port = port, ...))
 }
 
 #' Wrapper function for running exampleshiny apps in Jupyter at SSB
