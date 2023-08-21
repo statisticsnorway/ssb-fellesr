@@ -1,4 +1,5 @@
 pakker <- c("DBI",
+  "configr",
   "renv",
   "tidyverse",
   "PxWebApiData",
