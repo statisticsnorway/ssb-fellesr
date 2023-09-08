@@ -53,7 +53,7 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 + [Metodebiblioteket](https://statisticsnorway.github.io/metodebibliotek/catalogue_edit.html)
 + [R grunnkurs](https://github.com/statisticsnorway/R_grunnkurs)
 + [R for viderekomne](https://github.com/statisticsnorway/R_for_viderekomne)
-+ R i produksjon (kommer)
++ [R i produksjon](https://github.com/statisticsnorway/kurs-r-produksjon/tree/main)
 + [Bruk av renv for pakke installering](https://manual.dapla.ssb.no/pakke-install.html#r)
 + [Hvordan å bygge en tilleggspakke](https://statisticsnorway.github.io/fellesr/articles/web_only/bygge-en-r-tilleggspakke.html)
 + [Generelle veiledning til R programmering i SSB](https://wiki.ssb.no/display/s880/Veiledning+til+R+programmering+i+SSB)
