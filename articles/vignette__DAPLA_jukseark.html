@@ -128,7 +128,7 @@ wrapper-funksjoner:<a class="anchor" aria-label="anchor" href="#funksjonen-write
 <h4 id="andre-funksjoner">Andre funksjoner<a class="anchor" aria-label="anchor" href="#andre-funksjoner"></a>
 </h4>
 <ul>
-<li><code>list.files</code></li>
+<li><code>gcs.list.files</code></li>
 <li><code>gcs_list_objects</code></li>
 <li><code>gcs_delete_object</code></li>
 <li><code>gcs_bucket</code></li>
@@ -144,9 +144,9 @@ buckets. <code>list.files</code> kan brukes på alle mapper og
 undermapper, mens <code>gcs_list_objects</code> kun fungerer på
 “bøttenivå”. Til gjengjeld vises også filstørrelse og endringsdato.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/list.files.html">list.files</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">fellesr</span><span class="fu">::</span><span class="fu">gcs.list.files</span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/gcs_list_objects.html">gcs_list_objects</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">updated</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/gcs_list_objects.html">gcs_list_objects</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">updated</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="slette-filer-fra-google-cloud-storage">Slette filer fra Google Cloud Storage<a class="anchor" aria-label="anchor" href="#slette-filer-fra-google-cloud-storage"></a>
@@ -154,7 +154,7 @@ undermapper, mens <code>gcs_list_objects</code> kun fungerer på
 <p>Funksjonen <code>gcs_delete_object</code> kan brukes til å slette
 filer fra en Google Cloud Storage bucket.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/gcs_delete_object.html">gcs_delete_object</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">fellesr</span><span class="fu">::</span><span class="fu"><a href="../reference/gcs_delete_object.html">gcs_delete_object</a></span><span class="op">(</span><span class="st">"ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="lese-inn-data-fra-google-cloud-storage">Lese inn data fra Google Cloud Storage<a class="anchor" aria-label="anchor" href="#lese-inn-data-fra-google-cloud-storage"></a>
