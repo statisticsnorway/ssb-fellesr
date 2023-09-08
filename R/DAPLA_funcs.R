@@ -5,6 +5,7 @@
 
 env_check <- function() { 
   dapla <- stringr::str_detect(Sys.getenv('STATBANK_ENCRYPT_URL'), "^http://dapla")
+  onyxia <- stringr::str_detect(Sys.getenv('OIDC_TOKEN_EXCHANGE_URL'), "sso")
   bakke <- any(list.files("/ssb/") %in% "stamme01")
   prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
   
@@ -14,14 +15,21 @@ env_check <- function() {
   if ((dapla == TRUE & prod == FALSE)) {
     env <- "DaplaTest"
   }
-  if ((bakke == TRUE & prod == TRUE) | Sys.getenv("RSTUDIO") == 1) {
+  if (onyxia == TRUE){
+    env <- "Onyxia"
+  }
+  if ((bakke == TRUE & prod == TRUE) | (Sys.getenv("RSTUDIO") == 1 & onyxia == FALSE)) {
     env <- "BakkeProd"
   }  
   if ((bakke == TRUE & prod == FALSE)) {
     env <- "BakkeTest"    
-  }   
+  } 
+  if (!exists("env")) {
+    warning("Ukjent miljø. Denne funksjonene fungerer kun på Dapla og i produksjonssonen")
+  }  
   return(env)
 }
+
 
 
 
@@ -43,11 +51,17 @@ gcs_bucket <- function(bucket) {
     response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
     access_token <- httr::content(response)$exchanged_tokens$google$access_token
     expiration <- httr::content(response)$exchanged_tokens$google$exp
-  } else {
+  }  
+  else if (env_check() %in% c("Onyxia")){
+    response <- httr::GET(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"), httr::add_headers("Authorization" = paste0("Bearer ", Sys.getenv('OIDC_TOKEN'))))
+    access_token <- httr::content(response)$access_token
+    expiration <- httr::content(response)$accessTokenExpiration     
+  }
+  else {
     access_token <- getPass::getPass("Skriv inn access_token")
     expiration <- as.numeric(getPass::getPass("Skriv inn expiration"))
   }
-  bucket <- arrow::gs_bucket(bucket, access_token  = access_token, expiration = as.POSIXct(expiration))
+  bucket <- arrow::gs_bucket(bucket, access_token = access_token, expiration = as.POSIXct(expiration, origin="1970-01-01"))
 }
 
 #' Funksjon for å koble til Google Cloud Storage bucket med googleCloudStorageR
@@ -66,14 +80,22 @@ gcs_bucket <- function(bucket) {
 gcs_global_bucket <- function(bucket) {
   gcs_auth <- function() {
     manual_token <- function(scopes, ...) {
+      if (env_check() %in% c("DaplaProd", "DaplaTest")){
       response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'),
                             httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
       credentials <- list()
       credentials$access_token <- httr::content(response)$exchanged_tokens$google$access_token
-      httr::oauth2.0_token(endpoint = NULL, app = gargle::gargle_app(), scope = NULL, credentials = credentials)
+      }
+      else if (env_check() %in% c("Onyxia")){
+        response <- httr::GET(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"), httr::add_headers("Authorization" = paste0("Bearer ", Sys.getenv('OIDC_TOKEN'))))
+        credentials <- list()
+        credentials$access_token <- httr::content(response)$access_token
+      }
+      httr::oauth2.0_token(endpoint = NULL, app = gargle::gargle_client(), scope = NULL, credentials = credentials)
     }
     
-    gargle::cred_funs_add(manual_token)
+    gargle::cred_funs_add(manual_token = NULL)
+    gargle::cred_funs_add(manual_token = manual_token)
     
     token <- gargle::token_fetch()
     googleCloudStorageR::gcs_auth(token = token)
@@ -98,28 +120,14 @@ gcs_global_bucket <- function(bucket) {
 
 read_parquet <- function(file, ...) {
   
-  # Jupyterlab (DAPLA)
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
+  # DAPLA
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     df <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
-  # Jupyterlab (produksjonssonen)
+  # Produksjonssonen
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- arrow::read_parquet(file, ...)
-  }
-  
-  # RStudio Windows (produksjonssonen) - fra Linux
-  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){
-    
-    # Brukernavn og passord (Windows) #
-    options(usr = Sys.info()[["user"]])
-    options(passwd = rstudioapi::askForPassword("Windows passord:"))
-    df <- arrow::read_parquet(
-      RCurl::getBinaryURL(
-        url = paste0("sftp://sl-sas-work-1", file),
-        userpwd = paste0(getOption("usr"), ":",  getOption("passwd"))
-      )
-    )
   }
   
   return(df)
@@ -140,8 +148,8 @@ read_parquet <- function(file, ...) {
 
 read_parquet_sf <- function(file, ...) {
   
-  # Jupyterlab (DAPLA)
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
+  # DAPLA
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     
     ds <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), as_data_frame = FALSE, ...)
     
@@ -157,7 +165,7 @@ read_parquet_sf <- function(file, ...) {
     
   }
   
-  # Jupyterlab (produksjonssonen)
+  # Produksjonssonen
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     ds <- arrow::read_parquet(file, as_data_frame = FALSE, ...)
     metadata <- ds$metadata
@@ -189,26 +197,14 @@ read_parquet_sf <- function(file, ...) {
 #'@encoding UTF-8
 
 read_feather <- function(file, ...) {
-  # Jupyterlab (DAPLA)
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
+  # DAPLA
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     df <- arrow::read_feather(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
-  # Jupyterlab (produksjonssonen)
+  # Produksjonssonen
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- arrow::read_feather(file, ...)
-  }
-  
-  # RStudio Windows - fra Linux
-  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){
-    # Brukernavn og passord (Windows) #
-    options(usr = Sys.info()[["user"]])
-    options(passwd = rstudioapi::askForPassword("Windows passord:"))
-    df <- arrow::read_feather(
-      RCurl::getBinaryURL(
-        url = paste0("sftp://sl-sas-work-1", file),
-        userpwd = paste0(getOption("usr"), ":",  getOption("passwd"))
-      ))
   }
   
   return(df)
@@ -237,19 +233,14 @@ read_feather <- function(file, ...) {
 
 open_dataset <- function(file, ...) {
   
-  # Jupyterlab (DAPLA)
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
+  # DAPLA
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     ds <- arrow::open_dataset(gcs_bucket(file), ...)
   }
   
-  # Jupyterlab (produksjonssonen)
+  # Produksjonssonen
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     ds <- arrow::open_dataset(file, ...)
-  }
-  
-  # Windows (produksjonssonen) - fra Linux
-  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
-    # OBS: mangler
   }
   
   return(ds)
@@ -269,18 +260,13 @@ open_dataset <- function(file, ...) {
 #'@encoding UTF-8
 
 read_json <- function(file, ...) {
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Jupyterlab (produksjonssonen) + lokale filer fra RStudio Windows (produksjonssonen)
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- arrow::read_json_arrow(file, ...)
-  }
-  
-  # RStudio Windows (produksjonssonen) - fra Linux
-  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (RStudio Windows)
-    # OBS: mangler
   }
   
   return(df)
@@ -302,26 +288,15 @@ read_json <- function(file, ...) {
 #'@encoding UTF-8
 
 read_csv <- function(file, ...) {
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
+  
+  # DAPLA  
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     df <- arrow::read_delim_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
-  # Jupyterlab (produksjonssonen)
+  # Produksjonssonen
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- readr::read_delim(file, ...)
-  }
-  
-  if (grepl("FW-XAPROD", Sys.info()["nodename"]) & grepl("/ssb/", file)){ # FW-XAPROD = RStudio (Windows)
-    # OBS: test med ulike typer separator!
-    options(usr = Sys.info()[["user"]])
-    options(passwd = rstudioapi::askForPassword("Windows passord:"))
-    
-    df <- readr::read_delim(
-      RCurl::getBinaryURL(
-        url = paste0("sftp://sl-sas-work-1", file),
-        userpwd = paste0(getOption("usr"), ":",  getOption("passwd"))
-      ),
-    )
   }
   
   return(df)
@@ -342,7 +317,8 @@ read_csv <- function(file, ...) {
 
 read_rds <- function(file, ...) {
   
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
+  # DAPLA 
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     gcs_global_bucket(sub("/.*", "", file))
     
     my_parse <- function(obj){
@@ -355,7 +331,7 @@ read_rds <- function(file, ...) {
     df <- my_parse(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
   }
   
-  # Jupyterlab (produksjonssonen)
+  # Produksjonssonen
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     df <- readRDS(file, ...)
   }
@@ -378,7 +354,8 @@ read_rds <- function(file, ...) {
 
 read_xml <- function(file, ...) {
   
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
+  # DAPLA 
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     suppressMessages(gcs_global_bucket(sub("/.*", "", file)))
     
     my_parse <- function(obj){
@@ -390,6 +367,9 @@ read_xml <- function(file, ...) {
     
     df <- my_parse(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
   }
+  
+  # Produksjonssonen (mangler)
+  
   return(df)
 }
 
@@ -409,22 +389,22 @@ read_xml <- function(file, ...) {
 #'@encoding UTF-8
 
 write_parquet <- function(data, file, ...) {
-    
-  # Jupyterlab (DAPLA)
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
-  arrow::write_parquet(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
+  
+  # DAPLA
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+    arrow::write_parquet(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
-    
-  # Jupyterlab (produksjonssonen)
+  
+  # Produksjonssonen
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     arrow::write_parquet(data, file, ...)
   }
-    
-    
+  
+  
 }
 
 
-  
+
 
 
 
@@ -464,13 +444,13 @@ write_dataset <- function(data, file, ...) {
 #'@encoding UTF-8
 
 write_feather <- function(data, file, ...) {
-    
-    # Jupyterlab (DAPLA)
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
-  arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
+  
+  # DAPLA
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+    arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
-    
-  # Jupyterlab (produksjonssonen)
+  
+  # Produksjonssonen
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     arrow::write_feather(data, file, ...)
   }
@@ -495,17 +475,17 @@ write_feather <- function(data, file, ...) {
 
 write_csv <- function(data,
                       file, ...) {
-    
-          # Jupyterlab (DAPLA)
-  if (env_check() %in% c("DaplaProd", "DaplaTest")) {
-  arrow::write_csv_arrow(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
+  
+  # DAPLA
+  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+    arrow::write_csv_arrow(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
-    
-  # Jupyterlab (produksjonssonen)
+  
+  # Produksjonssonen
   if (env_check() %in% c("BakkeProd", "BakkeTest")){
     arrow::write_csv_arrow(data, file, ...)
   }
-    
+  
   
 }
 
