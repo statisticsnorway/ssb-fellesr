@@ -1,6 +1,6 @@
 #' Funksjon for å sjekke hvilket miljø man er i
 #'
-#' `env_check` er en hjelpefunksjon som sjekker hvilket miljø man er i (DaplaProd, DaplaTest, BakkeProd eller BakkeTest).
+#' `env_check` er en hjelpefunksjon som sjekker hvilket miljø man er i (DaplaProd, DaplaTest, BakkeProd, BakkeTest eller Onyxia).
 #'
 
 env_check <- function() { 

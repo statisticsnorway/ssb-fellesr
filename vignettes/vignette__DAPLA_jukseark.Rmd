@@ -54,7 +54,7 @@ renv::install("statisticsnorway/fellesr")
 + `write_dataset`
 
 #### Andre funksjoner
-+ `list.files`
++ `gcs.list.files`
 + `gcs_list_objects`
 + `gcs_delete_object`
 + `gcs_bucket`
@@ -65,9 +65,9 @@ renv::install("statisticsnorway/fellesr")
 Funksjonene `list.files` og `gcs_list_objects` kan brukes til å liste opp filene som finnes i Google Cloud Storage buckets. `list.files` kan brukes på alle mapper og undermapper, mens `gcs_list_objects` kun fungerer på "bøttenivå". Til gjengjeld vises også filstørrelse og endringsdato.
 
 ```{r, eval=FALSE}
-list.files("ssb-prod-dapla-felles-data-delt/R_smoke_test/")
+fellesr::gcs.list.files("ssb-prod-dapla-felles-data-delt/R_smoke_test/")
 
-gcs_list_objects("ssb-prod-dapla-felles-data-delt/R_smoke_test") %>% dplyr::arrange(desc(updated))
+fellesr::gcs_list_objects("ssb-prod-dapla-felles-data-delt/R_smoke_test") %>% dplyr::arrange(desc(updated))
 ```
 
 ## Slette filer fra Google Cloud Storage
@@ -75,7 +75,7 @@ gcs_list_objects("ssb-prod-dapla-felles-data-delt/R_smoke_test") %>% dplyr::arra
 Funksjonen `gcs_delete_object` kan brukes til å slette filer fra en Google Cloud Storage bucket.
 
 ```{r, eval=FALSE}
-gcs_delete_object("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+fellesr::gcs_delete_object("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
 ```
 
 ## Lese inn data fra Google Cloud Storage
