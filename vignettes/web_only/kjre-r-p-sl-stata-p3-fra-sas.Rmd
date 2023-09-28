@@ -4,7 +4,7 @@ description: |
   Her er et eksempel på hvordan å kjøre en R script på en annen server fra SAS 
 author:
   - name: Susie Jentoft, Øyvind Bruer-Skarsbø, Anna-Karin Mevik
-    url: {}
+output: rmarkdown::html_vignette
 date: 2022-05-23
 vignette: >
   %\VignetteIndexEntry{Kjøre R på sl-stata-p3 fra SAS}
