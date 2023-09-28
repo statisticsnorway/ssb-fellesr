@@ -47,7 +47,7 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 + [SdcForetakPerson](https://github.com/statisticsnorway/SdcForetakPerson)
 
 
-### Kursmateriell og veiledning
+### Kursmateriell, veiledning og tips
 + [kurs-r-nybegynner-jupyter](https://github.com/statisticsnorway/kurs-r-nybegynner-jupyter)
 + [kurs-r-viderekomne](kurs-r-viderekomne)
 + [Metodebiblioteket](https://statisticsnorway.github.io/metodebibliotek/catalogue_edit.html)
@@ -57,7 +57,8 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 + [Bruk av renv for pakke installering](https://manual.dapla.ssb.no/pakke-install.html#r)
 + [Hvordan å bygge en tilleggspakke](https://statisticsnorway.github.io/fellesr/articles/web_only/bygge-en-r-tilleggspakke.html)
 + [Generelle veiledning til R programmering i SSB](https://wiki.ssb.no/display/s880/Veiledning+til+R+programmering+i+SSB)
-+ R jukseark (kommer)
++ [databehandling med dplyr jukseark](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
++ [Kjøre R fra SAS](https://statisticsnorway.github.io/fellesr/articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html)
 
 
 ### Eksempler på produksjonsløp i R
