@@ -1,52 +1,56 @@
 ---
 title: "Kjøre R på sl-stata-p3 fra SAS"
 description: |
-  Her er et eksempel på hvordan å kjøre en R script på en annen server fra SAS 
+  Her er et eksempel på hvordan man kan kjøre et R script på en annen server fra SAS 
 author:
-  - name: Susie Jentoft, Øyvind Bruer-Skarsbø, Anna-Karin Mevik
+  - name: Susie Jentoft, Øyvind Bruer-Skarsbø, Anna-Karin Mevik, Anita Cecilie Dal
 output: rmarkdown::html_vignette
-date: 2022-05-23
+date: 2023-11-02
 vignette: >
   %\VignetteIndexEntry{Kjøre R på sl-stata-p3 fra SAS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-Av og til har vi behov for å kjøre en R-script fra SAS. Vanligvis fordi det er kun en små del av en store produksjonsprosess og det er en fordel å kjøre alt innenfor et miljø (SAS-EG). Per i dag har vi forkjellige versjoner av R på de forkjellige serverne. Det kan være en fordel å kjøre scripten på en nyere R-versjon på sl-stata-p3 fra et SAS prosjekt. 
+Av og til har vi behov for å kjøre et R-script fra SAS. Vanligvis fordi det kun er en liten del av en stor produksjonsprosess og det er en fordel å kjøre alt innenfor ett miljø (SAS-EG). Per i dag har vi forskjellige versjoner av R på de forskjellige serverne. Det kan være en fordel å kjøre scriptet på en nyere R-versjon på sl-stata-p3 fra et SAS prosjekt. 
 
-**Foreløpig fungere dette kun med kjøring på sl-stata-p3 og ikke python server**
+**Foreløpig fungerer dette kun med kjøring på sl-stata-p3 og ikke python server**
 
-Har viser vi et eksempel på hvordan du kan gjøre dette. 
+Her viser vi et eksempel på hvordan du kan gjøre dette. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 ```
 ## 1. SAS macro
-Følgende viser en SAS-macro som kan brukes inn i en SAS-program for å kjøre en R-script på en annen server. Macroen heter `RunScriptFromR`. Kopiere følgende inn i prosjektet ditt for å bruke macro.
+Det er laget en (felles) SAS-makro alle kan benytte som ligger tilgjengelig på Linux. Makroen heter %RunScriptFromR og er dokumentert på SSB sin SAS-wiki (https://wiki.ssb.no/display/SASDOC/Nyttige+SAS+program) og i prodsonen (Q:\\Saskurs\\Fellesprog\\RunScriptFromR.docx). Makroen tilbyr kjøring av skript og håndtering av loggfil fra R-kjøringen. Se dokumentasjon for nærmere beskrivelse.
+
+<br>
+En forenklet utgave av makroen er vist under hvis man ønsker å definere den selv i SAS. Eksempel på bruk:
+
+Kopier følgende inn i prosjektet ditt for å definere macroen.
 
 ```{bash, eval = F, class.source="sas"}
-%macro RunScriptFromR(program, server="sl-stata-p3");
+%macro RunScriptFromR(program='', server="sl-stata-p3");
 
 %let server2 = %sysfunc(dequote(&server.));
 %let program2 = %sysfunc(dequote(&program.));
 
 filename CliCmnd PIPE "export LC_ALL=en_US.UTF-8;
-    ssh -o 'StrictHostKeyChecking no' $USER@&server2. 'Rscript &program2.'";
-
+	ssh -o 'StrictHostKeyChecking=no' -o 'UserKnownHostsFile=/dev/null' $USER@&server2. 'Rscript &program2.'";
 DATA kjoring_logg;
+  LENGTH stdout $ 500 ;
   INFILE CliCmnd;
-  LENGTH stdout $ 500.;
-  INPUT stdout $ char50.;
+  INPUT stdout $char500 ;
 RUN;
 
 %mend RunScriptFromR;
 ```
 
 
-## 2. Lage R-scripten tilgjengelig
-Først må du skrive ferdig R-scripten og gjøre det tilgjengelig for deg og de som skal kjøre programmet.
+## 2. Lag R-scriptet og gjør det tilgjengelig
+Først må du skrive ferdig R-scriptet og gjøre det tilgjengelig for deg og de som skal kjøre programmet.
 
-Her er et eksempel på en R-script som leser inn data og kjøre en regresjon. Den lagre predikterte verdiene i tillegg til å lagre informasjon om hvilken server det kjøres på (nodename). Til slutt lagres data som en .csv. Vi kaller scripten: `run_test.R`. 
+Her er et eksempel på et R-script som leser inn data og kjører en regresjon. Den lagrer de predikterte verdiene i tillegg til å lagre informasjon om hvilken server det kjøres på (nodename). Til slutt lagres data som en .csv. Vi kaller scriptet: `run_test.R`. 
 
 ```{r}
 # Les inn  data
@@ -62,8 +66,8 @@ write.csv(dt, file ="~/sas_test/testdata_output.csv",
           row.names = F)
 ```
 
-## 3. Kjøre R-scripten fra SAS
-Til slutt kjøre vi macro i SAS som kjøres skripten. Her er et eksempel av å lage test data som en csv og lagre det som en csv.
+## 3. Kjøre R-scriptet fra SAS
+Til slutt kjører vi macroen i SAS.Her er et eksempel på å lage testdata som en csv og lagre det som en csv.
 
 
 ```{bash, eval = F, class.source="sas"}
@@ -84,12 +88,12 @@ RUN;
 ```
 
 
-Neste kjøre vi R-scripten ved å kjøre macro og spesifisere hvor R-script ligger: 
+Deretter kjører vi R-scriptet ved å kjøre macro og spesifiserer hvor R-script ligger (det er også mulig å kjøre til egen spesifisert logg om man ønsker det): 
 
 ```{bash, eval = F, class.source="sas"}
 %RunScriptFromR(program="~/sas_test/run_test.R");
 ```
-Og så kan vi se på data som ble lagret fra scripten i SAS ved å lese inn data:
+Og så kan vi se på data som ble lagret fra scriptet i SAS ved å lese inn data:
 
 ```{bash, eval = F, class.source="sas"}
 PROC IMPORT datafile="~/sas_test/testdata_output.csv"
