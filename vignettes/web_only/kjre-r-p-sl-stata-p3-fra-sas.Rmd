@@ -22,7 +22,7 @@ Her viser vi et eksempel på hvordan du kan gjøre dette.
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 ```
 ## 1. SAS macro
-Det er laget en (felles) SAS-makro alle kan benytte som ligger tilgjengelig på Linux. Makroen heter %RunScriptFromR og er dokumentert på SSB sin SAS-wiki (https://wiki.ssb.no/display/SASDOC/Nyttige+SAS+program) og i prodsonen (Q:\\Saskurs\\Fellesprog\\RunScriptFromR.docx). Makroen tilbyr kjøring av skript med og uten paramtere og håndtering av loggfil fra R-kjøringen. Se dokumentasjon for nærmere beskrivelse.
+Det er laget en (felles) SAS-makro alle kan benytte som ligger tilgjengelig på Linux. Makroen heter %RunScriptFromR og er dokumentert på SSB sin SAS-wiki (https://wiki.ssb.no/display/SASDOC/Nyttige+SAS+program) og i prodsonen (Q:\\Saskurs\\Fellesprog\\RunScriptFromR.docx). Makroen tilbyr kjøring av skript med og uten parametere og håndtering av loggfil fra R-kjøringen. Se dokumentasjon for nærmere beskrivelse.
 
 <br>
 En forenklet utgave av makroen er vist under hvis man ønsker å definere den selv i SAS. Eksempel på bruk:
@@ -71,6 +71,7 @@ write.csv(dt, file ="~/sas_test/testdata_output.csv",
 For å ta imot parametre i R-skriptet trenger man denne kodesnutten:
 ```{r}
 args <- commandArgs(trailingOnly = TRUE)
+aar <- as.numeric(args[1])  # Konverterer det første argumentet til numerisk verdi
 ```
 
 
