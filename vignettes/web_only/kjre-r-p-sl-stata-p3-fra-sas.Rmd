@@ -22,7 +22,7 @@ Her viser vi et eksempel på hvordan du kan gjøre dette.
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 ```
 ## 1. SAS macro
-Det er laget en (felles) SAS-makro alle kan benytte som ligger tilgjengelig på Linux. Makroen heter %RunScriptFromR og er dokumentert på SSB sin SAS-wiki (https://wiki.ssb.no/display/SASDOC/Nyttige+SAS+program) og i prodsonen (Q:\\Saskurs\\Fellesprog\\RunScriptFromR.docx). Makroen tilbyr kjøring av skript og håndtering av loggfil fra R-kjøringen. Se dokumentasjon for nærmere beskrivelse.
+Det er laget en (felles) SAS-makro alle kan benytte som ligger tilgjengelig på Linux. Makroen heter %RunScriptFromR og er dokumentert på SSB sin SAS-wiki (https://wiki.ssb.no/display/SASDOC/Nyttige+SAS+program) og i prodsonen (Q:\\Saskurs\\Fellesprog\\RunScriptFromR.docx). Makroen tilbyr kjøring av skript med og uten parametere og håndtering av loggfil fra R-kjøringen. Se dokumentasjon for nærmere beskrivelse.
 
 <br>
 En forenklet utgave av makroen er vist under hvis man ønsker å definere den selv i SAS. Eksempel på bruk:
@@ -30,17 +30,19 @@ En forenklet utgave av makroen er vist under hvis man ønsker å definere den se
 Kopier følgende inn i prosjektet ditt for å definere macroen.
 
 ```{bash, eval = F, class.source="sas"}
-%macro RunScriptFromR(program='', server="sl-stata-p3");
+%macro RunScriptFromR(program='', server="sl-stata-p3",param="");
 
 %let server2 = %sysfunc(dequote(&server.));
 %let program2 = %sysfunc(dequote(&program.));
+%let args = %sysfunc(dequote(&param.));
 
 filename CliCmnd PIPE "export LC_ALL=en_US.UTF-8;
-	ssh -o 'StrictHostKeyChecking=no' -o 'UserKnownHostsFile=/dev/null' $USER@&server2. 'Rscript &program2.'";
+    ssh -o 'StrictHostKeyChecking no' $USER@&server2. 'Rscript &program2. &args. '";
+
 DATA kjoring_logg;
-  LENGTH stdout $ 500 ;
-  INFILE CliCmnd;
-  INPUT stdout $char500 ;
+  INFILE CliCmnd encoding='utf-8';
+  LENGTH stdout $ 1500.;
+  INPUT stdout $ char500.;
 RUN;
 
 %mend RunScriptFromR;
@@ -48,7 +50,7 @@ RUN;
 
 
 ## 2. Lag R-scriptet og gjør det tilgjengelig
-Først må du skrive ferdig R-scriptet og gjøre det tilgjengelig for deg og de som skal kjøre programmet.
+Først må du skrive ferdig R-scriptet og gjøre det tilgjengelig for deg og de som skal kjøre programmet. Det er mulig å sende med parametere til kallet (param=''), men det er ikke påkrevet. 
 
 Her er et eksempel på et R-script som leser inn data og kjører en regresjon. Den lagrer de predikterte verdiene i tillegg til å lagre informasjon om hvilken server det kjøres på (nodename). Til slutt lagres data som en .csv. Vi kaller scriptet: `run_test.R`. 
 
@@ -65,6 +67,13 @@ dt$node <- Sys.info()["nodename"]
 write.csv(dt, file ="~/sas_test/testdata_output.csv", 
           row.names = F)
 ```
+
+For å ta imot parametre i R-skriptet trenger man denne kodesnutten:
+```{r}
+args <- commandArgs(trailingOnly = TRUE)
+aar <- as.numeric(args[1])  # Konverterer det første argumentet til numerisk verdi
+```
+
 
 ## 3. Kjøre R-scriptet fra SAS
 Til slutt kjører vi macroen i SAS.Her er et eksempel på å lage testdata som en csv og lagre det som en csv.
