@@ -255,6 +255,19 @@ statbank_validering <- function(data,
   }
 }
 
+#' Funksjon for å hente initialene til pålogget bruker
+#'
+#' Funksjonen `initialer_funk` henter initialene til brukeren som er pålogget Jupyterlab/RStudio. 
+#'
+#' @returns Karaktervektor med initialer (vanligvis tre siffer)
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' initialer_funk()
+#'}
+#' @encoding UTF-8
 
 initialer_funk <- function(lastefil) {
   if (grepl("Bakke", user_agent())) {

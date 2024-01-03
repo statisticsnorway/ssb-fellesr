@@ -1,7 +1,16 @@
 #' Funksjon for å sjekke hvilket miljø man er i
 #'
-#' `env_check` er en hjelpefunksjon som sjekker hvilket miljø man er i (DaplaProd, DaplaTest, BakkeProd, BakkeTest eller Onyxia).
+#' `env_check` er en hjelpefunksjon som sjekker hvilket miljø man er i
 #'
+#' @returns Karaktervektor: "DaplaProd", "DaplaTest", "BakkeProd", "BakkeTest" eller "Onyxia"
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' env_check()
+#'}
+#'@encoding UTF-8
 
 env_check <- function() { 
   dapla <- stringr::str_detect(Sys.getenv('STATBANK_ENCRYPT_URL'), "^http://dapla")
@@ -29,7 +38,6 @@ env_check <- function() {
   }  
   return(env)
 }
-
 
 
 
@@ -555,6 +563,8 @@ gcs.list.files <- function(bucket) {
 #'
 #' @param bucket Full sti til Google Cloud Storage bucket.
 #'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' gcs_list_objects("ssb-prod-dapla-felles-data-delt")
@@ -603,6 +613,8 @@ gcs_delete_object <- function(file) {
 #'
 #' @param data Filen som skal skrives.
 #' @param file Full filsti og filnavn for hvor filen skal skrives.
+#'
+#' @export
 #'
 #' @examples
 #' \dontrun{
