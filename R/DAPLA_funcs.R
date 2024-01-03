@@ -142,6 +142,9 @@ gcs_global_bucket <- function(bucket) {
 #'@encoding UTF-8
 
 read_parquet <- function(file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   # DAPLA
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
@@ -170,6 +173,9 @@ read_parquet <- function(file, ...) {
 #'@encoding UTF-8
 
 read_parquet_sf <- function(file, ...) {
+ 
+# Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   # DAPLA
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
@@ -220,6 +226,10 @@ read_parquet_sf <- function(file, ...) {
 #'@encoding UTF-8
 
 read_feather <- function(file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
+    
   # DAPLA
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     df <- arrow::read_feather(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
@@ -255,6 +265,9 @@ read_feather <- function(file, ...) {
 #'@encoding UTF-8
 
 open_dataset <- function(file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   # DAPLA
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
@@ -283,6 +296,10 @@ open_dataset <- function(file, ...) {
 #'@encoding UTF-8
 
 read_json <- function(file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
+    
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
@@ -311,6 +328,9 @@ read_json <- function(file, ...) {
 #'@encoding UTF-8
 
 read_csv <- function(file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   # DAPLA  
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
@@ -339,6 +359,9 @@ read_csv <- function(file, ...) {
 #'@encoding UTF-8
 
 read_rds <- function(file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   # DAPLA 
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
@@ -376,6 +399,9 @@ read_rds <- function(file, ...) {
 #'@encoding UTF-8
 
 read_xml <- function(file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   # DAPLA 
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
@@ -412,6 +438,9 @@ read_xml <- function(file, ...) {
 #'@encoding UTF-8
 
 write_parquet <- function(data, file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   # DAPLA
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
@@ -446,6 +475,9 @@ write_parquet <- function(data, file, ...) {
 #'@encoding UTF-8
 
 write_dataset <- function(data, file, ...) {
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
+    
   arrow::write_dataset(data, gcs_bucket(dirname(file))$path(paste0(basename(file))),
                        partitioning = dplyr::group_vars(data))
 }
@@ -467,6 +499,9 @@ write_dataset <- function(data, file, ...) {
 #'@encoding UTF-8
 
 write_feather <- function(data, file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   # DAPLA
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
@@ -498,6 +533,9 @@ write_feather <- function(data, file, ...) {
 
 write_csv <- function(data,
                       file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   # DAPLA
   if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
@@ -527,6 +565,9 @@ write_csv <- function(data,
 
 write_rds <- function(data,
                       file, ...) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   f <- function(input, output){
     saveRDS(input, file = output)
@@ -554,6 +595,10 @@ write_rds <- function(data,
 #'
 
 gcs.list.files <- function(bucket) {
+    
+    # Fjerner "gs://" fra filstien dersom det er spesifisert
+bucket <- gsub("gs://", "", bucket) 
+    
   gcs_bucket(bucket)$ls(recursive = T)
 }
 
@@ -578,6 +623,9 @@ gcs.list.files <- function(bucket) {
 #'
 
 gcs_list_objects <- function(bucket) {
+       # Fjerner "gs://" fra filstien dersom det er spesifisert
+bucket <- gsub("gs://", "", bucket)  
+    
   if (dirname(bucket) == "."){
     gcs_global_bucket(bucket)
     googleCloudStorageR::gcs_list_objects(bucket)
@@ -602,6 +650,10 @@ gcs_list_objects <- function(bucket) {
 #'
 
 gcs_delete_object <- function(file) {
+    
+        # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
+    
   gcs_global_bucket(sub("/.*", "", file))
   googleCloudStorageR::gcs_delete_object(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
 }
@@ -624,6 +676,9 @@ gcs_delete_object <- function(file) {
 #'
 
 write_sf_parquet <- function(data, file, ...) {
+    
+            # Fjerner "gs://" fra filstien dersom det er spesifisert
+file <- gsub("gs://", "", file) 
   
   geo_metadata <- sfarrow:::create_metadata(data)
   df <- sfarrow::encode_wkb(data)
