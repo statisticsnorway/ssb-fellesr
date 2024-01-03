@@ -1,25 +1,35 @@
 # -*- coding: utf-8 -*-
+
 # user_agent
 user_agent <- function() {
   
+  onyxia <- stringr::str_detect(Sys.getenv('OIDC_TOKEN_EXCHANGE_URL'), "sso")  
   dapla <- stringr::str_detect(Sys.getenv('STATBANK_ENCRYPT_URL'), "^http://dapla")
   bakke <- any(base::list.files("/ssb/") %in% "stamme01")
   prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
   
   if ((dapla == TRUE & prod == TRUE)) {
     user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
-  }
+  } 
   if ((dapla == TRUE & prod == FALSE)) {
     user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
-  }
-  if ((bakke == TRUE & prod == TRUE) | Sys.getenv("RSTUDIO") == 1) {
+  } 
+  if ((bakke == TRUE & prod == TRUE)) {
     user_agent <- paste0("BakkeProd-R-", httr:::default_ua())
-  }
+  } 
   if ((bakke == TRUE & prod == FALSE)) {
     user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
-  }
+  } 
+  if (onyxia == TRUE){
+    user_agent <- paste0("OnyxiaTest-R-", httr:::default_ua())
+  } 
+  if (!exists("user_agent")) {
+    warning("Ukjent miljø. Denne funksjonene fungerer kun på Dapla og i produksjonssonen")
+  }  
   return(user_agent)
 }
+
+user_agent()
 
 # statbank_encrypt_request
 
@@ -275,10 +285,16 @@ initialer_funk <- function(lastefil) {
   }
   if (grepl("Dapla", user_agent())) {
     initialer <- gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER'))
-    
   }
+  if (grepl("Onyxia", user_agent())) {
+    initialer <- gsub("user-ssb-", "", Sys.getenv("KUBERNETES_NAMESPACE"))
+  }
+  if (!exists("initialer")) {
+    warning("Finner ikke initialer")
+  }  
   return(initialer)
 }
+
 
 
 #' Funksjon for å laste opp data fra Jupyterlab til Statistikkbanken
