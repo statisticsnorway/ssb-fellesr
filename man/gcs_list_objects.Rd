@@ -11,7 +11,7 @@ gcs_list_objects(bucket)
 \item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjonen \code{list.files} kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket. I tillegg ser man størrelsen til filene og tidspnktet filen sist ble endret.
+Funksjonen \code{gcs_list_objects} kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket. I tillegg ser man størrelsen til filene og tidspnktet filen sist ble endret.
 }
 \examples{
 \dontrun{
