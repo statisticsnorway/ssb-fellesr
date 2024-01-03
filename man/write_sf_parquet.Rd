@@ -5,7 +5,7 @@
 \alias{write_sf_parquet}
 \title{Funksjon for å lagre sf-objekt som .parquet-fil til Google Cloud Storage bucket}
 \usage{
-write_sf_parquet(data, file)
+write_sf_parquet(data, file, ...)
 }
 \arguments{
 \item{data}{Filen som skal skrives.}

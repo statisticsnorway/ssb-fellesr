@@ -88,13 +88,21 @@ gcs_global_bucket <- function(bucket) {
   gcs_auth <- function() {
     manual_token <- function(scopes, ...) {
       if (env_check() %in% c("DaplaProd", "DaplaTest")){
-      response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'),
-                            httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
-      credentials <- list()
-      credentials$access_token <- httr::content(response)$exchanged_tokens$google$access_token
+        response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'),
+                              httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
+        credentials <- list()
+        credentials$access_token <- httr::content(response)$exchanged_tokens$google$access_token
       }
       else if (env_check() %in% c("Onyxia")){
-        response <- httr::GET(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"), httr::add_headers("Authorization" = paste0("Bearer ", Sys.getenv('OIDC_TOKEN'))))
+        response <- httr::POST(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"),
+                               httr::add_headers("Content-Type" = "application/x-www-form-urlencoded"),
+                               body = list(subject_token = Sys.getenv('OIDC_TOKEN'),
+                                           grant_type = "urn:ietf:params:oauth:grant-type:token-exchange",
+                                           requested_token_type = "urn:ietf:params:oauth:token-type:access_token",
+                                           requested_issuer = "google",
+                                           client_id = "onyxia"),
+                               encode = "form")        
+        
         credentials <- list()
         credentials$access_token <- httr::content(response)$access_token
       }
