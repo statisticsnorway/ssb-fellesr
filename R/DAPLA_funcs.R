@@ -53,9 +53,16 @@ gcs_bucket <- function(bucket) {
     expiration <- httr::content(response)$exchanged_tokens$google$exp
   }  
   else if (env_check() %in% c("Onyxia")){
-    response <- httr::GET(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"), httr::add_headers("Authorization" = paste0("Bearer ", Sys.getenv('OIDC_TOKEN'))))
+    response <- httr::POST(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"),
+                           httr::add_headers("Content-Type" = "application/x-www-form-urlencoded"),
+                           body = list(subject_token = Sys.getenv('OIDC_TOKEN'),
+                                       grant_type = "urn:ietf:params:oauth:grant-type:token-exchange",
+                                       requested_token_type = "urn:ietf:params:oauth:token-type:access_token",
+                                       requested_issuer = "google",
+                                       client_id = "onyxia"),
+                           encode = "form")
     access_token <- httr::content(response)$access_token
-    expiration <- httr::content(response)$accessTokenExpiration     
+    expiration <- Sys.time() + as.numeric(httr::content(response)$expires_in)
   }
   else {
     access_token <- getPass::getPass("Skriv inn access_token")
