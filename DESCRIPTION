@@ -1,7 +1,7 @@
 Package: fellesr
 Type: Package
 Title: General R functions for SSB
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
   c(person(given = "Susie",
            family = "Jentoft",
@@ -35,7 +35,8 @@ Imports:
     shiny,
     esquisse,
     rlang,
-    stringr
+    stringr,
+    sfarrow
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true

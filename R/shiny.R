@@ -20,8 +20,8 @@ getport <- function(){
 #' @export
 runApp_ssb <- function(...){
   port <- getport()
-  usr <- Sys.getenv("USER")
-  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
+  usr <- initialer_funk()
+  if (env_check() %in% c("BakkeProd", "BakkeTest")) {
     appUrl <- paste("https://sl-jupyter-p.ssb.no/user/", usr, "/proxy/", port, "/", sep = "")
   } else {
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
@@ -38,8 +38,8 @@ runApp_ssb <- function(...){
 #' @export
 runExample_ssb <- function(example, ...){
   port <- getport()
-  usr <- Sys.getenv("USER")
-  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
+  usr <- initialer_funk()
+  if (env_check() %in% c("BakkeProd", "BakkeTest")) {
     appUrl <- paste("https://sl-jupyter-p.ssb.no/user/", usr, "/proxy/", port, "/", sep = "")
   } else {
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
@@ -61,8 +61,8 @@ runExample_ssb <- function(example, ...){
 esquisser_ssb <- function(data, ...){
   port <- getport()
   options("shiny.port" = port)
-  usr <- Sys.getenv("USER")
-  if (grepl("onprem", Sys.getenv("JUPYTER_IMAGE_SPEC"))) {
+  usr <- initialer_funk()
+  if (env_check() %in% c("BakkeProd", "BakkeTest")) {
     appUrl <- paste("https://sl-jupyter-p.ssb.no/user/", usr, "/proxy/", port, "/", sep = "")
   } else {
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
