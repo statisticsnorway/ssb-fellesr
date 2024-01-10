@@ -46,7 +46,13 @@
     <loc>/reference/dynarev_uttrekk.html</loc>
   </url>
   <url>
+    <loc>/reference/env_check.html</loc>
+  </url>
+  <url>
     <loc>/reference/esquisser_ssb.html</loc>
+  </url>
+  <url>
+    <loc>/reference/gcs.list.files.html</loc>
   </url>
   <url>
     <loc>/reference/gcs_bucket.html</loc>
@@ -64,7 +70,7 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/list.files.html</loc>
+    <loc>/reference/initialer_funk.html</loc>
   </url>
   <url>
     <loc>/reference/open_dataset.html</loc>
