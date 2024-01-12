@@ -45,6 +45,10 @@ I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under f
 + [struktuR](https://github.com/statisticsnorway/struktuR)
 + [SSBpris](https://github.com/statisticsnorway/SSBpris)
 + [SdcForetakPerson](https://github.com/statisticsnorway/SdcForetakPerson)
++ [SSBcellKey](https://github.com/statisticsnorway/SSBcellKey)
++ [easySdcTable](https://cran.r-project.org/web/packages/easySdcTable/index.html)
++ [CalibrateSSB](https://github.com/statisticsnorway/CalibrateSSB)
++ [RegSDC](https://cran.r-project.org/web/packages/RegSDC/index.html)
 
 
 ### Kursmateriell, veiledning og tips
