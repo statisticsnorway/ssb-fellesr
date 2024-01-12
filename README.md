@@ -35,12 +35,12 @@ Pakken `fellesr` inneholder følgende funksjoner:
 ### Andre pakker laget for bruk i SSB
 I tillegg til `fellesr` har det blitt laget flere pakker for bruk i SSB. Under følger en foreløpig oversikt. Dersom du har laget en funksjon eller en pakke og ønsker å få lagt den til i `fellesr` eller i listen under er det bare å ta kontakt. 
 
-+ [PxWebApiData](https://cran.r-project.org/web/packages/PxWebApiData/vignettes/Introduction.html) (statistikkbankens API)
-+ [klassR](https://statisticsnorway.github.io/klassR/articles/klassR-vignette.html) (KLASS API)
++ [PxWebApiData](https://cran.r-project.org/web/packages/PxWebApiData/vignettes/Introduction.html) - Statistikkbankens API
++ [klassR](https://statisticsnorway.github.io/klassR/articles/klassR-vignette.html) - KLASS API
 + [SSBtools](https://github.com/statisticsnorway/SSBtools)
 + [SmallCountRounding](https://cran.r-project.org/web/packages/SmallCountRounding/vignettes/Introduction_to_SmallCountRounding.html)
 + [GaussSuppression](https://cran.r-project.org/web/packages/GaussSuppression/vignettes/define_tables.html)
-+ [GISSB – Nettverksanalyse i R](https://statisticsnorway.github.io/GISSB/articles/GISSB_vignette.html)
++ [GISSB](https://statisticsnorway.github.io/GISSB/articles/GISSB_vignette.html) - Nettverksanalyse i R
 + [Kostra](https://github.com/statisticsnorway/Kostra/)
 + [struktuR](https://github.com/statisticsnorway/struktuR)
 + [SSBpris](https://github.com/statisticsnorway/SSBpris)
