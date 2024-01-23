@@ -3,17 +3,17 @@
 \encoding{UTF-8}
 \name{read_feather}
 \alias{read_feather}
-\title{Funksjon for å laste inn .feather-fil fra Google Cloud Storage bucket}
+\title{Funksjon for aa laste inn .feather-fil fra Google Cloud Storage bucket}
 \usage{
 read_feather(file, ...)
 }
 \arguments{
-\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
+\item{file}{Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_feather.html)}
 }
 \description{
-Funksjonen \code{read_feather} kan brukes til å lese inn .feather-filer fra Google Cloud Storage.
+Funksjonen \code{read_feather} kan brukes til aa lese inn .feather-filer fra Google Cloud Storage.
 }
 \examples{
 \dontrun{

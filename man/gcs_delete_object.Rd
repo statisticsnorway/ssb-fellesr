@@ -3,15 +3,15 @@
 \encoding{UTF-8}
 \name{gcs_delete_object}
 \alias{gcs_delete_object}
-\title{Funksjon for å slette fil fra en Google Cloud Storage bucket}
+\title{Funksjon for aa slette fil fra en Google Cloud Storage bucket}
 \usage{
 gcs_delete_object(file)
 }
 \arguments{
-\item{bucket}{Full sti til Google Cloud Storage bucket og filen som skal slettes.}
+\item{file}{Full sti til Google Cloud Storage bucket og filen som skal slettes.}
 }
 \description{
-Funksjonen \code{gcs_delete_object} kan brukes til å slette filer fra Google Cloud Storage bucket.
+Funksjonen \code{gcs_delete_object} kan brukes til aa slette filer fra Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{

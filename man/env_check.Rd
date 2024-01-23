@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{env_check}
 \alias{env_check}
-\title{Funksjon for å sjekke hvilket miljø man er i}
+\title{Funksjon for aa sjekke hvilket miljoe man er i}
 \usage{
 env_check()
 }
@@ -11,7 +11,7 @@ env_check()
 Karaktervektor: "DaplaProd", "DaplaTest", "BakkeProd", "BakkeTest" eller "Onyxia"
 }
 \description{
-\code{env_check} er en hjelpefunksjon som sjekker hvilket miljø man er i
+\code{env_check} er en hjelpefunksjon som sjekker hvilket miljoe man er i
 }
 \examples{
 \dontrun{

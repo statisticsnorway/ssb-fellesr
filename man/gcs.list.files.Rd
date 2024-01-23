@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{gcs.list.files}
 \alias{gcs.list.files}
-\title{Funksjon for å sjekke hvilke filer som finnes i en mappe i en Google Cloud Storage bucket}
+\title{Funksjon for aa sjekke hvilke filer som finnes i en mappe i en Google Cloud Storage bucket}
 \usage{
 gcs.list.files(bucket)
 }
@@ -11,7 +11,7 @@ gcs.list.files(bucket)
 \item{bucket}{Full sti til Google Cloud Storage bucket (med eventuelle undermapper).}
 }
 \description{
-Funksjonen \code{gcs.list.files} kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket
+Funksjonen \code{gcs.list.files} kan brukes til aa sjekke hvilke filer som finnes i en Google Cloud Storage bucket
 }
 \examples{
 \dontrun{

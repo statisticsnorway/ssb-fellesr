@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{gcs_list_objects}
 \alias{gcs_list_objects}
-\title{Funksjon for å sjekke hvilke filer som finnes i en Google Cloud Storage bucket}
+\title{Funksjon for aa sjekke hvilke filer som finnes i en Google Cloud Storage bucket}
 \usage{
 gcs_list_objects(bucket)
 }
@@ -11,7 +11,7 @@ gcs_list_objects(bucket)
 \item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-Funksjonen \code{gcs_list_objects} kan brukes til å sjekke hvilke filer som finnes i en Google Cloud Storage bucket. I tillegg ser man størrelsen til filene og tidspnktet filen sist ble endret.
+Funksjonen \code{gcs_list_objects} kan brukes til aa sjekke hvilke filer som finnes i en Google Cloud Storage bucket. I tillegg ser man stoerrelsen til filene og tidspnktet filen sist ble endret.
 }
 \examples{
 \dontrun{

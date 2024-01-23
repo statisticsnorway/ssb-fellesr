@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{write_feather}
 \alias{write_feather}
-\title{Funksjon for å lagre .feather-fil til Google Cloud Storage bucket}
+\title{Funksjon for aa lagre .feather-fil til Google Cloud Storage bucket}
 \usage{
 write_feather(data, file, ...)
 }
@@ -15,7 +15,7 @@ write_feather(data, file, ...)
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_feather.html)}
 }
 \description{
-Funksjonen \code{write_feather} kan brukes til å skrive .feather-filer til Google Cloud Storage bucket.
+Funksjonen \code{write_feather} kan brukes til aa skrive .feather-filer til Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{
