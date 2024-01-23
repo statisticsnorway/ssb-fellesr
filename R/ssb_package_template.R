@@ -94,7 +94,7 @@ ssb_rtemplate <- function(path, description,
   file.rename( "packagename.rproj", paste0(package_name, ".rproj"))
 
   # Add comments file
-  usethis::use_cran_comments()
+  usethis::use_cran_comments(open=F)
 
   # Add example data
   test_data <- data.frame(x = runif(10), y=runif(10))
@@ -110,7 +110,7 @@ ssb_rtemplate <- function(path, description,
 
   # Set up tests
   usethis::use_testthat()
-  usethis::use_test("hello_world.R")
+  usethis::use_test("hello_world.R", open = F)
 
   # Set up github
   if (github){
