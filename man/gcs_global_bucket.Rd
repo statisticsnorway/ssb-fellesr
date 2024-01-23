@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{gcs_global_bucket}
 \alias{gcs_global_bucket}
-\title{Funksjon for å koble til Google Cloud Storage bucket med googleCloudStorageR}
+\title{Funksjon for aa koble til Google Cloud Storage bucket med googleCloudStorageR}
 \usage{
 gcs_global_bucket(bucket)
 }
@@ -11,7 +11,7 @@ gcs_global_bucket(bucket)
 \item{bucket}{Full sti til Google Cloud Storage bucket.}
 }
 \description{
-\code{gcs_global_bucket} er en hjelpefunksjon som kobler til en bucket på Google Cloud Storage med pakken \code{googleCloudStorageR}. Autentiseringen skjer via access_token og expiration som er lagret som miljøvariabler i Jupyter på DAPLA.
+\code{gcs_global_bucket} er en hjelpefunksjon som kobler til en bucket paa Google Cloud Storage med pakken \code{googleCloudStorageR}. Autentiseringen skjer via access_token og expiration som er lagret som miljoevariabler i Jupyter paa DAPLA.
 }
 \examples{
 \dontrun{

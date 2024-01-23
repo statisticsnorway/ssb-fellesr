@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{statbank_uttaksbeskrivelse}
 \alias{statbank_uttaksbeskrivelse}
-\title{Funksjon for å hente uttaksbeskrivelsen til en statistikkbanktabell}
+\title{Funksjon for aa hente uttaksbeskrivelsen til en statistikkbanktabell}
 \usage{
 statbank_uttaksbeskrivelse(
   tabell_id,
@@ -18,7 +18,11 @@ statbank_uttaksbeskrivelse(
 
 \item{laste_bruker}{Karaktervektor med seksjonens lastebruker.}
 
-\item{ask}{Boolsk. Hvis \code{TRUE} blir man spurt om passord til lastebrukeren. Hvis \code{FALSE} må \code{username_encryptedpassword} først være laget med funksjonen \code{statbank_encrypt_request}.}
+\item{ask}{Boolsk. Hvis \code{TRUE} blir man spurt om passord til lastebrukeren. Hvis \code{FALSE} maa \code{username_encryptedpassword} foerst vaere laget med funksjonen \code{statbank_encrypt_request}.}
+
+\item{username_encryptedpassword}{Passord som er encryptert.}
+
+\item{boundary}{Numerisk vektor med tallverdien som skiller de ulike filene i opplastningen. Trenger ikke aa endres.}
 }
 \description{
 Funksjonen \code{statbank_uttaksbeskrivelse} henter uttaksbeskrivelsen til en statistikkbanktabell.

@@ -1,7 +1,7 @@
 Package: fellesr
 Type: Package
 Title: General R functions for SSB
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: 
   c(person(given = "Susie",
            family = "Jentoft",
@@ -40,13 +40,17 @@ Imports:
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 Roxygen: list(markdown = TRUE)
 Suggests: 
     knitr,
     rmarkdown,
     RODBC,
     ROracle,
-    testthat
+    testthat,
+    usethis,
+    git2r,
+    openssl,
+    roxygen2
 URL: https://statisticsnorway.github.io/fellesr/
 VignetteBuilder: knitr

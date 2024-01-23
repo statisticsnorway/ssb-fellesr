@@ -3,17 +3,17 @@
 \encoding{UTF-8}
 \name{open_dataset}
 \alias{open_dataset}
-\title{Funksjon for å laste inn "multifile" datasett fra Google Cloud Storage bucket}
+\title{Funksjon for aa laste inn "multifile" datasett fra Google Cloud Storage bucket}
 \usage{
 open_dataset(file, ...)
 }
 \arguments{
-\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
+\item{file}{Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/open_dataset.html)}
 }
 \description{
-Funksjonen \code{open_dataset} kan brukes til å lese deler av datasett (bl.a. .parquet-, .feather- og .csv-filer) fra Google Cloud Storage. Det lages en forbindelse til mappen der filen ligger og deretter kan man bruke argumenter fra \code{dplyr}, som \code{filter} og \code{select}, før man bruker \code{collect} til å lese inn dataene i R. \code{open_dataset} kan også brukes til å lese inn sf-objekter (lagret som .parquet-fil med pakken \code{sfarrow}).
+Funksjonen \code{open_dataset} kan brukes til aa lese deler av datasett (bl.a. .parquet-, .feather- og .csv-filer) fra Google Cloud Storage. Det lages en forbindelse til mappen der filen ligger og deretter kan man bruke argumenter fra \code{dplyr}, som \code{filter} og \code{select}, foer man bruker \code{collect} til aa lese inn dataene i R. \code{open_dataset} kan ogsaa brukes til aa lese inn sf-objekter (lagret som .parquet-fil med pakken \code{sfarrow}).
 }
 \examples{
 \dontrun{

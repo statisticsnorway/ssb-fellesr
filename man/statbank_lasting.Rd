@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{statbank_lasting}
 \alias{statbank_lasting}
-\title{Funksjon for å laste opp data fra Jupyterlab til Statistikkbanken}
+\title{Funksjon for aa laste opp data fra Jupyterlab til Statistikkbanken}
 \usage{
 statbank_lasting(
   lastefil,
@@ -21,30 +21,32 @@ statbank_lasting(
 )
 }
 \arguments{
-\item{lastefil}{Objekt eller en liste med objekter som inneholder dataene som skal lastes opp. Det er også mulig å oppgi en karaktervektor med filnavn til .parquet-filer lagret i en Google Cloud Storage bucket (DAPLA) eller på Linux (produksjonssonen). Filstien oppgis under \code{lastefilsti}.}
+\item{lastefil}{Objekt eller en liste med objekter som inneholder dataene som skal lastes opp. Det er ogsaa mulig aa oppgi en karaktervektor med filnavn til .parquet-filer lagret i en Google Cloud Storage bucket (DAPLA) eller paa Linux (produksjonssonen). Filstien oppgis under \code{lastefilsti}.}
 
-\item{lastefilsti}{Karaktervektor med filsti til en Google Cloud Storage bucket hvor lastefilene (.parquet) er plassert. Dersom man laster opp objekter direkte kan denne stå blank.}
+\item{lastefilsti}{Karaktervektor med filsti til en Google Cloud Storage bucket hvor lastefilene (.parquet) er plassert. Dersom man laster opp objekter direkte kan denne staa blank.}
 
 \item{tabell_id}{Karaktervektor med tabell ID til tabellen som det skal lastes opp data til.}
 
 \item{laste_bruker}{Karaktervektor med seksjonens lastebruker.}
 
-\item{publiseringsdato}{Karaktervektor med publiseringsdato. Formatet skal være "ÅÅÅÅ-MM-DD".}
+\item{publiseringsdato}{Karaktervektor med publiseringsdato. Formatet skal vaere "YYYY-MM-DD".}
 
-\item{initialer}{Karaktervektor med initialer til personen som laster opp dataene (og som mottar e-post med lastelogg). Initialer hentes fra miljøvariabel i Jupyter så dersom det ikke er en annen person enn brukeren som kjører programmet som skal motta e-post kan denne stå blank.}
+\item{initialer}{Karaktervektor med initialer til personen som laster opp dataene (og som mottar e-post med lastelogg). Initialer hentes fra miljoevariabel i Jupyter saa dersom det ikke er en annen person enn brukeren som kjoerer programmet som skal motta e-post kan denne staa blank.}
 
 \item{autooverskriv}{Numerisk vektor. Standardverdi er satt til 1.}
 
 \item{autogodkjenn}{Numerisk vektor. 0: manuell, 1: automatisk (umiddelbart), 2: JIT (just-in-time). Standardverdi er satt til 2.}
 
-\item{boundary}{Numerisk vektor med tallverdien som skiller de ulike filene i opplastningen. Trenger ikke å endres.}
+\item{boundary}{Numerisk vektor med tallverdien som skiller de ulike filene i opplastningen. Trenger ikke aa endres.}
 
-\item{ask}{Boolsk. Hvis \code{TRUE} blir man spurt om passord til lastebrukeren. Hvis \code{FALSE} må \code{username_encryptedpassword} først være laget med funksjonen \code{statbank_encrypt_request}.}
+\item{ask}{Boolsk. Hvis \code{TRUE} blir man spurt om passord til lastebrukeren. Hvis \code{FALSE} maa \code{username_encryptedpassword} foerst vaere laget med funksjonen \code{statbank_encrypt_request}.}
 
-\item{validering}{Boolsk. Valideringssjekk for å oppdage vanlige lastefeil før tabellen lastes opp.}
+\item{username_encryptedpassword}{Passord som er encryptert.}
+
+\item{validering}{Boolsk. Valideringssjekk for aa oppdage vanlige lastefeil foer tabellen lastes opp.}
 }
 \description{
-Funksjonen \code{statbank_lasting} laster opp data fra Jupyterlab til Statistikkbanken. Det er mulig å laste opp objekter direkte eller ved å oppgi filsti til en eller flere .parquet-filer som er lagret i en Google Cloud Storage bucket (DAPLA) eller på Linux (produksjonssonen).
+Funksjonen \code{statbank_lasting} laster opp data fra Jupyterlab til Statistikkbanken. Det er mulig aa laste opp objekter direkte eller ved aa oppgi filsti til en eller flere .parquet-filer som er lagret i en Google Cloud Storage bucket (DAPLA) eller paa Linux (produksjonssonen).
 }
 \examples{
 \dontrun{

@@ -3,17 +3,17 @@
 \encoding{UTF-8}
 \name{read_parquet_sf}
 \alias{read_parquet_sf}
-\title{Funksjon for å laste inn .parquet-fil (i sf-format) fra Google Cloud Storage bucket}
+\title{Funksjon for aa laste inn .parquet-fil (i sf-format) fra Google Cloud Storage bucket}
 \usage{
 read_parquet_sf(file, ...)
 }
 \arguments{
-\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
+\item{file}{Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)}
 }
 \description{
-Funksjonen \code{read_parquet_sf} kan brukes til å lese inn .parquet-filer (i sf-format) fra Google Cloud Storage.
+Funksjonen \code{read_parquet_sf} kan brukes til aa lese inn .parquet-filer (i sf-format) fra Google Cloud Storage.
 }
 \examples{
 \dontrun{

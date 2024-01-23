@@ -32,11 +32,12 @@ runApp_ssb <- function(...){
 
 #' Wrapper function for running exampleshiny apps in Jupyter at SSB
 #'
+#' @param example Example shiny to run
 #' @param ... Parameters to send to runExample()
 #'
 #' @return None
 #' @export
-runExample_ssb <- function(example, ...){
+runExample_ssb <- function(example = NA, ...){
   port <- getport()
   usr <- initialer_funk()
   if (env_check() %in% c("BakkeProd", "BakkeTest")) {

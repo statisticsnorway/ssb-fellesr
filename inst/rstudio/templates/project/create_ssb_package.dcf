@@ -1,0 +1,27 @@
+Title: SSB R-package
+Description: This is a template for a standard SSB R package
+Binding: ssb_rtemplate
+
+Parameter: description
+Widget: TextInput
+Label: A decription of the package
+Default: This package performs important functions for SSB
+Position: left
+
+Parameter: firstname
+Widget: TextInput
+Label: Authors firstname
+Default: Kari
+Position: left
+
+Parameter: surname
+Widget: TextInput
+Label: Author's surname
+Default: Normann
+Position: left
+
+Parameter: github
+Widget: CheckboxInput
+Label: Create a GitHub Repository
+Default: On
+Position: left

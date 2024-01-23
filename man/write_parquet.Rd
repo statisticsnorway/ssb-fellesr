@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{write_parquet}
 \alias{write_parquet}
-\title{Funksjon for å lagre .parquet-fil til Google Cloud Storage bucket}
+\title{Funksjon for aa lagre .parquet-fil til Google Cloud Storage bucket}
 \usage{
 write_parquet(data, file, ...)
 }
@@ -15,7 +15,7 @@ write_parquet(data, file, ...)
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_parquet.html)}
 }
 \description{
-Funksjonen \code{write_parquet} kan brukes til å skrive .parquet-filer til Google Cloud Storage bucket.
+Funksjonen \code{write_parquet} kan brukes til aa skrive .parquet-filer til Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{

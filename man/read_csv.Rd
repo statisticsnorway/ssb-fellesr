@@ -3,17 +3,17 @@
 \encoding{UTF-8}
 \name{read_csv}
 \alias{read_csv}
-\title{Funksjon for å laste inn .csv-fil fra Google Cloud Storage bucket}
+\title{Funksjon for aa laste inn .csv-fil fra Google Cloud Storage bucket}
 \usage{
 read_csv(file, ...)
 }
 \arguments{
-\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
+\item{file}{Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)}
 }
 \description{
-Funksjonen \code{read_csv} kan brukes til å lese inn .csv-filer Google Cloud Storage.
+Funksjonen \code{read_csv} kan brukes til aa lese inn .csv-filer Google Cloud Storage.
 }
 \examples{
 \dontrun{

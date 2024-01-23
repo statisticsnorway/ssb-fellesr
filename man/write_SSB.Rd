@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{write_SSB}
 \alias{write_SSB}
-\title{Funksjon for å skrive filer til Google Cloud Storage bucket}
+\title{Funksjon for aa skrive filer til Google Cloud Storage bucket}
 \usage{
 write_SSB(data, file, partitioning = FALSE, sf = FALSE, ...)
 }
@@ -12,18 +12,21 @@ write_SSB(data, file, partitioning = FALSE, sf = FALSE, ...)
 
 \item{file}{Full filsti og filnavn for hvor filen skal skrives.}
 
+\item{partitioning}{Boolsk. Skal partisjonering brukes naar fle lagres.}
+
 \item{sf}{Boolsk. Standardverdi er FALSE. Sett \code{sf = TRUE} dersom filen som skal lagres er et sf-objekt.}
 
 \item{...}{Flere parametere (se dokumentasjonen til: \code{\link[=write_parquet]{write_parquet()}}/\code{\link[=write_sf_parquet]{write_sf_parquet()}}/\code{\link[=write_feather]{write_feather()}}/\code{\link[=write_csv]{write_csv()}}/\code{\link[=write_dataset]{write_dataset()}})}
 }
 \description{
-Funksjonen \code{write_SSB} kan brukes til å skrive filer til Google Cloud Storage. Funksjonen støtter .parquet- (inkludert sf-objekter), .feather-, .rds- og .csv-filer.
+Funksjonen \code{write_SSB} kan brukes til aa skrive filer til Google Cloud Storage. Funksjonen stoetter .parquet- (inkludert sf-objekter), .feather-, .rds- og .csv-filer.
 }
 \examples{
 \dontrun{
 write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
 
-write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test", partitioning = TRUE)
+write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test",
+   partitioning = TRUE)
 
 write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather")
 

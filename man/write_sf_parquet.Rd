@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{write_sf_parquet}
 \alias{write_sf_parquet}
-\title{Funksjon for å lagre sf-objekt som .parquet-fil til Google Cloud Storage bucket}
+\title{Funksjon for aa lagre sf-objekt som .parquet-fil til Google Cloud Storage bucket}
 \usage{
 write_sf_parquet(data, file, ...)
 }
@@ -11,9 +11,11 @@ write_sf_parquet(data, file, ...)
 \item{data}{Filen som skal skrives.}
 
 \item{file}{Full filsti og filnavn for hvor filen skal skrives.}
+
+\item{...}{Flere parametere (se dokumentasjonen til: \code{\link[=write_parquet]{write_parquet()}}/\code{\link[=write_sf_parquet]{write_sf_parquet()}}/\code{\link[=write_feather]{write_feather()}}/\code{\link[=write_csv]{write_csv()}}/\code{\link[=write_dataset]{write_dataset()}})}
 }
 \description{
-Funksjonen \code{write_sf_parquet} kan brukes til å skrive sf-objekter som .parquet-filer til Google Cloud Storage bucket.
+Funksjonen \code{write_sf_parquet} kan brukes til aa skrive sf-objekter som .parquet-filer til Google Cloud Storage bucket.
 }
 \examples{
 \dontrun{
