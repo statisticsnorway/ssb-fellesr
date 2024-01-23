@@ -1,0 +1,22 @@
+Package: {{PACKAGE_NAME}}
+Type: Package
+Title: {{PACKAGE_NAME}}
+Version: 0.0.1
+Authors@R: 
+  c(person(given = "{{AUTHOR_NAME1}}",
+           family = "{{AUTHOR_NAME2}}",
+           role = c("aut", "cre"),
+           email = "{{AUTHOR_EMAIL}}"),
+    person(given = "SSB",
+           role = "cph"))
+Maintainer: {{AUTHOR_NAME1}} {{AUTHOR_NAME2}} <{{AUTHOR_EMAIL}}>
+Description: {{PACKAGE_DESCRIPTION}}
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Config/testthat/edition: 3
+RoxygenNote: 7.3.0
+Suggests: 
+    testthat (>= 3.0.0)
+Depends: 
+    R (>= 2.10)
