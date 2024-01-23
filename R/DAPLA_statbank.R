@@ -79,6 +79,8 @@ statbank_encrypt_request <- function(laste_bruker) {
 #' @param tabell_id Karaktervektor med tabell ID til tabellen som det skal lastes opp data til.
 #' @param laste_bruker Karaktervektor med seksjonens lastebruker.
 #' @param ask Boolsk. Hvis `TRUE` blir man spurt om passord til lastebrukeren. Hvis `FALSE` maa `username_encryptedpassword` foerst vaere laget med funksjonen `statbank_encrypt_request`.
+#' @param username_encryptedpassword Passord som er encryptert.
+#' @param boundary Numerisk vektor med tallverdien som skiller de ulike filene i opplastningen. Trenger ikke aa endres.
 #' @export
 #'
 #' @examples
@@ -269,6 +271,7 @@ statbank_validering <- function(data,
 #'
 #' Funksjonen `initialer_funk` henter initialene til brukeren som er paalogget Jupyterlab/RStudio.
 #'
+#' @param lastefil Navn av fil til å laste opp
 #' @returns Karaktervektor med initialer (vanligvis tre siffer)
 #'
 #' @export
@@ -311,6 +314,7 @@ initialer_funk <- function(lastefil) {
 #' @param autogodkjenn Numerisk vektor. 0: manuell, 1: automatisk (umiddelbart), 2: JIT (just-in-time). Standardverdi er satt til 2.
 #' @param boundary Numerisk vektor med tallverdien som skiller de ulike filene i opplastningen. Trenger ikke aa endres.
 #' @param ask Boolsk. Hvis `TRUE` blir man spurt om passord til lastebrukeren. Hvis `FALSE` maa `username_encryptedpassword` foerst vaere laget med funksjonen `statbank_encrypt_request`.
+#' @param username_encryptedpassword Passord som er encryptert.
 #' @param validering Boolsk. Valideringssjekk for aa oppdage vanlige lastefeil foer tabellen lastes opp.
 #' @export
 #'

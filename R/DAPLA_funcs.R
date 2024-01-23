@@ -556,7 +556,7 @@ file <- gsub("gs://", "", file)
 #'
 #' @param data Filen som skal skrives.
 #' @param file Full filsti og filnavn for hvor filen skal skrives.
-#'
+#' @param ... Flere parametere (se dokumentasjonen til: [fellesr::write_parquet()]/[fellesr::write_sf_parquet()]/[fellesr::write_feather()]/[fellesr::write_csv()]/[fellesr::write_dataset()])
 #' @examples
 #' \dontrun{
 #' write_rds(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
@@ -640,7 +640,7 @@ bucket <- gsub("gs://", "", bucket)
 #'
 #' Funksjonen `gcs_delete_object` kan brukes til aa slette filer fra Google Cloud Storage bucket.
 #'
-#' @param bucket Full sti til Google Cloud Storage bucket og filen som skal slettes.
+#' @param file Full sti til Google Cloud Storage bucket og filen som skal slettes.
 #'
 #' @examples
 #' \dontrun{
@@ -665,6 +665,7 @@ file <- gsub("gs://", "", file)
 #'
 #' @param data Filen som skal skrives.
 #' @param file Full filsti og filnavn for hvor filen skal skrives.
+#' @param ... Flere parametere (se dokumentasjonen til: [fellesr::write_parquet()]/[fellesr::write_sf_parquet()]/[fellesr::write_feather()]/[fellesr::write_csv()]/[fellesr::write_dataset()])
 #'
 #' @export
 #'
@@ -750,6 +751,7 @@ read_SSB <- function(file, sf = FALSE, ...) {
 #'
 #' @param data Filen som skal skrives.
 #' @param file Full filsti og filnavn for hvor filen skal skrives.
+#' @param partitioning Boolsk. Skal partisjonering brukes naar fle lagres.
 #' @param sf Boolsk. Standardverdi er FALSE. Sett `sf = TRUE` dersom filen som skal lagres er et sf-objekt.
 #' @param ... Flere parametere (se dokumentasjonen til: [fellesr::write_parquet()]/[fellesr::write_sf_parquet()]/[fellesr::write_feather()]/[fellesr::write_csv()]/[fellesr::write_dataset()])
 #'
@@ -759,7 +761,8 @@ read_SSB <- function(file, sf = FALSE, ...) {
 #' \dontrun{
 #' write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
 #'
-#' write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test", partitioning = TRUE)
+#' write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test",
+#'    partitioning = TRUE)
 #'
 #' write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather")
 #'
