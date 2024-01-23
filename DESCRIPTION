@@ -48,6 +48,7 @@ Suggests:
     RODBC,
     ROracle,
     testthat,
-    usethis
+    usethis,
+    git2r
 URL: https://statisticsnorway.github.io/fellesr/
 VignetteBuilder: knitr
