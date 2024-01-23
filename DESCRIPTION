@@ -49,6 +49,8 @@ Suggests:
     ROracle,
     testthat,
     usethis,
-    git2r
+    git2r,
+    openssl,
+    roxygen2
 URL: https://statisticsnorway.github.io/fellesr/
 VignetteBuilder: knitr
