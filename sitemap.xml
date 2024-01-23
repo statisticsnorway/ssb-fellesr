@@ -52,6 +52,9 @@
     <loc>/reference/esquisser_ssb.html</loc>
   </url>
   <url>
+    <loc>/reference/fix_file.html</loc>
+  </url>
+  <url>
     <loc>/reference/gcs.list.files.html</loc>
   </url>
   <url>
@@ -119,6 +122,9 @@
   </url>
   <url>
     <loc>/reference/ssb_palettes.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ssb_rtemplate.html</loc>
   </url>
   <url>
     <loc>/reference/statbank_lasting.html</loc>

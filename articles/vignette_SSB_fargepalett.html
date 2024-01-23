@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,7 @@
                         <h4 data-toc-skip class="author">Sindre Mikael
 Haugen</h4>
             
-            <h4 data-toc-skip class="date">2024-01-12</h4>
+            <h4 data-toc-skip class="date">2024-01-23</h4>
       
       
       <div class="d-none name"><code>vignette_SSB_fargepalett.Rmd</code></div>
@@ -85,7 +85,7 @@ KLASS (<a href="https://www.ssb.no/klass/klassifikasjoner/614" class="external-l
 for SSB fargepalett</a>). Denne kan lastes inn i R med funksjonen
 <code>klassR</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ssb_farger</span> <span class="op">&lt;-</span> <span class="fu">klassR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/klassR/man/GetKlass.html" class="external-link">GetKlass</a></span><span class="op">(</span><span class="fl">614</span>, output_style <span class="op">=</span> <span class="st">"wide"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">ssb_farger</span> <span class="op">&lt;-</span> <span class="fu">klassR</span><span class="fu">::</span><span class="fu"><a href="https://statisticsnorway.github.io/klassR/reference/GetKlass.html" class="external-link">GetKlass</a></span><span class="op">(</span><span class="fl">614</span>, output_style <span class="op">=</span> <span class="st">"wide"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>farge_nummer <span class="op">=</span> <span class="va">code3</span>, </span>
 <span>                HEX <span class="op">=</span> <span class="va">name3</span>, </span>
 <span>                farge <span class="op">=</span> <span class="va">name2</span>, </span>
