@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{write_dataset}
 \alias{write_dataset}
-\title{Funksjon for å lagre "partitioned" .parquet-fil til Google Cloud Storage bucket}
+\title{Funksjon for aa lagre "partitioned" .parquet-fil til Google Cloud Storage bucket}
 \usage{
 write_dataset(data, file, ...)
 }
@@ -15,7 +15,7 @@ write_dataset(data, file, ...)
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_dataset.html)}
 }
 \description{
-Funksjonen \code{write_dataset} kan brukes til å skrive "partitioned" .parquet-filer til Google Cloud Storage bucket. "Partitioning" angis ut fra hvilke variabler datasettet er gruppert etter (gjøres via \code{\link[dplyr:group_by]{dplyr::group_by()}}).
+Funksjonen \code{write_dataset} kan brukes til aa skrive "partitioned" .parquet-filer til Google Cloud Storage bucket. "Partitioning" angis ut fra hvilke variabler datasettet er gruppert etter (gjoeres via \code{\link[dplyr:group_by]{dplyr::group_by()}}).
 }
 \examples{
 \dontrun{

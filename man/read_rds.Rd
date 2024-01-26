@@ -3,17 +3,17 @@
 \encoding{UTF-8}
 \name{read_rds}
 \alias{read_rds}
-\title{Funksjon for å laste inn .rds-fil fra Google Cloud Storage bucket}
+\title{Funksjon for aa laste inn .rds-fil fra Google Cloud Storage bucket}
 \usage{
 read_rds(file, ...)
 }
 \arguments{
-\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
+\item{file}{Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.}
 
 \item{...}{Flere parametere (se: https://rdrr.io/cran/googleCloudStorageR/man/gcs_get_object.html)}
 }
 \description{
-Funksjonen \code{read_rds} kan brukes til å lese inn .rds-filer fra Google Cloud Storage.
+Funksjonen \code{read_rds} kan brukes til aa lese inn .rds-filer fra Google Cloud Storage.
 }
 \examples{
 \dontrun{

@@ -3,17 +3,17 @@
 \encoding{UTF-8}
 \name{read_json}
 \alias{read_json}
-\title{Funksjon for å laste inn .json-fil fra Google Cloud Storage}
+\title{Funksjon for aa laste inn .json-fil fra Google Cloud Storage}
 \usage{
 read_json(file, ...)
 }
 \arguments{
-\item{file}{Full sti og navn på filen som skal leses inn fra Google Cloud Storage bucket.}
+\item{file}{Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.}
 
 \item{...}{Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_json_arrow.html)}
 }
 \description{
-Funksjonen \code{read_json} kan brukes til å lese inn .json-filer Google Cloud Storage.
+Funksjonen \code{read_json} kan brukes til aa lese inn .json-filer Google Cloud Storage.
 }
 \examples{
 \dontrun{

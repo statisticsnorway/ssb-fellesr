@@ -3,15 +3,18 @@
 \encoding{UTF-8}
 \name{initialer_funk}
 \alias{initialer_funk}
-\title{Funksjon for å hente initialene til pålogget bruker}
+\title{Funksjon for aa hente initialene til paalogget bruker}
 \usage{
 initialer_funk(lastefil)
+}
+\arguments{
+\item{lastefil}{Navn av fil til å laste opp}
 }
 \value{
 Karaktervektor med initialer (vanligvis tre siffer)
 }
 \description{
-Funksjonen \code{initialer_funk} henter initialene til brukeren som er pålogget Jupyterlab/RStudio.
+Funksjonen \code{initialer_funk} henter initialene til brukeren som er paalogget Jupyterlab/RStudio.
 }
 \examples{
 \dontrun{

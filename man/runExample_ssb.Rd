@@ -4,9 +4,11 @@
 \alias{runExample_ssb}
 \title{Wrapper function for running exampleshiny apps in Jupyter at SSB}
 \usage{
-runExample_ssb(example, ...)
+runExample_ssb(example = NA, ...)
 }
 \arguments{
+\item{example}{Example shiny to run}
+
 \item{...}{Parameters to send to runExample()}
 }
 \value{
