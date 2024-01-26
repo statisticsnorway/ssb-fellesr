@@ -1,8 +1,8 @@
 #' Funksjon for å sjekke hvilket miljø man er i
 #'
-#' `env_check` er en hjelpefunksjon som sjekker hvilket miljø man er i
+#' `env_check` er en hjelpefunksjon som sjekker hvilket miljø man er i. DAPLA_ENVIRONMENT: Angir miljøet (DEV, STAGING, TEST, PROD), DAPLA_REGION: Viser kjøreområdet (ON_PREM, DAPLA_LAB, BIP, CLOUD_RUN) og DAPLA_SERVICE: Identifiserer tjenesten (JUPYTERLAB, VS_CODE, R_STUDIO, KILDOMATEN).
 #'
-#' @returns Karaktervektor: "DaplaProd", "DaplaTest", "BakkeProd", "BakkeTest" eller "Onyxia"
+#' @returns Karaktervektor: f.eks. PROD-ON_PREM-JUPYTERLAB eller PROD-BIP-JUPYTERLAB
 #'
 #' @export
 #'
@@ -13,29 +13,15 @@
 #'@encoding UTF-8
 
 env_check <- function() { 
-  dapla <- stringr::str_detect(Sys.getenv('STATBANK_ENCRYPT_URL'), "^http://dapla")
-  onyxia <- stringr::str_detect(Sys.getenv('OIDC_TOKEN_EXCHANGE_URL'), "sso")
-  bakke <- any(list.files("/ssb/") %in% "stamme01")
-  prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
   
-  if ((dapla == TRUE & prod == TRUE)) {
-    env <- "DaplaProd"
-  }
-  if ((dapla == TRUE & prod == FALSE)) {
-    env <- "DaplaTest"
-  }
-  if (onyxia == TRUE){
-    env <- "Onyxia"
-  }
-  if ((bakke == TRUE & prod == TRUE) | (Sys.getenv("RSTUDIO") == 1 & onyxia == FALSE)) {
-    env <- "BakkeProd"
-  }  
-  if ((bakke == TRUE & prod == FALSE)) {
-    env <- "BakkeTest"    
-  } 
-  if (!exists("env")) {
+  env <- paste0(Sys.getenv("DAPLA_ENVIRONMENT"), "-", 
+                Sys.getenv("DAPLA_REGION"), "-", 
+                Sys.getenv("DAPLA_SERVICE"))
+  
+  if (Sys.getenv("DAPLA_REGION") == "" | Sys.getenv("DAPLA_ENVIRONMENT") == "" | Sys.getenv("DAPLA_SERVICE") == ""){
     warning("Ukjent miljø. Denne funksjonene fungerer kun på Dapla og i produksjonssonen")
-  }  
+  }
+  
   return(env)
 }
 
@@ -55,12 +41,12 @@ env_check <- function() {
 #'@encoding UTF-8
 
 gcs_bucket <- function(bucket) {
-  if (env_check() %in% c("DaplaProd", "DaplaTest")){
+  if (Sys.getenv("DAPLA_REGION") == "BIP"){
     response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
     access_token <- httr::content(response)$exchanged_tokens$google$access_token
     expiration <- httr::content(response)$exchanged_tokens$google$exp
   }  
-  else if (env_check() %in% c("Onyxia")){
+  else if (Sys.getenv("DAPLA_REGION") == "DAPLA_LAB"){
     response <- httr::POST(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"),
                            httr::add_headers("Content-Type" = "application/x-www-form-urlencoded"),
                            body = list(subject_token = Sys.getenv('OIDC_TOKEN'),
@@ -95,13 +81,13 @@ gcs_bucket <- function(bucket) {
 gcs_global_bucket <- function(bucket) {
   gcs_auth <- function() {
     manual_token <- function(scopes, ...) {
-      if (env_check() %in% c("DaplaProd", "DaplaTest")){
+      if (Sys.getenv("DAPLA_REGION") == "BIP"){
         response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'),
                               httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
         credentials <- list()
         credentials$access_token <- httr::content(response)$exchanged_tokens$google$access_token
       }
-      else if (env_check() %in% c("Onyxia")){
+      else if (Sys.getenv("DAPLA_REGION") == "DAPLA_LAB"){
         response <- httr::POST(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"),
                                httr::add_headers("Content-Type" = "application/x-www-form-urlencoded"),
                                body = list(subject_token = Sys.getenv('OIDC_TOKEN'),
@@ -142,17 +128,17 @@ gcs_global_bucket <- function(bucket) {
 #'@encoding UTF-8
 
 read_parquet <- function(file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   # DAPLA
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     df <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Produksjonssonen
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     df <- arrow::read_parquet(file, ...)
   }
   
@@ -173,12 +159,12 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 read_parquet_sf <- function(file, ...) {
- 
-# Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   # DAPLA
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     
     ds <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), as_data_frame = FALSE, ...)
     
@@ -195,7 +181,7 @@ file <- gsub("gs://", "", file)
   }
   
   # Produksjonssonen
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     ds <- arrow::read_parquet(file, as_data_frame = FALSE, ...)
     metadata <- ds$metadata
     geo <- jsonlite::fromJSON(metadata$geo)
@@ -226,17 +212,17 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 read_feather <- function(file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
-    
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
+  
   # DAPLA
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     df <- arrow::read_feather(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Produksjonssonen
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     df <- arrow::read_feather(file, ...)
   }
   
@@ -265,17 +251,17 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 open_dataset <- function(file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   # DAPLA
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     ds <- arrow::open_dataset(gcs_bucket(file), ...)
   }
   
   # Produksjonssonen
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     ds <- arrow::open_dataset(file, ...)
   }
   
@@ -296,16 +282,16 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 read_json <- function(file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
-    
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
+  
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Jupyterlab (produksjonssonen) + lokale filer fra RStudio Windows (produksjonssonen)
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     df <- arrow::read_json_arrow(file, ...)
   }
   
@@ -328,17 +314,17 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 read_csv <- function(file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   # DAPLA  
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     df <- arrow::read_delim_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Produksjonssonen
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     df <- readr::read_delim(file, ...)
   }
   
@@ -359,12 +345,12 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 read_rds <- function(file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   # DAPLA 
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     gcs_global_bucket(sub("/.*", "", file))
     
     my_parse <- function(obj){
@@ -378,7 +364,7 @@ file <- gsub("gs://", "", file)
   }
   
   # Produksjonssonen
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     df <- readRDS(file, ...)
   }
   return(df)
@@ -399,12 +385,12 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 read_xml <- function(file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   # DAPLA 
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     suppressMessages(gcs_global_bucket(sub("/.*", "", file)))
     
     my_parse <- function(obj){
@@ -438,17 +424,17 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 write_parquet <- function(data, file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   # DAPLA
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     arrow::write_parquet(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Produksjonssonen
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     arrow::write_parquet(data, file, ...)
   }
   
@@ -475,9 +461,9 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 write_dataset <- function(data, file, ...) {
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
-    
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
+  
   arrow::write_dataset(data, gcs_bucket(dirname(file))$path(paste0(basename(file))),
                        partitioning = dplyr::group_vars(data))
 }
@@ -499,17 +485,17 @@ file <- gsub("gs://", "", file)
 #'@encoding UTF-8
 
 write_feather <- function(data, file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   # DAPLA
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Produksjonssonen
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     arrow::write_feather(data, file, ...)
   }
   
@@ -533,17 +519,17 @@ file <- gsub("gs://", "", file)
 
 write_csv <- function(data,
                       file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   # DAPLA
-  if (env_check() %in% c("DaplaProd", "DaplaTest", "Onyxia")) {
+  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     arrow::write_csv_arrow(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
   
   # Produksjonssonen
-  if (env_check() %in% c("BakkeProd", "BakkeTest")){
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     arrow::write_csv_arrow(data, file, ...)
   }
   
@@ -565,9 +551,9 @@ file <- gsub("gs://", "", file)
 
 write_rds <- function(data,
                       file, ...) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   f <- function(input, output){
     saveRDS(input, file = output)
@@ -595,10 +581,10 @@ file <- gsub("gs://", "", file)
 #'
 
 gcs.list.files <- function(bucket) {
-    
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-bucket <- gsub("gs://", "", bucket) 
-    
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  bucket <- gsub("gs://", "", bucket) 
+  
   gcs_bucket(bucket)$ls(recursive = T)
 }
 
@@ -623,9 +609,9 @@ bucket <- gsub("gs://", "", bucket)
 #'
 
 gcs_list_objects <- function(bucket) {
-       # Fjerner "gs://" fra filstien dersom det er spesifisert
-bucket <- gsub("gs://", "", bucket)  
-    
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  bucket <- gsub("gs://", "", bucket)  
+  
   if (dirname(bucket) == "."){
     gcs_global_bucket(bucket)
     googleCloudStorageR::gcs_list_objects(bucket)
@@ -650,10 +636,10 @@ bucket <- gsub("gs://", "", bucket)
 #'
 
 gcs_delete_object <- function(file) {
-    
-        # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
-    
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
+  
   gcs_global_bucket(sub("/.*", "", file))
   googleCloudStorageR::gcs_delete_object(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
 }
@@ -676,9 +662,9 @@ file <- gsub("gs://", "", file)
 #'
 
 write_sf_parquet <- function(data, file, ...) {
-    
-            # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file) 
+  
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file) 
   
   geo_metadata <- sfarrow:::create_metadata(data)
   df <- sfarrow::encode_wkb(data)

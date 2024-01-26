@@ -3,44 +3,25 @@
 # user_agent
 user_agent <- function() {
   
-  onyxia <- stringr::str_detect(Sys.getenv('OIDC_TOKEN_EXCHANGE_URL'), "sso")  
-  dapla <- stringr::str_detect(Sys.getenv('STATBANK_ENCRYPT_URL'), "^http://dapla")
-  bakke <- any(base::list.files("/ssb/") %in% "stamme01")
-  prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
+  user_agent <- paste0(Sys.getenv("DAPLA_ENVIRONMENT"), "-", 
+                       Sys.getenv("DAPLA_REGION"), "-", 
+                       Sys.getenv("DAPLA_SERVICE"), "-", 
+                       httr:::default_ua())
   
-  if ((dapla == TRUE & prod == TRUE)) {
-    user_agent <- paste0("DaplaProd-R-", httr:::default_ua())
-  } 
-  if ((dapla == TRUE & prod == FALSE)) {
-    user_agent <- paste0("DaplaTest-R-", httr:::default_ua())
-  } 
-  if ((bakke == TRUE & prod == TRUE)) {
-    user_agent <- paste0("BakkeProd-R-", httr:::default_ua())
-  } 
-  if ((bakke == TRUE & prod == FALSE)) {
-    user_agent <- paste0("BakkeTest-R-", httr:::default_ua())
-  } 
-  if (onyxia == TRUE){
-    user_agent <- paste0("OnyxiaTest-R-", httr:::default_ua())
-  } 
-  if (!exists("user_agent")) {
+  if (Sys.getenv("DAPLA_REGION") == "" | Sys.getenv("DAPLA_ENVIRONMENT") == "" | Sys.getenv("DAPLA_SERVICE") == ""){
     warning("Ukjent miljø. Denne funksjonene fungerer kun på Dapla og i produksjonssonen")
-  }  
+  }
+  
   return(user_agent)
 }
-
-user_agent()
 
 # statbank_encrypt_request
 
 statbank_encrypt_request <- function(laste_bruker) {
-  prod <- stringr::str_detect(Sys.getenv('STATBANK_BASE_URL'), "i.ssb")
   
-  if (prod == TRUE | Sys.getenv("RSTUDIO") == 1) {
+  if (Sys.getenv("DAPLA_ENVIRONMENT") == "PROD") {
     db <- "PROD"
-  }
-  
-  if (prod == FALSE) {
+  } else {
     db <- "TEST"
   }
   
@@ -280,18 +261,18 @@ statbank_validering <- function(data,
 #' @encoding UTF-8
 
 initialer_funk <- function(lastefil) {
-  if (grepl("Bakke", user_agent())) {
+  if (grepl("ON_PREM", user_agent())) {
     initialer <- Sys.getenv('USER')
   }
-  if (grepl("Dapla", user_agent())) {
+  if (grepl("BIP", user_agent())) {
     initialer <- gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER'))
   }
-  if (grepl("Onyxia", user_agent())) {
+  if (grepl("DAPLA_LAB", user_agent())) {
     initialer <- gsub("user-ssb-", "", Sys.getenv("KUBERNETES_NAMESPACE"))
   }
   if (!exists("initialer")) {
     warning("Finner ikke initialer")
-  }  
+  }
   return(initialer)
 }
 
