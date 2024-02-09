@@ -39,10 +39,12 @@ SSBs mal for R-pakke sette opp et github repository på Statisticsnorway område
 For å starte et nytt prosjekt for pakken din, velg File > New Project... > New Directory.
 
 Det skal åpnes et vindu hvor du kan da velge "SSB R-package". Velg dette.
-![](images/SSBpakke.png)
+![Picture of project options](images/SSBpakke.png){width=60%}
+
 Gi pakken din et navn (ingen mellomrom eller bindestrekk) og fyll inn en beskrivelse, og navn ditt. Klikk på "Create project" for å opprette pakken.
 
-![](images/SSBpakkeCreate.png)
+![Picture of Create SSB R-package options](images/SSBpakkeCreate.png){width=60%}
+
 En mappe opprettes på område du har valgt å starte prosjektet men med "ssb-" på foran. Dette er for å fylle navn-standard i SSB. HVis du velge å opprette et github repository (anbefalt for å kunne dele med andre) vil det spøres om github brukernavn og github token. Github token må ha workflow rettigheter for å kunne opprette alle filene. 
 Følge prosessen videre og godkjenne endringer til README filene som anbefalt.
 
