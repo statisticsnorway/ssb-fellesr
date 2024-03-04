@@ -10,10 +10,7 @@ vignette: >
 ---
 
 
-```{r, echo = FALSE, eval = TRUE, out.width="40%"}
-knitr::include_graphics("images/nice.PNG")
-```
-
+![](images/nice.png)
 RStudio på Linux-serverne (sl-stata-p3 og sl-stata-p4), samt RStudio Server, opererer uten individuelle begrensninger på mengden minne (prosesslagring) som kan benyttes under kjøringer. Minnet er allokert på et fellesbasis, noe som betyr at det er teknisk mulig for en enkelt bruker å forbruke nesten alle tilgjengelige ressurser, og dermed risikere at andre brukere blir tvunget ut av serveren. Derfor, oppfordrer vi alle (spesielt de som utfører ressurskrevende operasjoner) til å vise hensyn til fellesskapet ved å justere prioriteten på sine oppgaver gjennom bruk av nice-nivå. Dette bidrar til et mer balansert og rettferdig ressursforbruk på serveren, og sikrer at alle brukere kan fortsette sitt arbeid uten avbrudd. Her finner du et oppskrift til hvordan du kan sette nice-nivå i R ved [psnice](https://www.rdocumentation.org/packages/tools/versions/3.6.2/topics/psnice).
 
 
