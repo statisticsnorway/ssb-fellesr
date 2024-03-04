@@ -44,6 +44,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../../articles/vignette_SSB_fargepalett.html">SSB fargepallet fra KLASS</a>
+    <a class="dropdown-item" href="../../articles/vignette_SSB_pakke.html">SSB mal for R-pakker</a>
     <a class="dropdown-item" href="../../articles/vignette_SSB_theme.html">SSB ggplot theme</a>
     <a class="dropdown-item" href="../../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a>
     <a class="dropdown-item" href="../../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a>
@@ -103,22 +104,22 @@ fra R-kjøringen. Se dokumentasjon for nærmere beskrivelse.</p>
 <p><br> En forenklet utgave av makroen er vist under hvis man ønsker å
 definere den selv i SAS. Eksempel på bruk:</p>
 <p>Kopier følgende inn i prosjektet ditt for å definere macroen.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">%macro</span> RunScriptFromR<span class="er">(</span><span class="va">program</span><span class="op">=</span><span class="st">''</span>, <span class="va">server</span><span class="op">=</span><span class="st">"sl-stata-p3"</span>,param=<span class="st">""</span><span class="kw">);</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">%let</span> server2 = %sysfunc<span class="er">(</span><span class="ex">dequote</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">server.</span><span class="kw">));</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">%let</span> program2 = %sysfunc<span class="er">(</span><span class="ex">dequote</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">program.</span><span class="kw">));</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">%let</span> args = %sysfunc<span class="er">(</span><span class="ex">dequote</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">param.</span><span class="kw">));</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">filename</span> CliCmnd PIPE <span class="st">"export LC_ALL=en_US.UTF-8;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">    ssh -o 'StrictHostKeyChecking no' </span><span class="va">$USER</span><span class="st">@&amp;server2. 'Rscript &amp;program2. &amp;args. '"</span><span class="kw">;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">DATA</span> kjoring_logg<span class="kw">;</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">INFILE</span> CliCmnd encoding=<span class="st">'utf-8'</span><span class="kw">;</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="ex">LENGTH</span> stdout $ 1500.<span class="kw">;</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="ex">INPUT</span> stdout $ char500.<span class="kw">;</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span><span class="kw">;</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">%mend</span> RunScriptFromR<span class="kw">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">%macro</span> RunScriptFromR<span class="er">(</span><span class="va">program</span><span class="op">=</span><span class="st">''</span>, <span class="va">server</span><span class="op">=</span><span class="st">"sl-stata-p3"</span>,param=<span class="st">""</span><span class="kw">);</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="ex">%let</span> server2 = %sysfunc<span class="er">(</span><span class="ex">dequote</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">server.</span><span class="kw">));</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="ex">%let</span> program2 = %sysfunc<span class="er">(</span><span class="ex">dequote</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">program.</span><span class="kw">));</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="ex">%let</span> args = %sysfunc<span class="er">(</span><span class="ex">dequote</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">param.</span><span class="kw">));</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="ex">filename</span> CliCmnd PIPE <span class="st">"export LC_ALL=en_US.UTF-8;</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="st">    ssh -o 'StrictHostKeyChecking no' </span><span class="va">$USER</span><span class="st">@&amp;server2. 'Rscript &amp;program2. &amp;args. '"</span><span class="kw">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="ex">DATA</span> kjoring_logg<span class="kw">;</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="ex">INFILE</span> CliCmnd encoding=<span class="st">'utf-8'</span><span class="kw">;</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="ex">LENGTH</span> stdout $ 1500.<span class="kw">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>  <span class="ex">INPUT</span> stdout $ char500.<span class="kw">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="ex">RUN</span><span class="kw">;</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="ex">%mend</span> RunScriptFromR<span class="kw">;</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="lag-r-scriptet-og-gjør-det-tilgjengelig">2. Lag R-scriptet og gjør det tilgjengelig<a class="anchor" aria-label="anchor" href="#lag-r-scriptet-og-gj%C3%B8r-det-tilgjengelig"></a>
@@ -153,30 +154,30 @@ kodesnutten:</p>
 </h2>
 <p>Til slutt kjører vi macroen i SAS.Her er et eksempel på å lage
 testdata som en csv og lagre det som en csv.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">DATA</span> testdata<span class="kw">;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">INPUT</span> x y<span class="kw">;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">DATALINES</span><span class="kw">;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">1</span> 3.4</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">5</span> 4.7</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">9</span> 6.1</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">6</span> 4.8</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="ex">PROC</span> EXPORT data=testdata</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">outfile</span><span class="op">=</span><span class="st">"~/sas_test/testdata.csv"</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">dbms</span><span class="op">=</span>csv</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="ex">replace</span><span class="kw">;</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span><span class="kw">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="ex">DATA</span> testdata<span class="kw">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">INPUT</span> x y<span class="kw">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="ex">DATALINES</span><span class="kw">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="ex">1</span> 3.4</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="ex">5</span> 4.7</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="ex">9</span> 6.1</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="ex">6</span> 4.8</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="kw">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="ex">PROC</span> EXPORT data=testdata</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>        <span class="va">outfile</span><span class="op">=</span><span class="st">"~/sas_test/testdata.csv"</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>        <span class="va">dbms</span><span class="op">=</span>csv</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>        <span class="ex">replace</span><span class="kw">;</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="ex">RUN</span><span class="kw">;</span></span></code></pre></div>
 <p>Deretter kjører vi R-scriptet ved å kjøre macro og spesifiserer hvor
 R-script ligger (det er også mulig å kjøre til egen spesifisert logg om
 man ønsker det):</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">%RunScriptFromR</span><span class="er">(</span><span class="va">program</span><span class="op">=</span><span class="st">"~/sas_test/run_test.R"</span><span class="kw">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="ex">%RunScriptFromR</span><span class="er">(</span><span class="va">program</span><span class="op">=</span><span class="st">"~/sas_test/run_test.R"</span><span class="kw">);</span></span></code></pre></div>
 <p>Og så kan vi se på data som ble lagret fra scriptet i SAS ved å lese
 inn data:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">PROC</span> IMPORT datafile=<span class="st">"~/sas_test/testdata_output.csv"</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">dbms</span><span class="op">=</span>csv</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">out</span><span class="op">=</span>test_output<span class="kw">;</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span><span class="kw">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="ex">PROC</span> IMPORT datafile=<span class="st">"~/sas_test/testdata_output.csv"</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>    <span class="va">dbms</span><span class="op">=</span>csv</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>    <span class="va">out</span><span class="op">=</span>test_output<span class="kw">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="ex">RUN</span><span class="kw">;</span></span></code></pre></div>
 <p>Da ser vi at data har nå en variabel for predikterte verdiene og en
 variabel som viser at den har kjørt på sl-stata-p3 serveren.</p>
 <p><img src="images/sas_output.PNG" width="40%"></p>
