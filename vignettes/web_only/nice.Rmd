@@ -1,0 +1,39 @@
+---
+title: "Vær en Ressurshelt med Bruk av Nice-Nivå på RStudio"
+author: "Susie Jentoft & Eirik Sjåvik"
+output: rmarkdown::html_vignette
+date: "2024-03-04"
+vignette: >
+  %\VignetteIndexEntry{Vær en Ressurshelt med Bruk av Nice-Nivå på RStudio}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, echo = FALSE, eval = TRUE, out.width="40%"}
+knitr::include_graphics("images/nice.PNG")
+```
+
+RStudio på Linux-serverne (sl-stata-p3 og sl-stata-p4), samt RStudio Server, opererer uten individuelle begrensninger på mengden minne (prosesslagring) som kan benyttes under kjøringer. Minnet er allokert på et fellesbasis, noe som betyr at det er teknisk mulig for en enkelt bruker å forbruke nesten alle tilgjengelige ressurser, og dermed risikere at andre brukere blir tvunget ut av serveren. Derfor, oppfordrer vi alle (spesielt de som utfører ressurskrevende operasjoner) til å vise hensyn til fellesskapet ved å justere prioriteten på sine oppgaver gjennom bruk av nice-nivå. Dette bidrar til et mer balansert og rettferdig ressursforbruk på serveren, og sikrer at alle brukere kan fortsette sitt arbeid uten avbrudd. Her finner du et oppskrift til hvordan du kan sette nice-nivå i R ved [psnice](https://www.rdocumentation.org/packages/tools/versions/3.6.2/topics/psnice).
+
+
+
+## Trinn 1: Overvåke Systemressurser
+Før du starter en tung beregningsoppgave, er det lurt å sjekke systemressursene som brukes. Dette kan gjøres direkte fra RStudio:
+
+1. **Åpne Terminalen i RStudio**: Dette kan du gjøre ved å klikke på 'Terminal'-fanen i den nedre delen av RStudio-grensesnittet.
+2. **Bruk 'top'-kommandoen**: Skriv inn top i terminalen og trykk Enter. Dette vil vise en dynamisk oversikt over systemressurser som brukes, inkludert CPU- og minnebruk.
+3. **Filtrer for CPU-bruk**: Mens 'top' kjører, trykk på Shift + i for å filtrere prosesslisten slik at den kun viser CPU-intensiv bruk. Dette hjelper deg med å se hvor mye av CPU-kapasiteten på serveren som forbrukes av dine og andres prosesser.
+
+## Trinn 2: Sette nice-nivået
+For å unngå at dine beregninger tar opp for mye ressurser og potensielt forstyrrer andres arbeid, bør du sette et nice-nivå for dine prosesser. Dette kan gjøre ved hejlp av R-funksjonen [psnice](https://www.rdocumentation.org/packages/tools/versions/3.6.2/topics/psnice):
+
+4. Angi nice-nivået: Før du starter den tunge beregningen, kjøre følgende linje:
+
+```{r, echo = TRUE, eval = FALSE}
+tools::psnice(value = 10)
+```
+
+## Viktig å Huske
+- **Effekt av Nice-nivået**: Å sette et høyere nice-nivå (f.eks., 10) betyr at prosessen din vil bli mer hensynsfull i bruk av ressurser. Dette kan føre til at beregningen tar lengre tid, men det bidrar til en mer stabil og rettferdig bruk av serverressurser.
+- **Verifisere Endringen**: Du kan bekrefte at nice-nivået er satt ved å kjøre `tools::psnice()` uten noen argumenter etter at du har satt det. Dette vil vise det gjeldende nice-nivået for R-prosessen.
