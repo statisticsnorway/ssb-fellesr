@@ -12,12 +12,12 @@
 #'}
 #'@encoding UTF-8
 
-env_check <- function() { 
-  
-  env <- paste0(Sys.getenv("DAPLA_ENVIRONMENT"), "-", 
-                Sys.getenv("DAPLA_REGION"), "-", 
+env_check <- function() {
+
+  env <- paste0(Sys.getenv("DAPLA_ENVIRONMENT"), "-",
+                Sys.getenv("DAPLA_REGION"), "-",
                 Sys.getenv("DAPLA_SERVICE"))
-  
+
   if (Sys.getenv("DAPLA_REGION") == "" | Sys.getenv("DAPLA_ENVIRONMENT") == "" | Sys.getenv("DAPLA_SERVICE") == ""){
     warning("Ukjent miljø. Denne funksjonene fungerer kun på Dapla og i produksjonssonen")
   }
@@ -44,7 +44,7 @@ gcs_bucket <- function(bucket) {
     response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
     access_token <- httr::content(response)$exchanged_tokens$google$access_token
     expiration <- httr::content(response)$exchanged_tokens$google$exp
-  }  
+  }
   else if (Sys.getenv("DAPLA_REGION") == "DAPLA_LAB"){
 
     response <- httr::POST(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"),
@@ -161,11 +161,11 @@ file <- gsub("gs://", "", file)
 read_parquet_sf <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    
+
     ds <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), as_data_frame = FALSE, ...)
 
     metadata <- ds$metadata
@@ -284,8 +284,8 @@ file <- gsub("gs://", "", file)
 read_json <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
 
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
@@ -317,9 +317,9 @@ read_json <- function(file, ...) {
 read_csv <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
-  # DAPLA  
+  file <- gsub("gs://", "", file)
+
+  # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     df <- arrow::read_delim_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
@@ -348,11 +348,11 @@ read_csv <- function(file, ...) {
 read_rds <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
-  # DAPLA 
+  file <- gsub("gs://", "", file)
+
+  # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    
+
     gcs_global_bucket(sub("/.*", "", file))
 
     my_parse <- function(obj){
@@ -389,9 +389,9 @@ read_rds <- function(file, ...) {
 read_xml <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
-  # DAPLA 
+  file <- gsub("gs://", "", file)
+
+  # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
 
     suppressMessages(gcs_global_bucket(sub("/.*", "", file)))
@@ -466,7 +466,7 @@ file <- gsub("gs://", "", file)
 write_dataset <- function(data, file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
+  file <- gsub("gs://", "", file)
 
   arrow::write_dataset(data, gcs_bucket(dirname(file))$path(paste0(basename(file))),
                        partitioning = dplyr::group_vars(data))
@@ -491,8 +491,8 @@ write_dataset <- function(data, file, ...) {
 write_feather <- function(data, file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
@@ -525,7 +525,7 @@ write_csv <- function(data,
                       file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
+  file <- gsub("gs://", "", file)
 
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
@@ -557,8 +557,8 @@ write_rds <- function(data,
                       file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   f <- function(input, output){
     saveRDS(input, file = output)
   }
@@ -587,8 +587,8 @@ write_rds <- function(data,
 gcs.list.files <- function(bucket) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  bucket <- gsub("gs://", "", bucket) 
-  
+  bucket <- gsub("gs://", "", bucket)
+
   gcs_bucket(bucket)$ls(recursive = T)
 }
 
@@ -615,8 +615,8 @@ gcs.list.files <- function(bucket) {
 gcs_list_objects <- function(bucket) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  bucket <- gsub("gs://", "", bucket)  
-  
+  bucket <- gsub("gs://", "", bucket)
+
   if (dirname(bucket) == "."){
     gcs_global_bucket(bucket)
     googleCloudStorageR::gcs_list_objects(bucket)
@@ -643,8 +643,8 @@ gcs_list_objects <- function(bucket) {
 gcs_delete_object <- function(file) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   gcs_global_bucket(sub("/.*", "", file))
   googleCloudStorageR::gcs_delete_object(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
 }
@@ -670,8 +670,8 @@ gcs_delete_object <- function(file) {
 write_sf_parquet <- function(data, file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   geo_metadata <- sfarrow:::create_metadata(data)
   df <- sfarrow::encode_wkb(data)
   tbl <- arrow::Table$create(df)
@@ -781,4 +781,131 @@ write_SSB <- function(data, file, partitioning = FALSE, sf = FALSE, ...) { # OBS
   } else {
     print("write_SSB kan for oeyeblikket kun skrive .parquet-, .feather-, .rds- og .csv-filer")
   }
+}
+
+
+#' Eksport av filer til GCS-bøtter med `rio::export`.
+#'
+#' Skriv data.frame og andre objekter til bøtter med  [rio::export].
+#'
+#' @param data objekt som skal eksporteres.
+#' @param file Full sti og filnavn på filen som skal opprettes. Eventuelt
+#'   `gs://`-prefiks fjernes, og det øverste mappenivået tolkes som navn på
+#'   GCS-bøtten.
+#' @param ... Argumenter som sendes videre til [rio::export], og dermed til
+#'   underliggende eksporterende funksjoner.
+#' @param export_function En funksjon med parametere `input` og `output` som
+#'   eksporterer den ønskede filen.
+#'
+#' @return Resultatet av eksporten som returnert av [rio::export].
+#'
+#' @details Parameterene `x`, `file`, og alle parametere i `...` blir sendt
+#' videre til [rio::export] (default), eller en funksjon angitt .
+#'
+#' Se [rio::export] for en oversikt over filformatene som kan eksporteres med
+#' denne funksjonen.
+#'
+#' @export
+#'
+#' @seealso [import_gcs()] og [rio::export()]
+#'
+#' @examples
+#' \dontrun{
+#'
+#' export_gcs(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_xlsx_test.xlsx")
+#'
+#' export_gcs(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_csv_test.csv")
+#'
+#' export_gcs(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+#'
+#' export_gcs(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
+#'
+#' export_gcs(data = list(foo = "bar", egg = "ham"),
+#'            file = "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_json_test.json")
+#'
+#' }
+#'
+export_gcs <- function(data, file, ...) {
+
+  match <- stringr::str_match(file, "^(?:gs:\\/\\/)?([^\\/\\.:]+)\\/(.+)$")
+
+  if (is.na(match[1])) {
+
+    stop("`file` har uventet format.")
+
+  }
+
+  gcs_global_bucket(match[2])
+
+
+  export_function <- function(input, output) {
+
+    do.call(rio::export, c(list(x = input, file = output), list(...)))
+
+  }
+
+  invisible(
+    googleCloudStorageR::gcs_upload(file = data,
+                                    name = match[3],
+                                    predefinedAcl = "bucketLevel",
+                                    object_function = export_function)
+  )
+
+}
+
+#' Import av filer fra GCS-bøtter med `rio::import`.
+#'
+#' @param file Full sti og filnavn på filen som skal importeres. Eventuelt
+#'   `gs://`-prefiks fjernes, og det øverste mappenivået tolkes som navn på
+#'   GCS-bøtten.
+#' @param ... Argumenter som sendes videre til [rio::import], og dermed til
+#'   underliggende eksporterende funksjoner.
+#'
+#' @return Resultatet av å kjøre [rio::import] på den angitte filen.
+#'
+#' @details Funksjonen laster ned den angitte filen på GCS til en midlertidig
+#' fil i det lokale filsystemet, og benytter [rio::import] til å importere den.
+#'
+#' Se [rio::import] for en oversikt over filformatene som kan importeres med
+#' denne funksjonen.
+#'
+#' @export
+#'
+#' @seealso [gcs_export()] og [rio::import()]
+#'
+#' @examples
+#'
+#' \dontrun{
+#'
+#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_xlsx_test.xlsx")
+#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_csv_test.csv")
+#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
+#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_json_test.json")
+#'
+#'
+#' }
+#'
+import_gcs <- function(file, ...) {
+
+  match <- stringr::str_match(file, "^(?:gs:\\/\\/)?([^\\/\\.:]+)\\/(.+)$")
+
+  if (is.na(match[1])) {
+
+    stop("`file` har uventet format.")
+
+  }
+
+  tmp <- tempfile(fileext = paste0(".", tools::file_ext(file)))
+
+  on.exit(unlink(tmp))
+
+  suppressMessages(gcs_global_bucket(match[2]))
+
+  suppressMessages(
+    googleCloudStorageR::gcs_get_object(match[3], saveToDisk = tmp)
+  )
+
+  return(rio::import(tmp, ...))
+
 }
