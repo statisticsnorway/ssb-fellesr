@@ -827,15 +827,8 @@ write_SSB <- function(data, file, partitioning = FALSE, sf = FALSE, ...) { # OBS
 #'
 export_gcs <- function(data, file, ...) {
 
-  match <- stringr::str_match(file, "^(?:gs:\\/\\/)?([^\\/\\.:]+)\\/(.+)$")
+  path <- gcs_validate_file_path(file)
 
-  if (is.na(match[1])) {
-
-    stop("`file` har uventet format.")
-
-  }
-
-  gcs_global_bucket(match[2])
 
 
   export_function <- function(input, output) {
@@ -844,9 +837,11 @@ export_gcs <- function(data, file, ...) {
 
   }
 
+  gcs_global_bucket(path["bucket"])
+
   invisible(
     googleCloudStorageR::gcs_upload(file = data,
-                                    name = match[3],
+                                    name = path["file"],
                                     predefinedAcl = "bucketLevel",
                                     object_function = export_function)
   )
@@ -888,24 +883,61 @@ export_gcs <- function(data, file, ...) {
 #'
 import_gcs <- function(file, ...) {
 
-  match <- stringr::str_match(file, "^(?:gs:\\/\\/)?([^\\/\\.:]+)\\/(.+)$")
+  path <- gcs_validate_file_path(file)
+
+  tmp <- tempfile(fileext = path["extension"])
+
+  on.exit(unlink(tmp))
+
+  suppressMessages(gcs_global_bucket(path["bucket"]))
+
+  suppressMessages(
+    googleCloudStorageR::gcs_get_object(object_name = path["file"],
+                                        saveToDisk  = tmp)
+  )
+
+  return(rio::import(tmp, ...))
+
+}
+
+#' Kontroller formatet til en GCS-filsti
+#'
+#' Gir informasjon om bøtte, filsti og filendelse for gyldige GCS-filstier, og
+#' feilmelding for ugyldige GCS-filstier.
+#'
+#' @param path En karakter-vektor med lengde en.
+#'
+#' @return Dersom vektoren har riktig format, en navngitt karaktervektor med
+#'   lengde 4. Det første elementet i vektoren er lik `path`, og de andre
+#'   elementene har navn `bucket`, `file` og `extension`. Det første elementet
+#'   er den opprinnelige vektoren, det andre elementet er GCS-bøtten i filstien
+#'   uten ev. `gs://`-prefiks, og det tredje elementet er resten av filstien,
+#'   inkludert mapper, filnavn og filendelse.
+#'
+#'   Dersom vektoren ikke har riktig format gir funksjonen en feilmelding.
+#'
+#' @examples
+#'
+#' \dontrun{
+#'
+#' gcs_validate_file_path()
+#'
+#' }
+gcs_validate_file_path <- function(path) {
+
+  regex <- paste0("^(?:gs:\\/\\/)?(?<bucket>[^\\/\\.:]+)\\/",
+                  "(?<file>[^\\.]+(?<extension>\\..+))$")
+
+  match <- stringr::str_match(path, regex)[1,]
 
   if (is.na(match[1])) {
 
     stop("`file` har uventet format.")
 
+  } else {
+
+    return(match)
+
   }
-
-  tmp <- tempfile(fileext = paste0(".", tools::file_ext(file)))
-
-  on.exit(unlink(tmp))
-
-  suppressMessages(gcs_global_bucket(match[2]))
-
-  suppressMessages(
-    googleCloudStorageR::gcs_get_object(match[3], saveToDisk = tmp)
-  )
-
-  return(rio::import(tmp, ...))
 
 }
