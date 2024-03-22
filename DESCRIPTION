@@ -47,10 +47,11 @@ Suggests:
     rmarkdown,
     RODBC,
     ROracle,
-    testthat,
+    testthat (>= 3.0.0),
     usethis,
     git2r,
     openssl,
     roxygen2
 URL: https://statisticsnorway.github.io/fellesr/
 VignetteBuilder: knitr
+Config/testthat/edition: 3
