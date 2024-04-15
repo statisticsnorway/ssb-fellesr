@@ -136,7 +136,7 @@ read_ssb <- function(file, ...) {
 
   if (Sys.getenv("DAPLA_REGION") %in% c("BIP", "DAPLA_LAB")) {
 
-    return()
+    return(import_gcs(file, ...))
 
   } else if (Sys.getenv("DAPLA_REGION") == "ON_PREM") {
 
