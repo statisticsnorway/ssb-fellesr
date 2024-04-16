@@ -23,3 +23,11 @@ Dersom vektoren ikke har riktig format gir funksjonen en feilmelding.
 Gir informasjon om bøtte, filsti og filendelse for gyldige GCS-filstier, og
 feilmelding for ugyldige GCS-filstier.
 }
+\examples{
+
+\dontrun{
+
+gcs_validate_file_path()
+
+}
+}

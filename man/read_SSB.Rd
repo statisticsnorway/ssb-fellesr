@@ -5,14 +5,14 @@
 \alias{read_SSB}
 \title{Funksjon for aa laste inn filer fra Google Cloud Storage bucket}
 \usage{
-read_SSB(file, sf = FALSE, ...)
+read_SSB(file, ...)
 }
 \arguments{
 \item{file}{Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.}
 
-\item{sf}{Boolsk. Standardverdi er FALSE. Sett \code{sf = TRUE} dersom .parquet-filen er et sf-objekt.}
-
 \item{...}{Flere parametere (se dokumentasjonen til: \code{\link[=read_parquet]{read_parquet()}}/\code{\link[=open_dataset]{open_dataset()}}/\code{\link[=read_feather]{read_feather()}}/\code{\link[=read_csv]{read_csv()}}/\code{\link[=read_rds]{read_rds()}}/\code{\link[=read_parquet]{read_parquet()}})}
+
+\item{sf}{Boolsk. Standardverdi er FALSE. Sett \code{sf = TRUE} dersom .parquet-filen er et sf-objekt.}
 }
 \description{
 Funksjonen \code{read_SSB} kan brukes til aa lese inn filer fra Google Cloud Storage. Funksjonen stoetter .parquet- (inkludert sf-objekter), .feather-, .rds- og .csv-, .xml- og .json-filer.

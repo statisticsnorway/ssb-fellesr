@@ -5,18 +5,18 @@
 \alias{write_SSB}
 \title{Funksjon for aa skrive filer til Google Cloud Storage bucket}
 \usage{
-write_SSB(data, file, partitioning = FALSE, sf = FALSE, ...)
+write_SSB(data, file, ...)
 }
 \arguments{
 \item{data}{Filen som skal skrives.}
 
 \item{file}{Full filsti og filnavn for hvor filen skal skrives.}
 
+\item{...}{Flere parametere (se dokumentasjonen til: \code{\link[=write_parquet]{write_parquet()}}/\code{\link[=write_sf_parquet]{write_sf_parquet()}}/\code{\link[=write_feather]{write_feather()}}/\code{\link[=write_csv]{write_csv()}}/\code{\link[=write_dataset]{write_dataset()}})}
+
 \item{partitioning}{Boolsk. Skal partisjonering brukes naar fle lagres.}
 
 \item{sf}{Boolsk. Standardverdi er FALSE. Sett \code{sf = TRUE} dersom filen som skal lagres er et sf-objekt.}
-
-\item{...}{Flere parametere (se dokumentasjonen til: \code{\link[=write_parquet]{write_parquet()}}/\code{\link[=write_sf_parquet]{write_sf_parquet()}}/\code{\link[=write_feather]{write_feather()}}/\code{\link[=write_csv]{write_csv()}}/\code{\link[=write_dataset]{write_dataset()}})}
 }
 \description{
 Funksjonen \code{write_SSB} kan brukes til aa skrive filer til Google Cloud Storage. Funksjonen stoetter .parquet- (inkludert sf-objekter), .feather-, .rds- og .csv-filer.
