@@ -15,6 +15,9 @@ test_that("importering fungerer", {
 
       read_ssb(paste0(smoke_test, "write_SSB_json_test.json"))
 
+      read_ssb(paste0(smoke_test,
+                      "write_SSB_feather_test.feather"))
+
     })
   )
 

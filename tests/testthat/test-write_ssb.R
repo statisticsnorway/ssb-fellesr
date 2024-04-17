@@ -20,6 +20,9 @@ test_that("eksportering fungerer", {
       write_ssb(data = list(foo = "bar", egg = "ham"),
                 file = paste0(smoke_test, "write_SSB_json_test.json"))
 
+      write_ssb(mtcars, paste0(smoke_test,
+                               "write_SSB_feather_test.feather"))
+
     })
   )
 
