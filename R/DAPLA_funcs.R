@@ -24,8 +24,6 @@ env_check <- function() {
   return(env)
 }
 
-
-
 #' Funksjon for aa koble til Google Cloud Storage bucket med arrow
 #'
 #' `gcs_bucket` er en hjelpefunksjon som kobler til en bucket paa Google Cloud Storage med pakken `arrow`. Autentiseringen skjer via access_token og expiration som er lagret som miljoevariabler i Jupyter paa DAPLA.
@@ -114,37 +112,6 @@ gcs_global_bucket <- function(bucket) {
   googleCloudStorageR::gcs_global_bucket(bucket)
 }
 
-#' Funksjon for aa laste inn .parquet-fil fra Google Cloud Storage bucket
-#'
-#' Funksjonen `read_parquet` kan brukes til aa lese inn .parquet-filer fra Google Cloud Storage.
-#'
-#' @param file Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_parquet.html)
-#'
-#' @examples
-#' \dontrun{
-#' data <- read_parquet("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet")
-#'}
-#'@encoding UTF-8
-
-read_parquet <- function(file, ...) {
-
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file)
-
-  # DAPLA
-  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    df <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-  }
-
-  # Produksjonssonen
-  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
-    df <- arrow::read_parquet(file, ...)
-  }
-
-  return(df)
-}
-
 #' Funksjon for aa laste inn .parquet-fil (i sf-format) fra Google Cloud Storage bucket
 #'
 #' Funksjonen `read_parquet_sf` kan brukes til aa lese inn .parquet-filer (i sf-format) fra Google Cloud Storage.
@@ -211,24 +178,6 @@ read_parquet_sf <- function(file, ...) {
 #'}
 #'@encoding UTF-8
 
-read_feather <- function(file, ...) {
-
-  # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file)
-
-  # DAPLA
-  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    df <- arrow::read_feather(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-  }
-
-  # Produksjonssonen
-  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
-    df <- arrow::read_feather(file, ...)
-  }
-
-  return(df)
-}
-
 
 #' Funksjon for aa laste inn "multifile" datasett fra Google Cloud Storage bucket
 #'
@@ -268,187 +217,6 @@ file <- gsub("gs://", "", file)
   return(ds)
 }
 
-#' Funksjon for aa laste inn .json-fil fra Google Cloud Storage
-#'
-#' Funksjonen `read_json` kan brukes til aa lese inn .json-filer Google Cloud Storage.
-#'
-#' @param file Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_json_arrow.html)
-#'
-#' @examples
-#' \dontrun{
-#' data <- read_json("ssb-prod-spesh-personell-data-kilde/example_1.json")
-#'}
-#'@encoding UTF-8
-
-read_json <- function(file, ...) {
-
-  # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file)
-
-  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-
-    df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-  }
-
-  # Jupyterlab (produksjonssonen) + lokale filer fra RStudio Windows (produksjonssonen)
-  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
-    df <- arrow::read_json_arrow(file, ...)
-  }
-
-  return(df)
-
-}
-
-
-#' Funksjon for aa laste inn .csv-fil fra Google Cloud Storage bucket
-#'
-#' Funksjonen `read_csv` kan brukes til aa lese inn .csv-filer Google Cloud Storage.
-#'
-#' @param file Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)
-#'
-#' @examples
-#' \dontrun{
-#' data <- read_csv("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv")
-#'}
-#'@encoding UTF-8
-
-read_csv <- function(file, ...) {
-
-  # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file)
-
-  # DAPLA
-  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    df <- arrow::read_delim_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-  }
-
-  # Produksjonssonen
-  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
-    df <- readr::read_delim(file, ...)
-  }
-
-  return(df)
-}
-
-#' Funksjon for aa laste inn .rds-fil fra Google Cloud Storage bucket
-#'
-#' Funksjonen `read_rds` kan brukes til aa lese inn .rds-filer fra Google Cloud Storage.
-#'
-#' @param file Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.
-#' @param ... Flere parametere (se: https://rdrr.io/cran/googleCloudStorageR/man/gcs_get_object.html)
-#'
-#' @examples
-#' \dontrun{
-#' data <- read_rds("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds")
-#'}
-#'@encoding UTF-8
-
-read_rds <- function(file, ...) {
-
-  # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file)
-
-  # DAPLA
-  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-
-    gcs_global_bucket(sub("/.*", "", file))
-
-    my_parse <- function(obj){
-      tmp <- tempfile(fileext = ".rds")
-      on.exit(unlink(tmp))
-      suppressMessages(googleCloudStorageR::gcs_get_object(obj, saveToDisk = tmp))
-      readRDS(tmp)
-    }
-
-    df <- my_parse(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
-  }
-
-  # Produksjonssonen
-  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
-    df <- readRDS(file, ...)
-  }
-  return(df)
-}
-
-
-#' Funksjon for aa laste inn .xml-fil fra Google Cloud Storage bucket
-#'
-#' Funksjonen `read_xml` kan brukes til aa lese inn .xml-filer fra Google Cloud Storage.
-#'
-#' @param file Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.
-#' @param ... Flere parametere (se: https://rdrr.io/cran/googleCloudStorageR/man/gcs_get_object.html)
-#'
-#' @examples
-#' \dontrun{
-#' data <- read_xml("ssb-prod-dapla-felles-data-delt/R_smoke_test/XXX.xml")
-#'}
-#'@encoding UTF-8
-
-read_xml <- function(file, ...) {
-
-  # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file)
-
-  # DAPLA
-  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-
-    suppressMessages(gcs_global_bucket(sub("/.*", "", file)))
-
-    my_parse <- function(obj){
-      tmp <- tempfile(fileext = ".xml")
-      on.exit(unlink(tmp))
-      suppressMessages(googleCloudStorageR::gcs_get_object(obj, saveToDisk = tmp))
-      XML::xmlToDataFrame(tmp)
-    }
-
-    df <- my_parse(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
-  }
-
-  # Produksjonssonen (mangler)
-
-  return(df)
-}
-
-
-#' Funksjon for aa lagre .parquet-fil til Google Cloud Storage bucket
-#'
-#' Funksjonen `write_parquet` kan brukes til aa skrive .parquet-filer til Google Cloud Storage bucket.
-#'
-#' @param data Filen som skal skrives.
-#' @param file Full filsti og filnavn for hvor filen skal skrives.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_parquet.html)
-#'
-#' @examples
-#' \dontrun{
-#' write_parquet(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
-#' }
-#'@encoding UTF-8
-
-write_parquet <- function(data, file, ...) {
-
-# Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file)
-
-  # DAPLA
-  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    arrow::write_parquet(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-  }
-
-  # Produksjonssonen
-  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
-    arrow::write_parquet(data, file, ...)
-  }
-
-
-}
-
-
-
-
-
-
 #' Funksjon for aa lagre "partitioned" .parquet-fil til Google Cloud Storage bucket
 #'
 #' Funksjonen `write_dataset` kan brukes til aa skrive "partitioned" .parquet-filer til Google Cloud Storage bucket. "Partitioning" angis ut fra hvilke variabler datasettet er gruppert etter (gjoeres via [dplyr::group_by()]).
@@ -473,101 +241,35 @@ write_dataset <- function(data, file, ...) {
 }
 
 
-
-#' Funksjon for aa lagre .feather-fil til Google Cloud Storage bucket
+#' Funksjon for aa lagre sf-objekt som .parquet-fil til Google Cloud Storage bucket
 #'
-#' Funksjonen `write_feather` kan brukes til aa skrive .feather-filer til Google Cloud Storage bucket.
-#'
-#' @param data Filen som skal skrives.
-#' @param file Full filsti og filnavn for hvor filen skal skrives.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/write_feather.html)
-#'
-#' @examples
-#' \dontrun{
-#' write_feather(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather")
-#' }
-#'@encoding UTF-8
-
-write_feather <- function(data, file, ...) {
-
-  # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file)
-
-  # DAPLA
-  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-  }
-
-  # Produksjonssonen
-  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
-    arrow::write_feather(data, file, ...)
-  }
-
-}
-
-
-
-#' Funksjon for aa lagre .csv-fil til Google Cloud Storage bucket
-#'
-#' Funksjonen `write_csv` kan brukes til aa skrive .csv-filer til Google Cloud Storage bucket.
-#'
-#' @param data Filen som skal skrives.
-#' @param file Full filsti og filnavn for hvor filen skal skrives.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_delim_arrow.html)
-#'
-#' @examples
-#' \dontrun{
-#' write_csv(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.csv")
-#' }
-#'@encoding UTF-8
-
-write_csv <- function(data,
-                      file, ...) {
-
-  # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file)
-
-  # DAPLA
-  if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    arrow::write_csv_arrow(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
-  }
-
-  # Produksjonssonen
-  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
-    arrow::write_csv_arrow(data, file, ...)
-  }
-
-
-}
-
-#' Funksjon for aa lagre .rds-fil til Google Cloud Storage bucket
-#'
-#' Funksjonen `write_rds` kan brukes til aa skrive .rds-filer til Google Cloud Storage bucket.
+#' Funksjonen `write_sf_parquet` kan brukes til aa skrive sf-objekter som .parquet-filer til Google Cloud Storage bucket.
 #'
 #' @param data Filen som skal skrives.
 #' @param file Full filsti og filnavn for hvor filen skal skrives.
 #' @param ... Flere parametere (se dokumentasjonen til: [fellesr::write_parquet()]/[fellesr::write_sf_parquet()]/[fellesr::write_feather()]/[fellesr::write_csv()]/[fellesr::write_dataset()])
+#'
+#' @export
+#'
 #' @examples
 #' \dontrun{
-#' write_rds(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
+#' write_sf_parquet(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_sf.parquet")
 #' }
 #'@encoding UTF-8
+#'
 
-write_rds <- function(data,
-                      file, ...) {
+write_sf_parquet <- function(data, file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
   file <- gsub("gs://", "", file)
 
-  f <- function(input, output){
-    saveRDS(input, file = output)
-  }
+  geo_metadata <- sfarrow:::create_metadata(data)
+  df <- sfarrow::encode_wkb(data)
+  tbl <- arrow::Table$create(df)
+  tbl$metadata[["geo"]] <- geo_metadata
 
-  gcs_global_bucket(sub("/.*", "", file))
-  googleCloudStorageR::gcs_upload(data, name = sub(paste0(".*", sub("/.*", "", file), "/"), "", file), object_function = f)
-
+  write_parquet(tbl, file, ...)
 }
-
 
 #' Funksjon for aa sjekke hvilke filer som finnes i en mappe i en Google Cloud Storage bucket
 #'
@@ -650,35 +352,7 @@ gcs_delete_object <- function(file) {
 }
 
 
-#' Funksjon for aa lagre sf-objekt som .parquet-fil til Google Cloud Storage bucket
-#'
-#' Funksjonen `write_sf_parquet` kan brukes til aa skrive sf-objekter som .parquet-filer til Google Cloud Storage bucket.
-#'
-#' @param data Filen som skal skrives.
-#' @param file Full filsti og filnavn for hvor filen skal skrives.
-#' @param ... Flere parametere (se dokumentasjonen til: [fellesr::write_parquet()]/[fellesr::write_sf_parquet()]/[fellesr::write_feather()]/[fellesr::write_csv()]/[fellesr::write_dataset()])
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' write_sf_parquet(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_sf.parquet")
-#' }
-#'@encoding UTF-8
-#'
 
-write_sf_parquet <- function(data, file, ...) {
-
-  # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file)
-
-  geo_metadata <- sfarrow:::create_metadata(data)
-  df <- sfarrow::encode_wkb(data)
-  tbl <- arrow::Table$create(df)
-  tbl$metadata[["geo"]] <- geo_metadata
-
-  write_parquet(tbl, file, ...)
-}
 
 gcs_validate_file_path <- function(path) {
 
