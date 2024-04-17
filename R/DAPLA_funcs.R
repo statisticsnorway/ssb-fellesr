@@ -123,7 +123,8 @@ gcs_global_bucket <- function(bucket) {
 #' \dontrun{
 #' data <- read_parquet_sf("ssb-prod-dapla-felles-data-delt/GIS/testdata/veger_oslo.parquet")
 #'}
-#'@encoding UTF-8
+#' @encoding UTF-8
+#' @export
 
 read_parquet_sf <- function(file, ...) {
 
