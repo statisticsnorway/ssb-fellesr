@@ -1,22 +1,26 @@
 test_that("eksportering fungerer", {
 
-  expect_no_error(write_ssb(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_xlsx_test.xlsx"))
-
-  expect_no_error(write_ssb(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_csv_test.csv"))
-
-  expect_no_error(write_ssb(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet"))
-
-  expect_no_error(write_ssb(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds"))
+  smoke_test <- "ssb-prod-dapla-felles-data-delt/R_smoke_test/"
 
   expect_no_error(
-    write_ssb(data = list(foo = "bar", egg = "ham"),
-               file = "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_json_test.json")
+    suppressMessages({
+
+      write_ssb(mtcars, paste0(smoke_test,
+                               "write_SSB_xlsx_test.xlsx"))
+
+      write_ssb(mtcars, paste0(smoke_test,
+                               "write_SSB_csv_test.csv"))
+
+      write_ssb(mtcars, paste0(smoke_test,
+                               "write_SSB_parquet_test.parquet"))
+
+      write_ssb(mtcars, paste0(smoke_test,
+                               "write_SSB_rds_test.rds"))
+
+      write_ssb(data = list(foo = "bar", egg = "ham"),
+                file = paste0(smoke_test, "write_SSB_json_test.json"))
+
+    })
   )
 
 })
-
-
-
-
-
-
