@@ -5,20 +5,20 @@ test_that("eksportering fungerer", {
   expect_no_error(
     suppressMessages({
 
-      export_gcs(mtcars, paste0(smoke_test,
-                               "export_gcs_xlsx_test.xlsx"))
+      gcs_export(mtcars, paste0(smoke_test,
+                               "gcs_export_xlsx_test.xlsx"))
 
-      export_gcs(mtcars, paste0(smoke_test,
-                               "export_gcs_csv_test.csv"))
+      gcs_export(mtcars, paste0(smoke_test,
+                               "gcs_export_csv_test.csv"))
 
-      export_gcs(mtcars, paste0(smoke_test,
-                               "export_gcs_parquet_test.parquet"))
+      gcs_export(mtcars, paste0(smoke_test,
+                               "gcs_export_parquet_test.parquet"))
 
-      export_gcs(mtcars, paste0(smoke_test,
-                               "export_gcs_rds_test.rds"))
+      gcs_export(mtcars, paste0(smoke_test,
+                               "gcs_export_rds_test.rds"))
 
-      export_gcs(data = list(foo = "bar", egg = "ham"),
-                file = paste0(smoke_test, "export_gcs_json_test.json"))
+      gcs_export(data = list(foo = "bar", egg = "ham"),
+                file = paste0(smoke_test, "gcs_export_json_test.json"))
 
     })
   )

@@ -22,25 +22,25 @@
 #'
 #' @export
 #'
-#' @seealso [import_gcs()] og [rio::export()]
+#' @seealso [gcs_import()] og [rio::export()]
 #'
 #' @examples
 #' \dontrun{
 #'
-#' export_gcs(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_xlsx_test.xlsx")
+#' gcs_export(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_xlsx_test.xlsx")
 #'
-#' export_gcs(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_csv_test.csv")
+#' gcs_export(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_csv_test.csv")
 #'
-#' export_gcs(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+#' gcs_export(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
 #'
-#' export_gcs(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
+#' gcs_export(mtcars, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
 #'
-#' export_gcs(data = list(foo = "bar", egg = "ham"),
+#' gcs_export(data = list(foo = "bar", egg = "ham"),
 #'            file = "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_json_test.json")
 #'
 #' }
 #'
-export_gcs <- function(data, file, ...) {
+gcs_export <- function(data, file, ...) {
 
   path <- gcs_validate_file_path(file)
 
@@ -85,16 +85,16 @@ export_gcs <- function(data, file, ...) {
 #'
 #' \dontrun{
 #'
-#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_xlsx_test.xlsx")
-#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_csv_test.csv")
-#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
-#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
-#' import_gcs("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_json_test.json")
+#' gcs_import("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_xlsx_test.xlsx")
+#' gcs_import("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_csv_test.csv")
+#' gcs_import("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+#' gcs_import("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
+#' gcs_import("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_json_test.json")
 #'
 #'
 #' }
 #'
-import_gcs <- function(file, ...) {
+gcs_import <- function(file, ...) {
 
   path <- gcs_validate_file_path(file)
 
@@ -117,7 +117,7 @@ import_gcs <- function(file, ...) {
 
 #' Eksport av filer på Dapla og på bakken
 #'
-#' @inheritParams export_gcs
+#' @inheritParams gcs_export
 #'
 #' @return
 #'
@@ -150,8 +150,8 @@ import_gcs <- function(file, ...) {
 write_ssb <- function(data, file, ...) {
 
   write_fun <- switch(Sys.getenv("DAPLA_REGION"),
-                      BIP       = export_gcs,
-                      DAPLA_LAB = export_gcs,
+                      BIP       = gcs_export,
+                      DAPLA_LAB = gcs_export,
                       ON_PREM   = rio::export,
                       stop("Ukjent miljø, avbryter"))
 
@@ -166,7 +166,7 @@ write_SSB <- write_ssb
 
 #' Import av filer på Dapla og på bakken
 #'
-#' @inheritParams import_gcs
+#' @inheritParams gcs_import
 #' @inheritParams rio::import
 #'
 #' @return
@@ -188,8 +188,8 @@ write_SSB <- write_ssb
 read_ssb <- function(file, ...) {
 
   read_fun <- switch(Sys.getenv("DAPLA_REGION"),
-                     BIP       = import_gcs,
-                     DAPLA_LAB = import_gcs,
+                     BIP       = gcs_import,
+                     DAPLA_LAB = gcs_import,
                      ON_PREM   = rio::import,
                      stop("Ukjent miljø, avbryter"))
 
