@@ -165,21 +165,6 @@ read_parquet_sf <- function(file, ...) {
   return(df)
 }
 
-
-#' Funksjon for aa laste inn .feather-fil fra Google Cloud Storage bucket
-#'
-#' Funksjonen `read_feather` kan brukes til aa lese inn .feather-filer fra Google Cloud Storage.
-#'
-#' @param file Full sti og navn paa filen som skal leses inn fra Google Cloud Storage bucket.
-#' @param ... Flere parametere (se: https://arrow.apache.org/docs/r/reference/read_feather.html)
-#'
-#' @examples
-#' \dontrun{
-#' data <- read_feather("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.feather")
-#'}
-#'@encoding UTF-8
-
-
 #' Funksjon for aa laste inn "multifile" datasett fra Google Cloud Storage bucket
 #'
 #' Funksjonen `open_dataset` kan brukes til aa lese deler av datasett (bl.a. .parquet-, .feather- og .csv-filer) fra Google Cloud Storage. Det lages en forbindelse til mappen der filen ligger og deretter kan man bruke argumenter fra `dplyr`, som `filter` og `select`, foer man bruker `collect` til aa lese inn dataene i R. `open_dataset` kan ogsaa brukes til aa lese inn sf-objekter (lagret som .parquet-fil med pakken `sfarrow`).
