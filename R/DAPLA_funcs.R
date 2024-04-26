@@ -197,13 +197,13 @@ read_parquet_sf <- function(file, ...) {
 #' data <- open_dataset("ssb-prod-dapla-felles-data-delt/GIS/Vegnett/2022") %>%
 #'  dplyr::filter(municipality == "301") %>%
 #'  sfarrow::read_sf_dataset()
-#'  }
-#'@encoding UTF-8
+#' }
+#' @encoding UTF-8
 
 open_dataset <- function(file, ...) {
 
     # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file)
+  file <- gsub("gs://", "", file)
 
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
@@ -230,7 +230,8 @@ file <- gsub("gs://", "", file)
 #' \dontrun{
 #' write_dataset(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test")
 #' }
-#'@encoding UTF-8
+#' @encoding UTF-8
+#'
 
 write_dataset <- function(data, file, ...) {
 

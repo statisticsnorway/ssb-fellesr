@@ -31,5 +31,5 @@ data <- open_dataset("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dat
 data <- open_dataset("ssb-prod-dapla-felles-data-delt/GIS/Vegnett/2022") \%>\%
  dplyr::filter(municipality == "301") \%>\%
  sfarrow::read_sf_dataset()
- }
+}
 }

@@ -53,7 +53,7 @@ write_SSB <- write_ssb
 #' @inheritParams gcs_import
 #' @inheritParams rio::import
 #'
-#' @return
+#' @return Det importerte datasettet.
 #' @export
 #'
 #' @examples

@@ -17,6 +17,9 @@ GCS-bøtten.}
 \item{...}{Argumenter som sendes videre til \link[rio:import]{rio::import}, og dermed til
 underliggende eksporterende funksjoner.}
 }
+\value{
+Det importerte datasettet.
+}
 \description{
 Import av filer på Dapla og på bakken
 }
