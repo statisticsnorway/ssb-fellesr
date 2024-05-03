@@ -1,15 +1,15 @@
 pandoc: 3.1.11
-pkgdown: 2.0.7
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
-  vignette_SSB_fargepalett: vignette_SSB_fargepalett.html
-  vignette_SSB_pakke: vignette_SSB_pakke.html
-  vignette_SSB_theme: vignette_SSB_theme.html
+  bygge-en-r-tilleggspakke: web_only/bygge-en-r-tilleggspakke.html
+  kjre-r-p-sl-stata-p3-fra-sas: web_only/kjre-r-p-sl-stata-p3-fra-sas.html
   vignette__DAPLA_jukseark: vignette__DAPLA_jukseark.html
   vignette_dynarev_uttrekk: vignette_dynarev_uttrekk.html
   vignette_shiny_ssb: vignette_shiny_ssb.html
+  vignette_SSB_fargepalett: vignette_SSB_fargepalett.html
+  vignette_SSB_pakke: vignette_SSB_pakke.html
+  vignette_SSB_theme: vignette_SSB_theme.html
   vignette_statbank_lasting: vignette_statbank_lasting.html
-  bygge-en-r-tilleggspakke: web_only/bygge-en-r-tilleggspakke.html
-  kjre-r-p-sl-stata-p3-fra-sas: web_only/kjre-r-p-sl-stata-p3-fra-sas.html
-last_built: 2024-03-04T13:58Z
+last_built: 2024-05-03T07:32Z
 
