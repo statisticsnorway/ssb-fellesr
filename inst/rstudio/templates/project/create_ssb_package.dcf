@@ -1,23 +1,22 @@
-Title: SSB R-package
+Title: R Package for SSB
 Description: This is a template for a standard SSB R package
 Binding: ssb_rtemplate
+OpenFiles: README.md
 
 Parameter: description
 Widget: TextInput
 Label: A decription of the package
-Default: This package performs important functions for SSB
+Default: Performs important functions.
 Position: left
 
 Parameter: firstname
 Widget: TextInput
-Label: Authors firstname
-Default: Kari
+Label: Author's firstname
 Position: left
 
 Parameter: surname
 Widget: TextInput
 Label: Author's surname
-Default: Normann
 Position: left
 
 Parameter: github
