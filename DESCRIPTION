@@ -36,7 +36,14 @@ Imports:
     esquisse,
     rlang,
     stringr,
-    sfarrow
+    sfarrow,
+    usethis,
+    roxygen2,
+    gh,
+    stats,
+    git2r,
+    renv,
+    pkgdown
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
@@ -48,9 +55,6 @@ Suggests:
     RODBC,
     ROracle,
     testthat,
-    usethis,
-    git2r,
-    openssl,
-    roxygen2
+    openssl
 URL: https://statisticsnorway.github.io/fellesr/
 VignetteBuilder: knitr
