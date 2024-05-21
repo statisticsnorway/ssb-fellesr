@@ -6,7 +6,6 @@
 #' @param replace Replacement term
 #'
 #' @return NULL
-#' @NoRd
 #' @keywords internal
 fix_file <- function(destination, file, find, replace){
     destination_path <- file.path(destination, file)
@@ -23,7 +22,6 @@ fix_file <- function(destination, file, find, replace){
 }
 
 #' Fix several files
-#' @NoRd
 #' @keywords internal
 fix_files <- function(path, package_name, prefixed_name, description, firstname, surname, email, type = "package"){
     year <- substring(Sys.Date(), 1, 4)
@@ -60,7 +58,6 @@ fix_files <- function(path, package_name, prefixed_name, description, firstname,
 #'
 #' @param path Path to new project
 #' @param project_type Type of project. Choose between "project" or "package".
-#' @NoRd
 #' @keywords internal
 get_files <- function(path, project_type){
     # Define the template path
@@ -101,7 +98,6 @@ get_files <- function(path, project_type){
 #' Download standard files
 #'
 #' @param path Path to where the new project is being set up
-#' @NoRd
 #' @keywords internal
 get_standard_files <- function(path){
     # Set file paths from KVAKK and ssb-project-client
@@ -124,7 +120,6 @@ get_standard_files <- function(path){
 #' Copy standard file to new project without accessing github standard files
 #'
 #' @param path Path to where the new project is being set up
-#' @NoRd
 #' @keywords internal
 get_standard_files_offline <- function(path){
     template_path <- system.file("rstudio/templates/project/standardfiles", package = "templater")
@@ -147,7 +142,6 @@ get_standard_files_offline <- function(path){
 #' @param path to where the new project is being set up
 #' @param prefixed_name Name of the package including the ssb- or stat- prefix
 #' @param project_type Whether the project is a package ("package") or project ("project").
-#' @NoRd
 #' @keywords internal
 create_project_file <- function(path, prefixed_name, project_type = "package"){
 
@@ -185,7 +179,6 @@ create_project_file <- function(path, prefixed_name, project_type = "package"){
 #'
 #' @param prefixed_name Name of the project including the prefix
 #' @param branch Name of the github branch to protect
-#' @NoRd
 #' @keywords internal
 add_branch_protect <- function(prefixed_name, branch = "main"){
     if (Sys.getenv("GITHUB_PAT") == ""){
@@ -209,7 +202,6 @@ add_branch_protect <- function(prefixed_name, branch = "main"){
     )
 }
 #' Add in github actions
-#' @NoRd
 #' @keywords internal
 add_github_actions <- function(path, type = "package"){
     # Define the primary function attempt
@@ -229,7 +221,6 @@ add_github_actions <- function(path, type = "package"){
 }
 
 #' Offline version of adding in github actions
-#' @NoRd
 #' @keywords internal
 add_github_actions_offline <- function(){
     # If an error occurs, print the error message
@@ -258,7 +249,6 @@ add_github_actions_offline <- function(){
 }
 
 #' Add test data to safe list
-#' @NoRd
 #' @keywords internal
 safe_data <- function(){
     # Read the current contents of the .gitignore file
