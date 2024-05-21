@@ -1,4 +1,6 @@
+
 Title: SSB package
+
 Description: This is a template for a standard SSB R package
 Binding: ssb_rtemplate
 OpenFiles: README.md

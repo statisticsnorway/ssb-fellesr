@@ -1,3 +1,28 @@
+
+
+#' Fix files by replacement of holders
+#'
+#' @param destination Where the file should be stored
+#' @param file Target file
+#' @param find Term to find
+#' @param replace Replacement term
+#'
+#' @return NULL
+fix_file <- function(destination, file, find, replace){
+  destination_path <- file.path(destination, file)
+
+  content <- readLines(destination_path)
+  content <- gsub(find, replace, content, fixed = TRUE)
+
+  # Check if the last line is a newline; if not, add one
+  if(length(content) > 0 && nchar(content[length(content)]) > 0){
+    content <- c(content, "")  # Add an empty string as the new final line
+  }
+
+  writeLines(content, destination_path)
+}
+
+
 #' SSB package template
 #'
 #' Create an R package with standard SSB format
