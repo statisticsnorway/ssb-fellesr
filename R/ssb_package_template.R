@@ -1,4 +1,5 @@
 
+
 #' Fix files by replacement of holders
 #'
 #' @param destination Where the file should be stored
@@ -54,54 +55,38 @@ ssb_rtemplate <- function(path, description,
   dir.create(path, recursive = TRUE)
   message("Project created at: ", path)
 
-  # Specify other variables
-  year <- substring(Sys.Date(), 1, 4)
+  # Specify user and email
   user <- Sys.info()['user']
   email <- paste0(user, '@ssb.no')
 
-  # Get the list of files and directories inside the template_path
-  template_path <- system.file("rstudio/templates/project", package = "fellesr")
-  template_contents <- list.files(template_path, full.names = TRUE)
-  template_contents <- template_contents[!grepl("create_ssb_package", template_contents)]
+  # Copy files to new project
+  get_files(path, "package")
+  get_standard_files_offline(path)
 
-  # Copy each file and directory in template_contents to destination
-  for (file in template_contents) {
-    file.copy(file, path, recursive = TRUE)
-  }
-  Sys.sleep(2)
+  # Fix and swap out template holders on copied files
+  fix_files(path, package_name, prefixed_name, description, firstname, surname, email)
 
-  # Fix Readme file
-  fix_file(path, "README.md", find = "{{PACKAGE_NAME}}", package_name)
-  fix_file(path, "README.md", find = "{{PACKAGE_NAME_CODE}}", prefixed_name)
-  fix_file(path, "README.md", find = "{{PACKAGE_DESCRIPTION}}", description)
-
-  # Fix description
-  fix_file(path, "DESCRIPTION", find = "{{PACKAGE_NAME}}", package_name)
-  fix_file(path, "DESCRIPTION", find = "{{PACKAGE_DESCRIPTION}}", description)
-  fix_file(path, "DESCRIPTION", find = "{{AUTHOR_NAME1}}", firstname)
-  fix_file(path, "DESCRIPTION", find = "{{AUTHOR_NAME2}}", surname)
-  fix_file(path, "DESCRIPTION", find = "{{AUTHOR_EMAIL}}", email)
-
-  # Fix Licence files
-  fix_file(path, "LICENSE.md", find = "{{YEAR}}", year)
-  fix_file(path, "LICENSE", find = "{{YEAR}}", year)
-
-  # Fix NEWS
-  fix_file(path, "NEWS.md", find = "{{PACKAGE_NAME}}", package_name)
-
-  # Fix SECURITY
-  fix_file(path, "SECURITY.md", find = "{{PACKAGE_NAME}}", package_name)
-
-  # Fix name of project file
+  # Add project file
+  create_project_file(path, prefixed_name = prefixed_name,
+                project_type = "package")
   setwd(path)
-  file.rename( "packagename.Rproj", paste0(prefixed_name, ".Rproj"))
+  print(paste0("Project files all copied to: ", path))
 
   # Add comments file
   usethis::use_cran_comments(open=F)
 
-  # Add example data
-  test_data <- data.frame(x = runif(10), y=runif(10))
+  # Add news file
+  usethis::use_news_md(open = F)
+
+  # Add buildignore
+  usethis::use_build_ignore("cran-comments.md")
+
+  # Add example data and add to safe list in .gitignore
+  #' @export
+  test_data <- data.frame(x = stats::runif(10), y=stats::runif(10))
+  Sys.sleep(1)
   usethis::use_data(test_data, overwrite=TRUE)
+  safe_data()
 
   # Add NAMESPACE and documents
   roxygen2::roxygenise()
@@ -126,14 +111,8 @@ ssb_rtemplate <- function(path, description,
     usethis::use_github(organisation = "statisticsnorway",
                         visibility = "internal", protocol = "https")
 
-    # Set up test action
-    usethis::use_github_action("check-standard", badge = TRUE)
-
-    # Set up pkgdown
-    usethis::use_pkgdown_github_pages()
-
-    # Set up other things
-    usethis::use_github_links()
+    # Set up actions
+    add_github_actions(path, type = "package")
 
     # Push all changes
     git2r::add(path=".")
@@ -145,28 +124,12 @@ ssb_rtemplate <- function(path, description,
     response <- httr::PATCH(url, body = list(name = prefixed_name),
                             httr::authenticate("", Sys.getenv("GITHUB_PAT")),
                             encode = "json")
-    httr::content(response)
 
     # Add branch protection
-    response <- gh::gh(
-      "PUT /repos/:owner/:repo/branches/:branch/protection",
-      owner = "statisticsnorway",
-      repo = prefixed_name,
-      branch = "main",
-      .token = Sys.getenv("GITHUB_PAT"),
-      required_status_checks = NA,  # No specific status checks are mentioned
-      enforce_admins = TRUE,  # Do not allow bypassing of the settings
-      required_pull_request_reviews = list(
-        dismiss_stale_reviews = TRUE,  # Dismiss stale pull request approvals when new commits are pushed
-        require_code_owner_reviews = FALSE,  # No specific requirement for code owner reviews was mentioned
-        required_approving_review_count = 1  # Require at least one approval
-      ),
-      restrictions = NA,  # No specific user or team restrictions mentioned
-      required_pull_requests_reviews_enforcement_level = "everyone"  # Enforce rules on everyone, including admins
-    )
+    add_branch_protect(prefixed_name)
   }
 
-  # Open new project
+  # Open project
   Sys.sleep(2)
   setwd(wd_dir)
   rstudioapi::openProject(path = path, newSession = FALSE)
@@ -175,5 +138,3 @@ ssb_rtemplate <- function(path, description,
   # This is currently sending an error message which I haven't been able to suppress.
   stop("Finished setting up package! This looks like an error but isn't (Just click ok).")
 }
-
-

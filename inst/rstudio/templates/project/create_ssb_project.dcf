@@ -1,13 +1,11 @@
-
-Title: SSB package
-
-Description: This is a template for a standard SSB R package
-Binding: ssb_rtemplate
+Title: SSB project
+Description: This is a template for a standard SSB R project
+Binding: ssb_rproject
 OpenFiles: README.md
 
 Parameter: description
 Widget: TextInput
-Label: A decription of the package
+Label: A decription of the project
 Default: Performs important functions.
 Position: left
 
