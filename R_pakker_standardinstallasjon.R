@@ -35,6 +35,7 @@ pakker <- c("DBI",
   "SmallCountRounding",
   "GaussSuppression",
   "GISSB",
+  "tidyfst",
   "ReGenesees", # Github (fork)
   "struktuR", # Github
   "SSBpris", # Github
