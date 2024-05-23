@@ -21,10 +21,12 @@ getport <- function(){
 runApp_ssb <- function(...){
   port <- getport()
   usr <- initialer_funk()
-  if (env_check() %in% c("BakkeProd", "BakkeTest")) {
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     appUrl <- paste("https://sl-jupyter-p.ssb.no/user/", usr, "/proxy/", port, "/", sep = "")
-  } else {
+  } else if (Sys.getenv("DAPLA_REGION") == "BIP") {
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
+  } else {
+    stop("Not sure where to launch when not in prod or on Dapla")
   }
   message(paste("App launching at:", appUrl))
   suppressMessages(shiny::runApp(port = port, ...))
@@ -40,10 +42,12 @@ runApp_ssb <- function(...){
 runExample_ssb <- function(example = NA, ...){
   port <- getport()
   usr <- initialer_funk()
-  if (env_check() %in% c("BakkeProd", "BakkeTest")) {
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM") {
     appUrl <- paste("https://sl-jupyter-p.ssb.no/user/", usr, "/proxy/", port, "/", sep = "")
-  } else {
+  } else if (Sys.getenv("DAPLA_REGION") == "BIP"){
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
+  } else {
+    stop("Not sure where to launch when not in prod or on Dapla")
   }
   message(paste("Example launching here:", appUrl))
   suppressMessages({
@@ -63,10 +67,12 @@ esquisser_ssb <- function(data, ...){
   port <- getport()
   options("shiny.port" = port)
   usr <- initialer_funk()
-  if (env_check() %in% c("BakkeProd", "BakkeTest")) {
+  if (Sys.getenv("DAPLA_REGION") == "ON_PREM") {
     appUrl <- paste("https://sl-jupyter-p.ssb.no/user/", usr, "/proxy/", port, "/", sep = "")
-  } else {
+  } else if (Sys.getenv("DAPLA_REGION") == "BIP"){
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
+  } else {
+    stop("Not sure where to launch when not in prod or on Dapla")
   }
 
   message((paste("Esquisser launching at:", appUrl)))
