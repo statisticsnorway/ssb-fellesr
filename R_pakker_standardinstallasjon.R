@@ -25,11 +25,17 @@ pakker <- c("DBI",
   "esquisse",
   "dcmodify",
   "simputation",
+  "openxlsx",
+  "survey",
+  "RJDemetra",
+  "eurostat",
+  "dggridR",
   "SSBtools",
   "easySdcTable",
   "SmallCountRounding",
   "GaussSuppression",
   "GISSB",
+  "tidyfst",
   "ReGenesees", # Github (fork)
   "struktuR", # Github
   "SSBpris", # Github
