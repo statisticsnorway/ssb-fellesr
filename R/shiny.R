@@ -20,13 +20,14 @@ getport <- function(){
 #' @export
 runApp_ssb <- function(...){
   port <- getport()
-  usr <- initialer_funk()
+  usr <- Sys.info()[["user"]]
   if (Sys.getenv("DAPLA_REGION") == "ON_PREM"){
     appUrl <- paste("https://sl-jupyter-p.ssb.no/user/", usr, "/proxy/", port, "/", sep = "")
   } else if (Sys.getenv("DAPLA_REGION") == "BIP") {
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
   } else {
-    stop("Not sure where to launch when not in prod or on Dapla")
+    shiny::runApp(port = port, ...)
+    return(NULL)
   }
   message(paste("App launching at:", appUrl))
   suppressMessages(shiny::runApp(port = port, ...))
