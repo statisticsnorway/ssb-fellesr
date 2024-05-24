@@ -48,7 +48,8 @@ runExample_ssb <- function(example = NA, ...){
   } else if (Sys.getenv("DAPLA_REGION") == "BIP"){
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
   } else {
-    stop("Not sure where to launch when not in prod or on Dapla")
+    shiny::runExample(port = port, ...)
+    return(NULL)
   }
   message(paste("Example launching here:", appUrl))
   suppressMessages({
@@ -73,7 +74,8 @@ esquisser_ssb <- function(data, ...){
   } else if (Sys.getenv("DAPLA_REGION") == "BIP"){
     appUrl <- paste("https://jupyter.dapla.ssb.no/user/", usr, "@ssb.no/proxy/", port, "/", sep = "")
   } else {
-    stop("Not sure where to launch when not in prod or on Dapla")
+    esquisse::esquisser(data, ...)
+    return(NULL)
   }
 
   message((paste("Esquisser launching at:", appUrl)))
