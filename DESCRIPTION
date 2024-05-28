@@ -1,7 +1,7 @@
 Package: fellesr
 Type: Package
 Title: General R functions for SSB
-Version: 0.2.4
+Version: 0.2.5
 Authors@R: 
   c(person(given = "Susie",
            family = "Jentoft",
