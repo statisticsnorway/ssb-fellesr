@@ -69,21 +69,21 @@
 </h1></div>
 <p>Her finner du en rekke funksjoner laget for å løse problemstillinger som er vanlige i SSB. Pakken kan installeres i et renv-miljø i Jupyterlab (på DAPLA og i prodsonen) og i RStudio Server (prodsonen). Følgende kode vil sette opp et <code>renv</code>-miljø og installere <code>fellesr</code>-pakken. Dette skal kun gjøres én gang per prosjekt. Les mer om hvordan å opprette et virtuelt miljø med <code>renv</code> i <a href="https://manual.dapla.ssb.no/jobbe-med-kode.html#r-og-renv" class="external-link">Dapla-manualen</a></p>
 <pre><code><span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/init.html" class="external-link">init</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"statisticsnorway/fellesr"</span><span class="op">)</span></span></code></pre>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"statisticsnorway/ssb-fellesr"</span><span class="op">)</span></span></code></pre>
 <p>For å ta i bruk funksjoner i <code>fellesr</code> må du kalle biblioteket med</p>
 <pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr</a></span><span class="op">)</span></span></code></pre>
-<p>Se under «Articles» på <a href="https://statisticsnorway.github.io/fellesr/" class="external-link">fellesr nettsiden</a> eller finner du en oppsummering nedenfor med linker for å velge emner.</p>
+<p>Se under «Articles» på <strong><a href="https://statisticsnorway.github.io/ssb-fellesr/" class="external-link">fellesr nettsiden</a></strong> eller finner du en oppsummering nedenfor med linker for å velge emner.</p>
 <p>Pakken <code>fellesr</code> inneholder følgende funksjoner:</p>
 <div class="section level4">
 <h4 id="produksjonssonen">Produksjonssonen<a class="anchor" aria-label="anchor" href="#produksjonssonen"></a>
 </h4>
 <ul>
 <li>
-<a href="https://statisticsnorway.github.io/fellesr/articles/vignette_dynarev_uttrekk.html" class="external-link">Uttrekk fra Dynarev i R</a> (<code>dynarev_uttrekk</code>)</li>
+<a href="https://statisticsnorway.github.io/ssb-fellesr/articles/vignette_dynarev_uttrekk.html" class="external-link">Uttrekk fra Dynarev i R</a> (<code>dynarev_uttrekk</code>)</li>
 <li>
-<a href="https://statisticsnorway.github.io/fellesr/articles/vignette_statbank_lasting.html" class="external-link">Laste opp data til Statistikkbanken</a> (<code>statbank_lasting</code>)</li>
+<a href="https://statisticsnorway.github.io/ssb-fellesr/articles/vignette_statbank_lasting.html" class="external-link">Laste opp data til Statistikkbanken</a> (<code>statbank_lasting</code>)</li>
 <li>
-<a href="https://statisticsnorway.github.io/fellesr/articles/vignette_shiny_ssb.html" class="external-link">Kjøre shiny og esquisse</a> (<code>runApp_ssb</code>, <code>runExample_ssb</code>, <code>esquisser_ssb</code>)</li>
+<a href="https://statisticsnorway.github.io/ssb-fellesr/articles/vignette_shiny_ssb.html" class="external-link">Kjøre shiny og esquisse</a> (<code>runApp_ssb</code>, <code>runExample_ssb</code>, <code>esquisser_ssb</code>)</li>
 </ul>
 </div>
 <div class="section level4">
@@ -91,19 +91,19 @@
 </h4>
 <ul>
 <li>
-<a href="https://statisticsnorway.github.io/fellesr/articles/vignette__DAPLA_jukseark.html" class="external-link">Lese inn og skrive filer på DAPLA</a> (<code>read_SSB</code>, <code>write_SSB</code>, <code>gcs_bucket</code>, <code>list.files</code>)</li>
+<a href="https://statisticsnorway.github.io/ssb-fellesr/articles/vignette__DAPLA_jukseark.html" class="external-link">Lese inn og skrive filer på DAPLA</a> (<code>read_SSB</code>, <code>write_SSB</code>, <code>gcs_bucket</code>, <code>list.files</code>)</li>
 <li>
-<a href="https://statisticsnorway.github.io/fellesr/articles/vignette_statbank_lasting.html" class="external-link">Laste opp data til Statistikkbanken</a> (<code>statbank_lasting</code>)</li>
+<a href="https://statisticsnorway.github.io/ssb-fellesr/articles/vignette_statbank_lasting.html" class="external-link">Laste opp data til Statistikkbanken</a> (<code>statbank_lasting</code>)</li>
 <li>
-<a href="https://statisticsnorway.github.io/fellesr/articles/vignette_shiny_ssb.html" class="external-link">Kjøre shiny og esquisse</a> (<code>runApp_ssb</code>, <code>runExample_ssb</code>, <code>esquisser_ssb</code>)</li>
+<a href="https://statisticsnorway.github.io/ssb-fellesr/articles/vignette_shiny_ssb.html" class="external-link">Kjøre shiny og esquisse</a> (<code>runApp_ssb</code>, <code>runExample_ssb</code>, <code>esquisser_ssb</code>)</li>
 </ul>
 </div>
 <div class="section level4">
 <h4 id="visualisering">Visualisering<a class="anchor" aria-label="anchor" href="#visualisering"></a>
 </h4>
 <ul>
-<li><a href="https://statisticsnorway.github.io/fellesr/articles/vignette_SSB_theme.html" class="external-link">SSB theme for ggplot</a></li>
-<li><a href="https://statisticsnorway.github.io/fellesr/articles/vignette_SSB_fargepalett.html" class="external-link">SSB fargepallet fra KLASS</a></li>
+<li><a href="https://statisticsnorway.github.io/ssb-fellesr/articles/vignette_SSB_theme.html" class="external-link">SSB theme for ggplot</a></li>
+<li><a href="https://statisticsnorway.github.io/ssb-fellesr/articles/vignette_SSB_fargepalett.html" class="external-link">SSB fargepallet fra KLASS</a></li>
 </ul>
 </div>
 <div class="section level3">
@@ -114,19 +114,19 @@
 <li>
 <a href="https://cran.r-project.org/web/packages/PxWebApiData/vignettes/Introduction.html" class="external-link">PxWebApiData</a> - Statistikkbankens API</li>
 <li>
-<a href="https://statisticsnorway.github.io/klassR/articles/klassR-vignette.html" class="external-link">klassR</a> - KLASS API</li>
-<li><a href="https://github.com/statisticsnorway/SSBtools" class="external-link">SSBtools</a></li>
+<a href="https://statisticsnorway.github.io/ssb-klassr/articles/klassR-vignette.html" class="external-link">klassR</a> - KLASS API</li>
+<li><a href="https://github.com/statisticsnorway/ssb-ssbtools" class="external-link">SSBtools</a></li>
 <li><a href="https://cran.r-project.org/web/packages/SmallCountRounding/vignettes/Introduction_to_SmallCountRounding.html" class="external-link">SmallCountRounding</a></li>
 <li><a href="https://cran.r-project.org/web/packages/GaussSuppression/vignettes/define_tables.html" class="external-link">GaussSuppression</a></li>
 <li>
 <a href="https://statisticsnorway.github.io/GISSB/articles/GISSB_vignette.html" class="external-link">GISSB</a> - Nettverksanalyse i R</li>
-<li><a href="https://github.com/statisticsnorway/Kostra/" class="external-link">Kostra</a></li>
+<li><a href="https://github.com/statisticsnorway/ssb-kostra/" class="external-link">Kostra</a></li>
 <li><a href="https://github.com/statisticsnorway/struktuR" class="external-link">struktuR</a></li>
 <li><a href="https://github.com/statisticsnorway/SSBpris" class="external-link">SSBpris</a></li>
 <li><a href="https://github.com/statisticsnorway/SdcForetakPerson" class="external-link">SdcForetakPerson</a></li>
 <li><a href="https://github.com/statisticsnorway/SSBcellKey" class="external-link">SSBcellKey</a></li>
 <li><a href="https://cran.r-project.org/web/packages/easySdcTable/index.html" class="external-link">easySdcTable</a></li>
-<li><a href="https://github.com/statisticsnorway/CalibrateSSB" class="external-link">CalibrateSSB</a></li>
+<li><a href="https://github.com/statisticsnorway/sssb-calibrateSSB" class="external-link">CalibrateSSB</a></li>
 <li><a href="https://cran.r-project.org/web/packages/RegSDC/index.html" class="external-link">RegSDC</a></li>
 </ul>
 </div>
@@ -136,15 +136,15 @@
 <ul>
 <li><a href="https://github.com/statisticsnorway/kurs-r-nybegynner-jupyter" class="external-link">kurs-r-nybegynner-jupyter</a></li>
 <li><a href="kurs-r-viderekomne">kurs-r-viderekomne</a></li>
-<li><a href="https://statisticsnorway.github.io/metodebibliotek/catalogue_edit.html" class="external-link">Metodebiblioteket</a></li>
-<li><a href="https://github.com/statisticsnorway/R_grunnkurs" class="external-link">R grunnkurs</a></li>
-<li><a href="https://github.com/statisticsnorway/R_for_viderekomne" class="external-link">R for viderekomne</a></li>
+<li><a href="https://statisticsnorway.github.io/ssb-metodebiblioteket/catalogue_edit.html" class="external-link">Metodebiblioteket</a></li>
+<li><a href="https://github.com/statisticsnorway/kurs-r-grunnkurs-dapla" class="external-link">R grunnkurs</a></li>
+<li><a href="https://github.com/statisticsnorway/kurs-r-viderekomne" class="external-link">R for viderekomne</a></li>
 <li><a href="https://github.com/statisticsnorway/kurs-r-produksjon/tree/main" class="external-link">R i produksjon</a></li>
-<li><a href="https://manual.dapla.ssb.no/pakke-install.html#r" class="external-link">Bruk av renv for pakke installering</a></li>
-<li><a href="https://statisticsnorway.github.io/fellesr/articles/web_only/bygge-en-r-tilleggspakke.html" class="external-link">Hvordan å bygge en tilleggspakke</a></li>
+<li><a href="https://manual.dapla.ssb.no/statistikkere/jobbe-med-kode.html#r-og-renv" class="external-link">Bruk av renv for pakke installering</a></li>
+<li><a href="https://statisticsnorway.github.io/ssb-fellesr/articles/web_only/bygge-en-r-tilleggspakke.html" class="external-link">Hvordan å bygge en tilleggspakke</a></li>
 <li><a href="https://wiki.ssb.no/display/s880/Veiledning+til+R+programmering+i+SSB" class="external-link">Generelle veiledning til R programmering i SSB</a></li>
 <li><a href="https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf" class="external-link">databehandling med dplyr jukseark</a></li>
-<li><a href="https://statisticsnorway.github.io/fellesr/articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html" class="external-link">Kjøre R fra SAS</a></li>
+<li><a href="https://statisticsnorway.github.io/ssb-fellesr/articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html" class="external-link">Kjøre R fra SAS</a></li>
 </ul>
 </div>
 <div class="section level3">
