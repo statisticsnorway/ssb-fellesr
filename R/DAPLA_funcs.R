@@ -170,12 +170,12 @@ read_parquet_sf <- function(file, ...) {
 
     metadata <- ds$metadata
     geo <- jsonlite::fromJSON(metadata$geo)
-    crs <- geo$columns$geometry$crs
+    crs <- geo$columns$geometry$crs$id$code
     sfarrow:::validate_metadata(geo)
     df <- dplyr::collect(ds)
     df <- as.data.frame(df)
     primary_geom <- geo$primary_column
-    df[[primary_geom]] <- sf::st_as_sfc(df[[primary_geom]], crs = sf::st_crs(geo$columns$geometry$crs), EWKB=TRUE)
+    df[[primary_geom]] <- sf::st_as_sfc(df[[primary_geom]], crs = sf::st_crs(crs), EWKB=TRUE)
     df <- sf::st_sf(df, sf_column_name = primary_geom)
 
   }
