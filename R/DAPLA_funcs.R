@@ -673,7 +673,7 @@ write_sf_parquet <- function(data, file, ...) {
   file <- gsub("gs://", "", file) 
   
   geo_metadata <- sfarrow:::create_metadata(data)
-  df <- sfarrow::encode_wkb(data)
+  df <- sfarrow:::encode_wkb(data)
   tbl <- arrow::Table$create(df)
   tbl$metadata[["geo"]] <- geo_metadata
 
