@@ -98,7 +98,7 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
 
   URL <- paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/uttaksbeskrivelse?', "tableId=", tabell_id)
 
-  uttaksbeksrivelse <- httr::GET(URL,
+  uttaksbeskrivelse <- httr::GET(URL,
                                  httr::add_headers(
                                    'Authorization' = paste0('Basic ', username_encryptedpassword),
                                    'Content-Type' = paste0('multipart/form-data; boundary=', boundary),
@@ -107,8 +107,17 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
                                    'User-Agent' = user_agent()
                                  ))
 
-  uttaksbeksrivelse <- jsonlite::fromJSON(httr::content(uttaksbeksrivelse))
-  return(uttaksbeksrivelse)
+  uttaksbeskrivelse <- tryCatch({
+  jsonlite::fromJSON(httr::content(uttaksbeskrivelse, as = "text"))
+}, error = function(e) {
+  uttaksbeskrivelse <- rvest::html_nodes(rvest::read_html(uttaksbeskrivelse), "body") %>%
+    as.character()
+  uttaksbeskrivelse <- gsub("<.*?>", "", uttaksbeskrivelse)
+  uttaksbeskrivelse <- gsub("\t", "", uttaksbeskrivelse)
+    jsonlite::fromJSON(uttaksbeskrivelse)
+})
+    
+  return(uttaksbeskrivelse)
 }
 
 # statbank_body
@@ -166,6 +175,11 @@ statbank_validering <- function(data,
   for (i in 1:length(data)) {
 
     data_1 <- data.frame(data[i])
+      
+if (any(is.na(data_1)) == TRUE){
+print(data_1[!complete.cases(data_1), ] )
+    stop("NA (manglende verdier) er ikke tillatt i statistikkbanken. Fjern disse eller erstatt disse med gyldige verdier")
+    }
 
     variabler <- data.frame(uttaksbeskrivelse$deltabller$variabler[i]) # OBS: kan det finnes flere i listen?
     statistikkvariabler <- data.frame(uttaksbeskrivelse$deltabller$statistikkvariabler[i])
@@ -229,7 +243,8 @@ statbank_validering <- function(data,
     }
 
     problemer <- data_1 %>%
-      dplyr::filter(problemer != "")
+      # dplyr::filter(problemer != "")
+      dplyr::filter(problemer != "" | is.na(problemer))
 
     problemer_alle <- rbind(problemer_alle, problemer)
     dubletter_alle <- rbind(dubletter_alle, dubletter)
