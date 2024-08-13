@@ -1,192 +1,66 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/SECURITY.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/vignette_SSB_fargepalett.html</loc>
-  </url>
-  <url>
-    <loc>/articles/vignette_SSB_pakke.html</loc>
-  </url>
-  <url>
-    <loc>/articles/vignette_SSB_theme.html</loc>
-  </url>
-  <url>
-    <loc>/articles/vignette__DAPLA_jukseark.html</loc>
-  </url>
-  <url>
-    <loc>/articles/vignette_dynarev_uttrekk.html</loc>
-  </url>
-  <url>
-    <loc>/articles/vignette_shiny_ssb.html</loc>
-  </url>
-  <url>
-    <loc>/articles/vignette_statbank_lasting.html</loc>
-  </url>
-  <url>
-    <loc>/articles/web_only/bygge-en-r-tilleggspakke.html</loc>
-  </url>
-  <url>
-    <loc>/articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/add_branch_protect.html</loc>
-  </url>
-  <url>
-    <loc>/reference/add_github_actions.html</loc>
-  </url>
-  <url>
-    <loc>/reference/add_github_actions_offline.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_project_file.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dynarev_uttrekk.html</loc>
-  </url>
-  <url>
-    <loc>/reference/env_check.html</loc>
-  </url>
-  <url>
-    <loc>/reference/esquisser_ssb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fix_file.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fix_files.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gcs.list.files.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gcs_bucket.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gcs_delete_object.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gcs_global_bucket.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gcs_list_objects.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_files.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_standard_files.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_standard_files_offline.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/initialer_funk.html</loc>
-  </url>
-  <url>
-    <loc>/reference/open_dataset.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_SSB.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_csv.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_feather.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_json.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_parquet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_parquet_sf.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_rds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_xml.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runApp_ssb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runExample_ssb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/safe_data.html</loc>
-  </url>
-  <url>
-    <loc>/reference/scale_colour_ssb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/scale_fill_ssb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ssb_colours.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ssb_palettes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ssb_rproject.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ssb_rtemplate.html</loc>
-  </url>
-  <url>
-    <loc>/reference/statbank_lasting.html</loc>
-  </url>
-  <url>
-    <loc>/reference/statbank_uttaksbeskrivelse.html</loc>
-  </url>
-  <url>
-    <loc>/reference/theme_ssb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_SSB.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_csv.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_dataset.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_feather.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_parquet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_rds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_sf_parquet.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/SECURITY.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/vignette_SSB_fargepalett.html</loc></url>
+<url><loc>/articles/vignette_SSB_pakke.html</loc></url>
+<url><loc>/articles/vignette_SSB_theme.html</loc></url>
+<url><loc>/articles/vignette__DAPLA_jukseark.html</loc></url>
+<url><loc>/articles/vignette_dynarev_uttrekk.html</loc></url>
+<url><loc>/articles/vignette_shiny_ssb.html</loc></url>
+<url><loc>/articles/vignette_statbank_lasting.html</loc></url>
+<url><loc>/articles/web_only/bygge-en-r-tilleggspakke.html</loc></url>
+<url><loc>/articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/reference/add_branch_protect.html</loc></url>
+<url><loc>/reference/add_github_actions.html</loc></url>
+<url><loc>/reference/add_github_actions_offline.html</loc></url>
+<url><loc>/reference/create_project_file.html</loc></url>
+<url><loc>/reference/dynarev_uttrekk.html</loc></url>
+<url><loc>/reference/env_check.html</loc></url>
+<url><loc>/reference/esquisser_ssb.html</loc></url>
+<url><loc>/reference/fix_file.html</loc></url>
+<url><loc>/reference/fix_files.html</loc></url>
+<url><loc>/reference/gcs.list.files.html</loc></url>
+<url><loc>/reference/gcs_bucket.html</loc></url>
+<url><loc>/reference/gcs_delete_object.html</loc></url>
+<url><loc>/reference/gcs_global_bucket.html</loc></url>
+<url><loc>/reference/gcs_list_objects.html</loc></url>
+<url><loc>/reference/get_files.html</loc></url>
+<url><loc>/reference/get_standard_files.html</loc></url>
+<url><loc>/reference/get_standard_files_offline.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/initialer_funk.html</loc></url>
+<url><loc>/reference/open_dataset.html</loc></url>
+<url><loc>/reference/pipe.html</loc></url>
+<url><loc>/reference/read_SSB.html</loc></url>
+<url><loc>/reference/read_csv.html</loc></url>
+<url><loc>/reference/read_feather.html</loc></url>
+<url><loc>/reference/read_json.html</loc></url>
+<url><loc>/reference/read_parquet.html</loc></url>
+<url><loc>/reference/read_parquet_sf.html</loc></url>
+<url><loc>/reference/read_rds.html</loc></url>
+<url><loc>/reference/read_xml.html</loc></url>
+<url><loc>/reference/runApp_ssb.html</loc></url>
+<url><loc>/reference/runExample_ssb.html</loc></url>
+<url><loc>/reference/safe_data.html</loc></url>
+<url><loc>/reference/scale_colour_ssb.html</loc></url>
+<url><loc>/reference/scale_fill_ssb.html</loc></url>
+<url><loc>/reference/ssb_colours.html</loc></url>
+<url><loc>/reference/ssb_palettes.html</loc></url>
+<url><loc>/reference/ssb_rproject.html</loc></url>
+<url><loc>/reference/ssb_rtemplate.html</loc></url>
+<url><loc>/reference/statbank_lasting.html</loc></url>
+<url><loc>/reference/statbank_uttaksbeskrivelse.html</loc></url>
+<url><loc>/reference/theme_ssb.html</loc></url>
+<url><loc>/reference/write_SSB.html</loc></url>
+<url><loc>/reference/write_csv.html</loc></url>
+<url><loc>/reference/write_dataset.html</loc></url>
+<url><loc>/reference/write_feather.html</loc></url>
+<url><loc>/reference/write_parquet.html</loc></url>
+<url><loc>/reference/write_rds.html</loc></url>
+<url><loc>/reference/write_sf_parquet.html</loc></url>
 </urlset>
+
