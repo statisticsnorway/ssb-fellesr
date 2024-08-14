@@ -12,23 +12,20 @@ dir.create(test_dir)
 
 if (!dir.exists(test_dir)) stop("Kunne ikke lage testmappe.")
 
-test_filer <- paste0(test_dir, c("test_fil_p2022_v1.txt",
-                                 "test_fil_p2022_v2.txt",
-                                 "test_fil_p2022_v4.txt",
-                                 "test_fil_p2022_v5.txt",
-                                 "test_fil_p2022_v6.txt",
-                                 "test_fil_p2022_v19.txt",
-                                 "test_fil_p2022.txt"))
+test_filer <- list(eldst       = paste0(test_dir, "test_fil_p2022_v1.txt"),
+                   v2          = paste0(test_dir, "test_fil_p2022_v2.txt"),
+                   v3          = paste0(test_dir, "test_fil_p2022_v4.txt"),
+                   v4          = paste0(test_dir, "test_fil_p2022_v5.txt"),
+                   v5          = paste0(test_dir, "test_fil_p2022_v6.txt"),
+                   sist        = paste0(test_dir, "test_fil_p2022_v19.txt"),
+                   uversjonert = paste0(test_dir, "test_fil_p2022.txt"))
 
-### Husk å redigere `test_filer_ny`, `test_filer_nyeste` og
-### `test_filer_uversjonert` dersom du endrer `test_filer`.
+### Husk å redigere `test_filer_ny` dersom du endrer `test_filer`.
 
-test_filer_ny          <- paste0(test_dir, "test_fil_p2022_v20.txt")
-test_filer_nyeste      <- test_filer[6]
-test_filer_uversjonert <- test_filer[7]
+test_filer_ny <- paste0(test_dir, "test_fil_p2022_v20.txt")
 
-### For å simulere en arkivmappe som inneholder filer fra andre perioder,
-### samt helt andre filer
+### Lager også andre filer for å simulere en arkivmappe som inneholder filer fra
+### andre perioder, samt helt andre filer
 
 ekstrafiler <- paste0(test_dir, c("test_fil_p2021_v1.txt",
                                   "test_fil_p2021_v2.txt",
@@ -51,8 +48,18 @@ ekstrafiler <- paste0(test_dir, c("test_fil_p2021_v1.txt",
                                   "fil_med_v1gml.txt",
                                   "annen_fil_p2021.txt"))
 
+### Konstruerer også noen fil- og mappenavn som vi ikke kommer til å opprette,
+### for å teste feilmeldinger samt oppretting av ikke-hittil-versjonerte filer.
+### Vi bruker tempmappe-navnet for å være helt sikre på at disse
+### filene/mappene ikke eksisterer når vi kjører testene.
+
 ukjent_fil    <- paste0(test_dir, "ukjent_fil_p2022.txt")
 ukjent_fil_ny <- paste0(test_dir, "ukjent_fil_p2022_v1.txt")
+
+ukjent_mappe <- paste0(tempdir(),
+                       "/test-versjonering-",
+                       format(Sys.time(), "%Y%m%d%H%M%S_ikkelag"),
+                       "/")
 
 for (fil in c(test_filer, ekstrafiler)) {
 
@@ -60,28 +67,46 @@ for (fil in c(test_filer, ekstrafiler)) {
 
 }
 
-if(!all(file.exists(test_filer))) stop("Kunne ikke lage testfiler.")
+if(!all(vapply(c(test_filer, ekstrafiler), file.exists, logical(1)))) {
+
+  stop("Kunne ikke lage testfiler.")
+
+}
 
 # Tester ------------------------------------------------------------------
 
-test_that("finn_siste_versjon fungerer", {
 
-  expect_equal(finn_siste_versjon(test_filer[1]),
-               test_filer_nyeste)
+test_that("lag_versjonert_filsti klarer å finne den siste versjonen", {
 
-  expect_equal(finn_siste_versjon(test_filer_uversjonert),
-               test_filer_nyeste)
+  # Finner vi den siste versjonen av en fil, uavhengig av hvilken versjon vi
+  # angir som input (inkludert en fil uten versjonsstempel?)
 
-  expect_error(finn_siste_versjon(ukjent_fil))
+  expect_true(all(vapply(test_filer,
+                         lag_versjonert_filsti,
+                         versjon = "siste",
+                         character(1)) == test_filer$sist))
+
+  # Får vi feilmelding dersom vi prøver å finne den siste versjonen til en fil
+  # som ikke eksisterer?
+
+  expect_error(lag_versjonert_filsti(ukjent_fil, versjon = "siste"))
 
 })
 
-test_that("lag_ny_versjon fungerer", {
+test_that("lag_versjonert_filsti klarer å opprette en ny versjon", {
 
-  expect_equal(lag_ny_versjon(test_filer[1]),
-               test_filer_ny)
+  # Klarer vi å lage en ny versjon, uavhengig av hvilken versjon vi angir som
+  # input (inkludert en fil uten versjonsstempel?)
 
-  expect_equal(lag_ny_versjon(ukjent_fil),
+  expect_true(all(vapply(test_filer,
+                         lag_versjonert_filsti,
+                         versjon = "ny",
+                         character(1)) == test_filer_ny))
+
+  # Fungerer det å lage en versjon for en fil som ikke er versjonert enda?
+
+  expect_equal(lag_versjonert_filsti(ukjent_fil,
+                                     versjon = "ny"),
                ukjent_fil_ny)
 
 })
