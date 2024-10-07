@@ -1,5 +1,5 @@
 ---
-title: "Kjøre R på sl-stata-p3 fra SAS"
+title: "Kjøre R på sl-stata-p4 fra SAS"
 description: |
   Her er et eksempel på hvordan man kan kjøre et R script på en annen server fra SAS 
 author:
@@ -7,14 +7,14 @@ author:
 output: rmarkdown::html_vignette
 date: 2023-11-02
 vignette: >
-  %\VignetteIndexEntry{Kjøre R på sl-stata-p3 fra SAS}
+  %\VignetteIndexEntry{Kjøre R på sl-stata-p4 fra SAS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-Av og til har vi behov for å kjøre et R-script fra SAS. Vanligvis fordi det kun er en liten del av en stor produksjonsprosess og det er en fordel å kjøre alt innenfor ett miljø (SAS-EG). Per i dag har vi forskjellige versjoner av R på de forskjellige serverne. Det kan være en fordel å kjøre scriptet på en nyere R-versjon på sl-stata-p3 fra et SAS prosjekt. 
+Av og til har vi behov for å kjøre et R-script fra SAS. Vanligvis fordi det kun er en liten del av en stor produksjonsprosess og det er en fordel å kjøre alt innenfor ett miljø (SAS-EG). Per i dag har vi forskjellige versjoner av R på de forskjellige serverne. Det kan være en fordel å kjøre scriptet på en nyere R-versjon på sl-stata-p4 fra et SAS prosjekt. 
 
-**Foreløpig fungerer dette kun med kjøring på sl-stata-p3 og ikke python server**
+**Foreløpig fungerer dette kun med kjøring på sl-stata-p4 og ikke python server**
 
 Her viser vi et eksempel på hvordan du kan gjøre dette. 
 
@@ -22,7 +22,7 @@ Her viser vi et eksempel på hvordan du kan gjøre dette.
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 ```
 ## 1. SAS macro
-Det er laget en (felles) SAS-makro alle kan benytte som ligger tilgjengelig på Linux. Makroen heter %RunScriptFromR og er dokumentert på SSB sin SAS-wiki (https://wiki.ssb.no/display/SASDOC/Nyttige+SAS+program) og i prodsonen (Q:\\Saskurs\\Fellesprog\\RunScriptFromR.docx). Makroen tilbyr kjøring av skript med og uten parametere og håndtering av loggfil fra R-kjøringen. Se dokumentasjon for nærmere beskrivelse.
+Det er laget en (felles) SAS-makro alle kan benytte som ligger tilgjengelig på Linux. Makroen heter %RunScriptFromR og er dokumentert på SSB sin SAS-wiki (https://statistics-norway.atlassian.net/wiki/spaces/SASDOC/pages/3768288266/Nyttige+SAS+program) og i prodsonen (Q:\\Saskurs\\Fellesprog\\RunScriptFromR.docx). Makroen tilbyr kjøring av skript med og uten parametere og håndtering av loggfil fra R-kjøringen. Se dokumentasjon for nærmere beskrivelse.
 
 <br>
 En forenklet utgave av makroen er vist under hvis man ønsker å definere den selv i SAS. Eksempel på bruk:
@@ -30,7 +30,7 @@ En forenklet utgave av makroen er vist under hvis man ønsker å definere den se
 Kopier følgende inn i prosjektet ditt for å definere macroen.
 
 ```{bash, eval = F, class.source="sas"}
-%macro RunScriptFromR(program='', server="sl-stata-p3",param="");
+%macro RunScriptFromR(program='', server="sl-stata-p4",param="");
 
 %let server2 = %sysfunc(dequote(&server.));
 %let program2 = %sysfunc(dequote(&program.));
@@ -111,7 +111,7 @@ PROC IMPORT datafile="~/sas_test/testdata_output.csv"
 RUN;
 ```
 
-Da ser vi at data har nå en variabel for predikterte verdiene og en variabel som viser at den har kjørt på sl-stata-p3 serveren.
+Da ser vi at data har nå en variabel for predikterte verdiene og en variabel som viser at den har kjørt på sl-stata-p4 serveren.
 
 ```{r, echo = FALSE, eval = TRUE, out.width="40%"}
 knitr::include_graphics("images/sas_output.PNG")
