@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.0
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   web_only/bygge-en-r-tilleggspakke: web_only/bygge-en-r-tilleggspakke.html
@@ -11,4 +11,4 @@ articles:
   vignette_SSB_pakke: vignette_SSB_pakke.html
   vignette_SSB_theme: vignette_SSB_theme.html
   vignette_statbank_lasting: vignette_statbank_lasting.html
-last_built: 2024-08-13T08:16Z
+last_built: 2024-10-08T10:55Z
