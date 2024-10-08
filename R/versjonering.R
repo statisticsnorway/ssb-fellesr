@@ -420,29 +420,134 @@ sjekk_endring <- function(filsti){
   }   
 }
 
-#' Lag versjonerte filstier for flere filer
+                                 
+                                 
+#' Lag logg for versjonering
+#'
+#' Funksjonen oppdaterer en loggfil med informasjon om en ny kjøring der flere filstier blir versjonert. Den sjekker først om det allerede finnes
+#' en logg, og hvis det ikke er noen endringer siden forrige kjøring, vil loggfilen ikke bli oppdatert.
+#'
+#' @param resultat En liste som inneholder resultatet av kjøringen fra \code{\link{versjoner_filer}}. Hver oppføring representerer filstiens oppdaterte versjon.
+#' @param arbeidsmappe En karakterstreng som representerer banen til arbeidsmappen der loggfilen skal lagres.
+#' @param logg_fil En karakterstreng som representerer navnet på loggfilen. Standard er `"versjonering_logg.json"`.
+#'
+#' @details
+#' Funksjonen logger hver kjøring av \code{\link{versjoner_filer}} ved å sjekke om loggfilen allerede eksisterer. Hvis det er første gang loggfilen opprettes,
+#' vil en ny logg bli laget. Hvis det allerede finnes en logg, vil funksjonen sjekke om resultatet av den nye kjøringen er
+#' identisk med den siste kjøringen. Hvis ingen endringer er oppdaget (dvs. ingen oppdaterte versjoner av filene), vil loggen ikke bli oppdatert. 
+#' Hvis det er en forskjell i resultatene, vil funksjonen legge til en ny kjøring med en unik ID og tidsstempel.
+#'
+#' Objektet `resultat` fra \code{\link{versjoner_filer}} er en liste der hver filsti er oppdatert til å representere siste versjon. 
+#' Funksjonen skriver denne informasjonen til loggen hvis en endring oppdages.
+#'
+#' @return Returnerer den oppdaterte loggen som en liste. Hvis ingen endringer ble oppdaget, returnerer funksjonen uten å oppdatere loggen.
+#'
+#' @examples
+#' # Versjoner filstier og loggfør kjøringen
+#' filstier <- c("data1.parquet", "data2.parquet")
+#' resultat <- versjoner_filer(filstier)
+#' logg <- logg_kjoring(resultat, arbeidsmappe = "prosjekt/logg")
+#'
+#' # Hvis ingen endringer siden forrige kjøring, blir loggfilen ikke oppdatert
+#' logg <- logg_kjoring(resultat, arbeidsmappe = "prosjekt/logg")
+#'
+#' @seealso \code{\link{versjoner_filer}} for generering av resultatet.
+#'
+#' @export
+logg_kjoring <- function(resultat, 
+                         arbeidsmappe,
+                         logg_fil = "versjonering_logg.json") {
+  
+  logg_filsti <- glue::glue("{arbeidsmappe}/{logg_fil}")  
+  
+  # Sjekk om loggfilen allerede eksisterer
+  if (file.exists(logg_filsti)) {
+    # Les inn eksisterende logg
+    logg <- jsonlite::fromJSON(logg_filsti)
+    
+    # Sjekk om loggen har minst én kjøring
+    if (length(logg) > 0) {
+      # Hent den siste oppføringen (siste kjøring)
+      siste_kjoring <- logg[[length(logg)]]
+      
+      # Sjekk om den nye kjøringen er identisk med den siste versjonerte filene
+      identisk <- identical(siste_kjoring$versjonerte_filer, resultat)
+      
+      if (identisk) {
+        cat("Ingenting har endret seg siden forrige kjøring. Loggen oppdateres ikke.\n")
+        return(logg)
+      }
+    }
+  } else {
+    # Opprett en tom liste hvis loggfilen ikke finnes
+    logg <- list()
+  }
+  
+  # Finn antall kjøringer så langt (lengden på loggen)
+  antall_kjoringer <- length(logg) + 1
+  
+  # Generer en unik ID for denne kjøringen (f.eks. R1, R2, ...)
+  kjoring_id <- paste0("R", antall_kjoringer)
+  
+  # Få gjeldende dato og klokkeslett
+  dato_tid <- Sys.time()
+  
+  # Lag en ny kjøring med 'kjoring_id' og 'dato_tid' som attributter
+  ny_kjoring <- list(
+    attributes = list(
+      kjoring_id = kjoring_id,
+      dato_tid = as.character(dato_tid)
+    ),
+    versjonerte_filer = resultat
+  )
+  
+  # Legg til den nye kjøringen i loggen
+  logg[[kjoring_id]] <- ny_kjoring
+  
+  # Skriv oppdatert logg til JSON-fil
+  jsonlite::write_json(logg, logg_filsti, pretty = TRUE, auto_unbox = TRUE)
+  
+  cat("Loggen er oppdatert for kjøring", kjoring_id, "\n")
+  
+  # Returner oppdatert logg
+  return(logg)
+}
+
+
+
+                                 
+                                 
+#' Versjonere filer
 #'
 #' Funksjonen oppdaterer filstier for flere filer ved å lage en ny versjon av filene dersom det er oppdaget endringer,
 #' eller returnerer stien til den siste versjonerte filen hvis ingen endringer er oppdaget.
+#' Funksjonen logger også resultatene av kjøringen ved hjelp av \code{\link{logg_kjoring}}, som lagrer informasjon om 
+#' versjonerte filer og kjøringsattributter som `kjoring_id` og `dato_tid` i en egen loggfil.
 #'
 #' @param filstier En karaktervektor som inneholder navnene på filstier som skal versjoneres.
 #' Funksjonen antar at filene er registrert som variable i det globale miljøet.
+#' @param logg_fil Navnet på loggfilen der kjøringsinformasjon og versjonerte filer lagres. Standard er "versjonering_logg.json".
+#' @param arbeidsmappe Stien til arbeidsmappen der loggfilen lagres.
 #'
 #' @details
-#' Funksjonen itererer over en liste med filstier og sjekker først om en ny versjon allerede eksisterer. Hvis det ikke finnes
-#' en ny versjon (hvis versjon 1 blir opprettet), opprettes denne automatisk. Deretter sjekkes det om det har skjedd endringer 
-#' i kolonner, datatyper eller verdier for hver fil ved hjelp av \code{\link{sjekk_endring}}. Hvis det er oppdaget endringer, 
+#' Funksjonen itererer over en liste med filstier og sjekker først om en versjonert fil allerede eksisterer. Hvis det ikke finnes
+#' en versjonert fil opprettes versjon 1 (v1) automatisk. Dersom versjonerte filer allerede eksisterer sjekkes det om det har skjedd endringer 
+#' i kolonner, datatyper eller verdier for hver fil (mot den siste versjonerte filen) ved hjelp av \code{\link{sjekk_endring}}. Hvis det er oppdaget endringer, 
 #' vil funksjonen opprette en ny versjon av filen. Hvis ingen endringer oppdages, returneres stien til den siste versjonerte filen.
+#' Etter hver kjøring, oppdateres loggfilen med informasjon om hvilke versjoner av filene som har blitt brukt i kjøringen samt metadata om kjøringen
+#' (`kjoring_id` og `dato_tid`) ved hjelp av \code{\link{logg_kjoring}}.
 #'
 #' @return En liste som inneholder filstiene til de siste versjonene av de versjonerte filene.
 #'
 #' @examples
 #' # Lag versjonerte filstier for en liste med filnavn
 #' filstier <- c("filsti1", "filsti2")
-#' lag_versjonerte_filstier(filstier)
+#' versjoner_filer(filstier)
 #'
 #' @export
-lag_versjonerte_filstier <- function(filstier) {
+versjoner_filer <- function(filstier, 
+                            logg_fil = "versjonering_logg.json", 
+                            arbeidsmappe) {
     
   # Lager liste med filstier  
   filstier_liste <- setNames(mget(filstier, envir = globalenv()), filstier)
@@ -472,99 +577,13 @@ lag_versjonerte_filstier <- function(filstier) {
       
   # Beholder de originale navnene for filstiene
   names(updated_filstier) <- names(filstier_liste)
+    
+  logg_kjoring(resultat = updated_filstier, 
+             logg_fil = logg_fil,
+             arbeidsmappe = arbeidsmappe)        
   
   return(updated_filstier)   
-}
-                                 
-                                 
-#' Lag logg for versjonering
-#'
-#' Funksjonen oppdaterer en loggfil med informasjon om en ny kjøring der flere filstier blir versjonert. Den sjekker først om det allerede finnes
-#' en logg, og hvis det ikke er noen endringer siden forrige kjøring, vil loggfilen ikke bli oppdatert.
-#'
-#' @param resultat En liste som inneholder resultatet av kjøringen fra \code{\link{lag_versjonerte_filstier}}. Hver oppføring representerer filstiens oppdaterte versjon.
-#' @param arbeidsmappe En karakterstreng som representerer banen til arbeidsmappen der loggfilen skal lagres.
-#' @param logg_fil En karakterstreng som representerer navnet på loggfilen. Standard er `"versjonering_logg.json"`.
-#'
-#' @details
-#' Funksjonen logger hver kjøring av \code{\link{lag_versjonerte_filstier}} ved å sjekke om loggfilen allerede eksisterer. Hvis det er første gang loggfilen opprettes,
-#' vil en ny logg bli laget. Hvis det allerede finnes en logg, vil funksjonen sjekke om resultatet av den nye kjøringen er
-#' identisk med den siste kjøringen. Hvis ingen endringer er oppdaget (dvs. ingen oppdaterte versjoner av filene), vil loggen ikke bli oppdatert. 
-#' Hvis det er en forskjell i resultatene, vil funksjonen legge til en ny kjøring med en unik ID og tidsstempel.
-#'
-#' Objektet `resultat` fra \code{\link{lag_versjonerte_filstier}} er en liste der hver filsti er oppdatert til å representere siste versjon. 
-#' Funksjonen skriver denne informasjonen til loggen hvis en endring oppdages.
-#'
-#' @return Returnerer den oppdaterte loggen som en liste. Hvis ingen endringer ble oppdaget, returnerer funksjonen uten å oppdatere loggen.
-#'
-#' @examples
-#' # Versjoner filstier og loggfør kjøringen
-#' filstier <- c("data1.parquet", "data2.parquet")
-#' resultat <- lag_versjonerte_filstier(filstier)
-#' logg <- logg_kjoring(resultat, arbeidsmappe = "prosjekt/logg")
-#'
-#' # Hvis ingen endringer siden forrige kjøring, blir loggfilen ikke oppdatert
-#' logg <- logg_kjoring(resultat, arbeidsmappe = "prosjekt/logg")
-#'
-#' @seealso \code{\link{lag_versjonerte_filstier}} for generering av resultatet.
-#'
-#' @export
-logg_kjoring <- function(resultat, 
-                         arbeidsmappe,
-                         logg_fil = "versjonering_logg.json") {
-  
-  logg_filsti <- glue::glue("{arbeidsmappe}/{logg_fil}")  
-  
-  # Sjekk om loggfilen allerede eksisterer
-  if (file.exists(logg_filsti)) {
-    # Les inn eksisterende logg
-    logg <- jsonlite::fromJSON(logg_filsti)
-    
-    # Hent den siste oppføringen (siste kjøring)
-    siste_kjoring <- logg[[length(logg)]]
-    
-    # Få alle elementer i resultat som skal sammenlignes, ekskluder 'kjoring_id' og 'dato_tid'
-    elementer_a_sjekke <- setdiff(names(resultat), c("kjoring_id", "dato_tid"))
-    
-    # Sjekk om den nye kjøringen er identisk med den siste for alle relevante elementer
-    identisk <- all(sapply(elementer_a_sjekke, function(x) identical(siste_kjoring[[x]], resultat[[x]])))
-    
-    if (identisk) {
-      cat("Ingenting har endret seg siden forrige kjøring. Loggen oppdateres ikke.\n")
-      return(logg)
-    }
-    
-  } else {
-    # Opprett en tom liste hvis loggfilen ikke finnes
-    logg <- list()
-  }
-  
-  # Finn antall kjøringer så langt (lengden på loggen)
-  antall_kjoringer <- length(logg) + 1
-  
-  # Generer en unik ID for denne kjøringen (f.eks. R1, R2, ...)
-  kjoring_id <- paste0("R", antall_kjoringer)
-  
-  # Få gjeldende dato og klokkeslett
-  dato_tid <- Sys.time()
-  
-  # Lag en ny kjøring basert på input-listen 'resultat'
-  ny_kjoring <- c(
-    list(kjoring_id = kjoring_id, dato_tid = as.character(dato_tid)),
-    resultat
-  )
-  
-  # Legg til den nye kjøringen i loggen
-  logg[[kjoring_id]] <- ny_kjoring
-  
-  # Skriv oppdatert logg til JSON-fil
-  jsonlite::write_json(logg, logg_filsti, pretty = TRUE, auto_unbox = TRUE)
-  
-  cat("Loggen er oppdatert for kjøring", kjoring_id, "\n")
-  
-  # Returner oppdatert logg
-  return(logg)
-}
+}                           
 
 #' Finn en release fra logg basert på ulike kriterier
 #'
@@ -638,8 +657,8 @@ finn_release <- function(release = NULL,
   # Søk etter spesifikk release hvis oppgitt
   if (!is.null(release)){  
     if (release == "siste") {
-      # Finn den nyeste basert på dato_tid
-      datoer <- sapply(logg, function(x) as.POSIXct(x$dato_tid))  # Hent alle dato_tid som POSIXct
+      # Finn den nyeste basert på dato_tid i attributes
+      datoer <- sapply(logg, function(x) as.POSIXct(x$attributes$dato_tid))  # Hent alle dato_tid som POSIXct
       siste_indeks <- which.max(datoer)  # Finn indeksen til nyeste dato
       resultat <- logg[[siste_indeks]]  # Hent det nyeste elementet
     } else {
@@ -651,11 +670,11 @@ finn_release <- function(release = NULL,
   if (!is.null(dato)){  
     # Hvis bare dato (uten klokkeslett) er oppgitt
     if (nchar(dato) == 10) {  # Antar format "YYYY-MM-DD" er 10 tegn langt
-      # Filtrer elementer som har dato_tid som starter med datoen
-      resultat <- Filter(function(x) startsWith(x$dato_tid, dato), logg)
+      # Filtrer elementer som har dato_tid i attributes som starter med datoen
+      resultat <- Filter(function(x) startsWith(x$attributes$dato_tid, dato), logg)
     } else {
       # Hvis både dato og klokkeslett er oppgitt, gjør eksakt sammenligning
-      resultat <- Filter(function(x) x$dato_tid == dato, logg)
+      resultat <- Filter(function(x) x$attributes$dato_tid == dato, logg)
     }
   }
   
@@ -674,9 +693,9 @@ finn_release <- function(release = NULL,
       dato_slutt <- as.POSIXct(dato_slutt)
     }
     
-    # Filtrer elementer der dato_tid er innenfor intervallet
+    # Filtrer elementer der dato_tid i attributes er innenfor intervallet
     resultat <- Filter(function(x) {
-      dato_tid <- as.POSIXct(x$dato_tid)
+      dato_tid <- as.POSIXct(x$attributes$dato_tid)
       return(dato_tid >= dato_start & dato_tid <= dato_slutt)
     }, logg)
   }
