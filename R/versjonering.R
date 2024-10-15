@@ -1,18 +1,25 @@
 #' Opprett mappestruktur
 #'
-#' Funksjonen oppretter en standard mappestruktur basert på en gitt arbeidsmappe, og lager variabler
-#' som peker på stien til hver undermappe i det globale miljøet.
+#' Funksjonen oppretter en standard mappestruktur basert på en filstien til en arbeidsmappe, og lager variabler
+#' som peker på stien til hver undermappe i det globale miljøet. Det er også mulig å spesifisere en 
+#' valgfri parameter `aargang` for å opprette en undermappe med det navnet i hver av hovedmappene.
 #'
 #' @param arbeidsmappe En karakterstreng som spesifiserer hovedmappen der de nye undermappene skal opprettes.
-#' Hvis denne stien slutter med en skråstrek (`/`), fjernes den automatisk.
+#' Hvis denne stien slutter med en skråstrek (`/`), fjernes den automatisk. Dersom `arbeidsmappe` ikke 
+#' eksisterer, vil funksjonen automatisk opprette den.
 #' @param mapper En karaktervektor som inneholder navnene på undermappene som skal opprettes. Standardverdien er
-#' `c("inndata", "klargjorte-data", "statistikk", "utdata")`. Det er mulig å legge til flere mapper (f.eks. "oppdrag")
+#' `c("inndata", "klargjorte-data", "statistikk", "utdata")`. Det er mulig å legge til flere mapper (f.eks. "oppdrag").
+#' @param aargang En valgfri karakterstreng som spesifiserer en undermappe som opprettes i hver av hovedmappene. 
+#' Hvis denne ikke er spesifisert (default er `NULL`), opprettes ingen slike undermapper.
 #'
 #' @details
 #' Denne funksjonen går gjennom en liste av mapper, og for hver mappe:
 #' - Fjerner en eventuell avsluttende skråstrek (`/`) fra hovedmappen.
+#' - Oppretter `arbeidsmappe` dersom den ikke allerede finnes.
 #' - Oppretter undermappen inne i arbeidsmappen dersom den ikke allerede eksisterer.
-#' - Erstatte bindestreker i undermappenavn med understrek for å lage gyldige variabelnavn.
+#' - Hvis `aargang` er spesifisert, oppretter funksjonen også en undermappe med navnet spesifisert av `aargang`
+#'   i hver hovedmappe.
+#' - Erstatt bindestreker i undermappenavn med understrek for å lage gyldige variabelnavn.
 #' - Tilordner hver undermappe-sti som en variabel i det globale miljøet (bruker `assign`).
 #'
 #' Variabelnavnene som opprettes har formatet `mappe_navn_mappe`, der eventuelle bindestreker i mappe-navn
@@ -27,9 +34,13 @@
 #' # Opprett en egendefinert mappestruktur
 #' opprett_mappestruktur("analyse", mapper = c("data", "output", "figurer"))
 #'
+#' # Opprett mappestruktur med en spesifikk aargang (f.eks. "2024")
+#' opprett_mappestruktur("prosjekt", aargang = "2024")
+#'
 #' @export
 opprett_mappestruktur <- function(arbeidsmappe, 
-                                  mapper = c("inndata", "klargjorte-data", "statistikk", "utdata")) {
+                                  mapper = c("inndata", "klargjorte-data", "statistikk", "utdata"), 
+                                  aargang = NULL) {
   
   # Fjerner eventuell avsluttende "/" fra arbeidsmappe først
   arbeidsmappe <- sub("/$", "", arbeidsmappe)
@@ -39,22 +50,36 @@ opprett_mappestruktur <- function(arbeidsmappe,
     # Lag full sti til mappen
     full_mappe_path <- file.path(arbeidsmappe, mappe)
     
-    # Legg til avsluttende "/" dersom den ikke er der
-    full_mappe_path <- paste0(full_mappe_path, "/")
-    
     # Oppretter mappen om den ikke finnes
     if (!dir.exists(full_mappe_path)) {
       dir.create(full_mappe_path, recursive = TRUE)
     }
     
+    # Hvis 'aargang' er spesifisert, opprett undermappe med det navnet og oppdater stien
+    if (!is.null(aargang)) {
+      full_mappe_path <- file.path(full_mappe_path, aargang)
+      
+      # Oppretter undermappen om den ikke finnes
+      if (!dir.exists(full_mappe_path)) {
+        dir.create(full_mappe_path, recursive = TRUE)
+      }
+    }
+    
+    # Sørg for at stien slutter med "/"
+    full_mappe_path <- paste0(rtrim(full_mappe_path, "/"), "/")
+    
     # Erstatt bindestrek med understrek i variabelnavn
     var_navn <- gsub("-", "_", paste0(mappe, "_mappe"))  # F.eks. "klargjorte_data_mappe"
     
-    # Tilordner full sti som en variabel med det oppdaterte navnet
+    # Tilordner den oppdaterte fullstien som en variabel i det globale miljøet
     assign(var_navn, full_mappe_path, envir = .GlobalEnv)  # Oppretter variabel i globalt miljø
   }
 }
 
+# Hjelpefunksjon for å fjerne avsluttende skråstreker fra en filsti
+rtrim <- function(x, char = "/") {
+  sub(paste0(char, "$"), "", x)
+}
 
 #' Finn versjonsnummer fra et filnavn
 #'
