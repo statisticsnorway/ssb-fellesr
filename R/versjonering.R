@@ -2,14 +2,14 @@
 #'
 #' Funksjonen oppretter en standard mappestruktur basert på en filstien til en arbeidsmappe, og lager variabler
 #' som peker på stien til hver undermappe i det globale miljøet. Det er også mulig å spesifisere en 
-#' valgfri parameter `aargang` for å opprette en undermappe med det navnet i hver av hovedmappene.
+#' valgfri parameter `periode` for å opprette en undermappe med det navnet i hver av hovedmappene.
 #'
 #' @param arbeidsmappe En karakterstreng som spesifiserer hovedmappen der de nye undermappene skal opprettes.
 #' Hvis denne stien slutter med en skråstrek (`/`), fjernes den automatisk. Dersom `arbeidsmappe` ikke 
 #' eksisterer, vil funksjonen automatisk opprette den.
 #' @param mapper En karaktervektor som inneholder navnene på undermappene som skal opprettes. Standardverdien er
 #' `c("inndata", "klargjorte-data", "statistikk", "utdata")`. Det er mulig å legge til flere mapper (f.eks. "oppdrag").
-#' @param aargang En valgfri karakterstreng som spesifiserer en undermappe som opprettes i hver av hovedmappene. 
+#' @param periode En valgfri karakterstreng som spesifiserer en undermappe som opprettes i hver av hovedmappene. 
 #' Hvis denne ikke er spesifisert (default er `NULL`), opprettes ingen slike undermapper.
 #'
 #' @details
@@ -17,7 +17,7 @@
 #' - Fjerner en eventuell avsluttende skråstrek (`/`) fra hovedmappen.
 #' - Oppretter `arbeidsmappe` dersom den ikke allerede finnes.
 #' - Oppretter undermappen inne i arbeidsmappen dersom den ikke allerede eksisterer.
-#' - Hvis `aargang` er spesifisert, oppretter funksjonen også en undermappe med navnet spesifisert av `aargang`
+#' - Hvis `periode` er spesifisert, oppretter funksjonen også en undermappe med navnet spesifisert av `periode`
 #'   i hver hovedmappe.
 #' - Erstatt bindestreker i undermappenavn med understrek for å lage gyldige variabelnavn.
 #' - Tilordner hver undermappe-sti som en variabel i det globale miljøet (bruker `assign`).
@@ -34,13 +34,13 @@
 #' # Opprett en egendefinert mappestruktur
 #' opprett_mappestruktur("analyse", mapper = c("data", "output", "figurer"))
 #'
-#' # Opprett mappestruktur med en spesifikk aargang (f.eks. "2024")
-#' opprett_mappestruktur("prosjekt", aargang = "2024")
+#' # Opprett mappestruktur med en spesifikk periode (f.eks. "2024" eller "2024-Q1")
+#' opprett_mappestruktur("prosjekt", periode = "2024")
 #'
 #' @export
 opprett_mappestruktur <- function(arbeidsmappe, 
                                   mapper = c("inndata", "klargjorte-data", "statistikk", "utdata"), 
-                                  aargang = NULL) {
+                                  periode = NULL) {
   
   # Fjerner eventuell avsluttende "/" fra arbeidsmappe først
   arbeidsmappe <- sub("/$", "", arbeidsmappe)
@@ -55,9 +55,9 @@ opprett_mappestruktur <- function(arbeidsmappe,
       dir.create(full_mappe_path, recursive = TRUE)
     }
     
-    # Hvis 'aargang' er spesifisert, opprett undermappe med det navnet og oppdater stien
-    if (!is.null(aargang)) {
-      full_mappe_path <- file.path(full_mappe_path, aargang)
+    # Hvis 'periode' er spesifisert, opprett undermappe med det navnet og oppdater stien
+    if (!is.null(periode)) {
+      full_mappe_path <- file.path(full_mappe_path, periode)
       
       # Oppretter undermappen om den ikke finnes
       if (!dir.exists(full_mappe_path)) {
@@ -480,8 +480,9 @@ sjekk_endring <- function(filsti){
 #'
 #' @export
 logg_kjoring <- function(resultat, 
-                         arbeidsmappe,
-                         logg_fil = "versjonering_logg.json") {
+                         logg_fil = "versjonering_logg.json", 
+                         arbeidsmappe, 
+                         periode) {
   
   logg_filsti <- glue::glue("{arbeidsmappe}/{logg_fil}")  
   
@@ -521,7 +522,8 @@ logg_kjoring <- function(resultat,
   ny_kjoring <- list(
     attributes = list(
       kjoring_id = kjoring_id,
-      dato_tid = as.character(dato_tid)
+      dato_tid = as.character(dato_tid), 
+      periode = periode  
     ),
     versjonerte_filer = resultat
   )
@@ -572,7 +574,8 @@ logg_kjoring <- function(resultat,
 #' @export
 versjoner_filer <- function(filstier, 
                             logg_fil = "versjonering_logg.json", 
-                            arbeidsmappe) {
+                            arbeidsmappe, 
+                            periode) {
     
   # Lager liste med filstier  
   filstier_liste <- setNames(mget(filstier, envir = globalenv()), filstier)
@@ -605,20 +608,22 @@ versjoner_filer <- function(filstier,
     
   logg_kjoring(resultat = updated_filstier, 
              logg_fil = logg_fil,
-             arbeidsmappe = arbeidsmappe)        
+             arbeidsmappe = arbeidsmappe, 
+             periode = as.character(periode))        
   
   return(updated_filstier)   
 }                           
 
 #' Finn en release fra logg basert på ulike kriterier
 #'
-#' Funksjonen søker gjennom en loggfil for å finne en spesifikk release, den siste release, eller alle releaser innenfor et datointervall.
+#' Funksjonen søker gjennom en loggfil for å finne en spesifikk release, siste release, alle releaser innenfor et datointervall, alle releaser for en gitt periode eller siste release innenfor en spesifisert periode.
 #'
-#' @param release En karakterstreng som spesifiserer hvilken release som skal hentes. Hvis `release = "siste"`, returneres den nyeste releasen basert på dato.
-#' @param dato En karakterstreng som spesifiserer en eksakt dato eller dato med tid (f.eks. `"2023-01-01"` eller `"2023-01-01 12:00:00"`). 
+#' @param release En karakterstreng som spesifiserer hvilken release som skal hentes. Hvis `release = "siste"`, returneres den nyeste releasen basert på dato. Kombiner med `periode` for å hente den siste releasen innenfor en spesifikk periode.
+#' @param dato En karakterstreng som spesifiserer en eksakt dato eller dato med tid (f.eks. "2023", `"2023-01-01"` eller `"2023-01-01 12:00:00"`). 
 #' Hvis bare dato oppgis, returneres alle releaser fra denne dagen.
-#' @param dato_start En karakterstreng som spesifiserer startdato for et datointervall (f.eks. `"2023-01-01"`). Brukes sammen med `dato_slutt` for å hente releaser innenfor et intervall.
-#' @param dato_slutt En karakterstreng som spesifiserer sluttdato for et datointervall (f.eks. `"2023-01-31"`). Brukes sammen med `dato_start`.
+#' @param dato_start En karakterstreng som spesifiserer startdato for et datointervall (f.eks. "2023", `"2023-01-01"`). Brukes sammen med `dato_slutt` for å hente releaser innenfor et intervall.
+#' @param dato_slutt En karakterstreng som spesifiserer sluttdato for et datointervall (f.eks. "2023", `"2023-01-31"`). Brukes sammen med `dato_start`.
+#' @param periode En karakterstreng som spesifiserer en tidsperiode (f.eks. "2023", `"2023-Q1"`). Hvis `release = "siste"` er angitt, returneres den nyeste releasen innenfor den spesifiserte perioden.
 #' @param arbeidsmappe En karakterstreng som representerer banen til arbeidsmappen der loggfilen ligger.
 #' @param logg_fil En karakterstreng som representerer navnet på loggfilen. Standard er `"versjonering_logg.json"`.
 #'
@@ -628,6 +633,7 @@ versjoner_filer <- function(filstier,
 #' \itemize{
 #'   \item Spesifikk release: Angi `release` for å hente en bestemt release.
 #'   \item Nyeste release: Angi `release = "siste"` for å hente den siste basert på tidsstempelet.
+#'   \item Nyeste release innenfor en spesifikk periode: Angi både `release = "siste"` og `periode` for å hente den nyeste releasen innenfor perioden.
 #'   \item Spesifikk dato: Angi `dato` for å hente releaser som ble logget på en gitt dato.
 #'   \item Dato-intervall: Angi både `dato_start` og `dato_slutt` for å hente releaser innenfor et bestemt tidsrom.
 #' }
@@ -641,6 +647,9 @@ versjoner_filer <- function(filstier,
 #' @examples
 #' # Finn siste release
 #' finn_release(release = "siste", arbeidsmappe = "prosjekt")
+#'
+#' # Finn siste release i en spesifikk periode
+#' finn_release(release = "siste", periode = "2021-Q1", arbeidsmappe = "prosjekt")
 #'
 #' # Finn en spesifikk release
 #' finn_release(release = "R1", arbeidsmappe = "prosjekt")
@@ -658,6 +667,7 @@ finn_release <- function(release = NULL,
                          dato = NULL,
                          dato_start = NULL, 
                          dato_slutt = NULL,
+                         periode = NULL,
                          arbeidsmappe,
                          logg_fil = "versjonering_logg.json") {
   
@@ -679,16 +689,37 @@ finn_release <- function(release = NULL,
   
   resultat <- NULL
   
-  # Søk etter spesifikk release hvis oppgitt
-  if (!is.null(release)){  
-    if (release == "siste") {
-      # Finn den nyeste basert på dato_tid i attributes
-      datoer <- sapply(logg, function(x) as.POSIXct(x$attributes$dato_tid))  # Hent alle dato_tid som POSIXct
-      siste_indeks <- which.max(datoer)  # Finn indeksen til nyeste dato
-      resultat <- logg[[siste_indeks]]  # Hent det nyeste elementet
-    } else {
-      resultat <- logg[[release]]  
+  # Søk etter spesifikk periode hvis oppgitt
+  if (!is.null(periode)) {
+    # Filtrer elementer der periode i attributes matcher perioden
+    logg <- Filter(function(x) x$attributes$periode == periode, logg)
+    
+    # Hvis release også er "siste", finn den nyeste innenfor perioden
+    if (!is.null(release) && release == "siste") {
+      if (length(logg) > 0) {
+        datoer <- sapply(logg, function(x) as.POSIXct(x$attributes$dato_tid))  # Hent alle dato_tid som POSIXct
+        siste_indeks <- which.max(datoer)  # Finn indeksen til nyeste dato
+        resultat <- logg[[siste_indeks]]  # Hent det nyeste elementet
+      } else {
+        warning("Ingen oppføringer funnet for den spesifiserte perioden.")
+        return(NULL)
+      }
+      return(resultat)
     }
+  }
+  
+  # Søk etter spesifikk release hvis oppgitt (dersom release != "siste" eller ingen periode)
+  if (!is.null(release) && release != "siste") {  
+    resultat <- logg[[release]]
+    return(resultat)
+  }
+  
+  # Hvis release er "siste" uten periode, finn den nyeste uavhengig av periode
+  if (!is.null(release) && release == "siste") {
+    datoer <- sapply(logg, function(x) as.POSIXct(x$attributes$dato_tid))  # Hent alle dato_tid som POSIXct
+    siste_indeks <- which.max(datoer)  # Finn indeksen til nyeste dato
+    resultat <- logg[[siste_indeks]]  # Hent det nyeste elementet
+    return(resultat)
   }
   
   # Søk etter en spesifikk dato (enten full dato_tid eller bare dato)
