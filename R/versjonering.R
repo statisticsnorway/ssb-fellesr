@@ -250,44 +250,56 @@ lag_versjonert_filsti <- function(fil,
 }
 
 
-#' Sjekk for endringer i kolonner mellom siste og nyeste versjon av en fil
+#' Sjekk for endringer i rader og kolonner mellom siste og nyeste versjon av en fil
 #'
-#' Funksjonen sammenligner kolonnenavnene i den siste versjonerte filen med kolonnenavnene i en ny fil
-#' for å se om det har skjedd endringer i antall eller navn på kolonner.
+#' Funksjonen sammenligner antall rader og kolonner, samt kolonnenavnene, i den siste versjonerte filen
+#' med tilsvarende i en ny fil for å se om det har skjedd endringer i struktur.
 #'
 #' @param filsti En karakterstreng som representerer filstien til den nyeste versjonen av filen.
 #' Funksjonen finner selv den siste versjonerte filen ved å bruke \code{\link{lag_versjonert_filsti}}.
 #'
 #' @details
 #' Funksjonen åpner den siste versjonerte filen i en gitt sti ved hjelp av \code{\link{lag_versjonert_filsti}} og sammenligner
-#' kolonnene med de i den nye filen som er angitt av `filsti`. Det kontrolleres om antallet kolonner og
-#' navnene på kolonnene har endret seg mellom den siste versjonen og den nye filen. Hvis det er en endring i enten
-#' antall eller rekkefølgen på kolonnene, returnerer funksjonen `TRUE`. Hvis ingen endringer oppdages, returneres `FALSE`.
+#' antall rader og kolonner, samt kolonnene (navn og antall), med de i den nye filen som er angitt av `filsti`. 
+#' Det kontrolleres først om antallet rader eller kolonner har endret seg. Deretter kontrolleres det om navnene på kolonnene
+#' har endret seg. Hvis det er en endring i enten antall rader, antall kolonner eller kolonnenavnene, returnerer funksjonen `TRUE`.
+#' Hvis ingen endringer oppdages, returneres `FALSE`.
 #' 
 #' @return Funksjonen returnerer en logisk verdi:
 #' \itemize{
-#'   \item `TRUE`: Hvis det har skjedd endringer i kolonnene (antall eller navn) mellom den siste versjonerte filen og den nye filen.
-#'   \item `FALSE`: Hvis det ikke er noen endringer i kolonnene.
+#'   \item `TRUE`: Hvis det har skjedd endringer i antall rader, antall kolonner eller kolonnenavn mellom den siste versjonerte filen og den nye filen.
+#'   \item `FALSE`: Hvis det ikke er noen endringer i rader eller kolonner.
 #' }
 #'
 #' @examples
-#' # Sjekk om det er endringer i kolonnene mellom siste versjon og ny fil
-#' sjekk_endring_kolonner("prosjekt/data.parquet")
+#' # Sjekk om det er endringer i rader eller kolonner mellom siste versjon og ny fil
+#' sjekk_endring_rader_kolonner("prosjekt/data.parquet")
 #'
 #' @export
-sjekk_endring_kolonner <- function(filsti){
+sjekk_endring_rader_kolonner <- function(filsti) {
+  
+  # Hent antall rader og kolonner fra siste versjonerte fil
+  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, "siste"))
+  dim_siste <- dim(data_siste)
+  
+  # Hent antall rader og kolonner fra ny fil
+  data_ny <- arrow::open_dataset(filsti)
+  dim_ny <- dim(data_ny)
+  
+  # Sjekk om antall rader eller kolonner er forskjellige
+  if (!identical(dim_siste, dim_ny)) {
+    return(TRUE)  # Returnerer TRUE hvis antall rader eller kolonner er forskjellige
+  }
   
   # Hent kolonner fra siste versjonerte fil
-  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, "siste"))$schema
-  kolonnenavn_siste <- data_siste$names
+  kolonnenavn_siste <- data_siste$schema$names
   
   # Hent kolonner fra ny fil
-  data_ny <- arrow::open_dataset(filsti)$schema
-  kolonnenavn_ny <- data_ny$names   
+  kolonnenavn_ny <- data_ny$schema$names   
   
   # Sjekk om det er endringer i kolonnenavn eller antall kolonner
-  if ((length(kolonnenavn_siste) != (length(kolonnenavn_ny)) | 
-       (identical(sort(kolonnenavn_siste), sort(kolonnenavn_ny)) == FALSE))){
+  if ((length(kolonnenavn_siste) != length(kolonnenavn_ny)) | 
+      !identical(sort(kolonnenavn_siste), sort(kolonnenavn_ny))) {
     endring_kolonner <- TRUE  
   } else {
     endring_kolonner <- FALSE  
@@ -295,6 +307,7 @@ sjekk_endring_kolonner <- function(filsti){
   
   return(endring_kolonner)
 }
+
 
 #' Sjekk for endringer i datatyper mellom siste og nyeste versjon av en fil
 #'
@@ -348,6 +361,75 @@ sjekk_endring_datatype <- function(filsti){
   
   return(endring_datatype)
 }
+                                 
+#' Sjekk for endringer i sum for numeriske kolonner mellom siste og nyeste versjon av en fil
+#'
+#' Denne funksjonen sjekker om det har skjedd noen endringer i summene av de numeriske kolonnene mellom den siste versjonerte filen med en ny fil for å se om det har skjedd endringer i dataene.
+#' Funksjonen sammenligner datasett ved å beregne summen av numeriske kolonner i hvert sett, og deretter sjekke om det finnes forskjeller.
+#'
+#' @param filsti En tekststreng som spesifiserer filstien til den nye datasetten som skal sammenlignes. 
+#' Funksjonen forventer at det finnes en tidligere versjonert fil på samme plassering.
+#'
+#' @return En logisk verdi (\code{TRUE} eller \code{FALSE}). Returnerer \code{TRUE} hvis det er endringer i summen av numeriske kolonner mellom de to datasettene, og \code{FALSE} hvis det ikke er noen endringer.
+#'
+#' @details Funksjonen benytter seg av Arrow-pakken for å åpne datasettene med lazy loading og Arsenal-pakken for å sammenligne dataene. 
+#' Den håndterer kolonner som er numeriske (int eller float) og summerer disse før sammenligning. 
+#' Dersom det er noen forskjeller i summene mellom de to datasettene, returnerer funksjonen \code{TRUE}. 
+#'
+#' @import arrow dplyr arsenal
+#'
+#' @examples
+#' # Sjekk om det er endringer i verdiene mellom siste versjon og ny fil
+#' sjekk_endring_sum("prosjekt/data.parquet")
+#'
+#' @export
+sjekk_endring_sum <- function(filsti) {
+  
+  # Åpne datasettene med lazy loading
+  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, "siste"))
+  data_ny <- arrow::open_dataset(filsti)
+  
+  # Funksjon for å sjekke om en kolonne er numerisk (integer eller float/double)
+  is_numeric_column <- function(dataset, column_name) {
+    column_type <- dataset$schema$GetFieldByName(column_name)$type$ToString()  # Konverter til streng
+    column_type %in% c("int32", "int64", "float", "double")
+  }
+  
+  # Få kolonnenavn fra datasettene
+  columns_siste <- data_siste$schema$names
+  columns_ny <- data_ny$schema$names
+  
+  # Filtrer kolonner som er numeriske for data_siste og data_ny
+  numeric_columns_siste <- columns_siste[sapply(columns_siste, function(col) is_numeric_column(data_siste, col))]
+  numeric_columns_ny <- columns_ny[sapply(columns_ny, function(col) is_numeric_column(data_ny, col))]
+  
+  # Dynamisk bygge summarize for data_siste
+  summarized_siste <- data_siste %>%
+    summarize(across(all_of(numeric_columns_siste), ~ sum(.x, na.rm = TRUE)))
+  
+  # Dynamisk bygge summarize for data_ny
+  summarized_ny <- data_ny %>%
+    summarize(across(all_of(numeric_columns_ny), ~ sum(.x, na.rm = TRUE)))
+  
+  # Samle resultatene inn i minnet med collect()
+  resultat_siste <- summarized_siste %>% collect()
+  resultat_ny <- summarized_ny %>% collect()
+                                          
+  # Sammenlign dataene mellom siste og ny fil
+  comparison <- arsenal::comparedf(resultat_siste, resultat_ny, by = NULL)
+  
+  forskjeller <- summary(comparison)$diffs.table  
+  
+  # Sjekk om det er forskjeller i dataene
+  if (nrow(forskjeller) > 0){
+    endring_sum <- TRUE   
+  } else {
+    endring_sum <- FALSE  
+  }
+  
+  return(endring_sum)
+}
+                                 
 
 #' Sjekk for endringer i verdier mellom siste og nyeste versjon av en fil
 #'
@@ -375,18 +457,16 @@ sjekk_endring_datatype <- function(filsti){
 sjekk_endring_verdier <- function(filsti){
   
   # Hent data fra siste versjonerte fil og ny fil
-  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, "siste"))
-  data_ny <- arrow::open_dataset(filsti)
+  data_siste <- arrow::read_parquet(lag_versjonert_filsti(filsti, "siste"))
+  data_ny <- arrow::read_parquet(filsti)
   
   # Sammenlign dataene mellom siste og ny fil
-  forskjeller_1 <- suppressMessages(dplyr::anti_join(data_ny, data_siste)) %>%
-    collect()
-  
-  forskjeller_2 <- suppressMessages(dplyr::anti_join(data_siste, data_ny)) %>%
-    collect()
+  comparison <- arsenal::comparedf(data_siste, data_ny, by = NULL)
+    
+  forskjeller <- summary(comparison)$diffs.table  
   
   # Sjekk om det er forskjeller i dataene
-  if (nrow(forskjeller_1) > 0 | nrow(forskjeller_2) > 0){
+  if (nrow(forskjeller) > 0){
     endring_verdier <- TRUE   
   } else {
     endring_verdier <- FALSE  
@@ -404,7 +484,7 @@ sjekk_endring_verdier <- function(filsti){
 #' Funksjonen finner selv den siste versjonerte filen ved å bruke \code{\link{lag_versjonert_filsti}}.
 #'
 #' @details
-#' Funksjonen kombinerer sjekker fra \code{\link{sjekk_endring_kolonner}}, \code{\link{sjekk_endring_datatype}}, og \code{\link{sjekk_endring_verdier}}.
+#' Funksjonen kombinerer sjekker fra \code{\link{sjekk_endring_rader_kolonner}}, \code{\link{sjekk_endring_datatype}}, og \code{\link{sjekk_endring_verdier}}.
 #' Den sjekker først om det har skjedd endringer i kolonnene, deretter i datatypene, og til slutt om det har skjedd endringer i verdiene mellom filene.
 #' Hvis det oppdages en endring på noen av disse områdene, returnerer funksjonen `TRUE`. Hvis ingen endringer oppdages, returneres `FALSE`.
 #' 
@@ -420,10 +500,11 @@ sjekk_endring_verdier <- function(filsti){
 #'
 #' @export
 sjekk_endring <- function(filsti){
-  endring_kolonner <- sjekk_endring_kolonner(filsti = filsti)
+  endring_rader_kolonner <- sjekk_endring_rader_kolonner(filsti = filsti)
   
-  if (endring_kolonner == TRUE){
+  if (endring_rader_kolonner == TRUE){
     endring <- TRUE
+    print(glue::glue("Endring i rader og/eller kolonner: {filsti}"))    
     return(endring)  # Avslutt funksjonen uten feilmelding hvis kolonner har endret seg
   }    
   
@@ -431,13 +512,23 @@ sjekk_endring <- function(filsti){
   
   if (endring_datatype == TRUE){
     endring <- TRUE
+    print(glue::glue("Endring i datatyper: {filsti}"))    
     return(endring)  # Avslutt funksjonen uten feilmelding hvis datatyper har endret seg
   }   
+    
+  endring_sum <- sjekk_endring_sum(filsti = filsti)
+  
+  if (endring_sum == TRUE){
+    endring <- TRUE
+    print(glue::glue("Endring i summen til numeriske kolonner for: {filsti}"))    
+    return(endring)  # Avslutt funksjonen uten feilmelding hvis datatyper har endret seg
+  }      
   
   endring_verdier <- sjekk_endring_verdier(filsti = filsti)
   
   if (endring_verdier == TRUE){
     endring <- TRUE
+    print(glue::glue("Endring i verdier for: {filsti}"))   
     return(endring)  # Avslutt funksjonen uten feilmelding hvis verdier har endret seg
   } else {
     endring <- FALSE 
