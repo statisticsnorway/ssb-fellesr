@@ -430,11 +430,19 @@ statbank_lasting <- function(lastefil,
                              body = list(raw = body))
 
 
+    
   if (httr::content(transfer_log)$TotalResult$Status == "Success") {
     print("Lasting vellykket!")
     return(transfer_log)
     stop()
   }
+    
+
+    if (httr::content(transfer_log)$TotalResult$Status == "Failure") {
+    print("Lasting mislyktes")
+    return(transfer_log)
+  }    
+    
 
   if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(grepl("brudd paa unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
     print("Lasting mislyktes. Kan skyldes at forrige opplasting ikke er ferdig. Vent noen minutter og proev igjen.")
