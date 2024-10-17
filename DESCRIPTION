@@ -1,7 +1,7 @@
 Package: fellesr
 Type: Package
 Title: General R functions for SSB
-Version: 0.2.6
+Version: 0.2.7
 Authors@R: 
   c(person(given = "Susie",
            family = "Jentoft",
@@ -11,7 +11,7 @@ Authors@R:
            family = "Haugen",
            role = "aut",
            email = "sindre.haugen@ssb.no"))
-Description: This package is for gerenal R functions which may be useful for general use at SSB.
+Description: This package is for general R functions which may be useful for general use at SSB.
 Imports: 
     here,
     getPass,
