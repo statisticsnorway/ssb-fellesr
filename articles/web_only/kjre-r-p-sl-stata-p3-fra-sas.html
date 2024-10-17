@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Kjøre R på sl-stata-p3 fra SAS • fellesr</title>
+<title>Kjøre R på sl-stata-p4 fra SAS • fellesr</title>
 <script src="../../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="../../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../../deps/headroom-0.11.0/headroom.min.js"></script><script src="../../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../../deps/search-1.0.0/fuse.min.js"></script><script src="../../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../../pkgdown.js"></script><meta property="og:title" content="Kjøre R på sl-stata-p3 fra SAS">
+<script src="../../deps/headroom-0.11.0/headroom.min.js"></script><script src="../../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../../deps/search-1.0.0/fuse.min.js"></script><script src="../../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../../pkgdown.js"></script><meta property="og:title" content="Kjøre R på sl-stata-p4 fra SAS">
 <meta name="description" content="Her er et eksempel på hvordan man kan kjøre et R script på en annen server fra SAS
 ">
 <meta property="og:description" content="Her er et eksempel på hvordan man kan kjøre et R script på en annen server fra SAS
@@ -38,7 +38,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a></li>
-    <li><a class="dropdown-item" href="../../articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html">Kjøre R på sl-stata-p3 fra SAS</a></li>
+    <li><a class="dropdown-item" href="../../articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html">Kjøre R på sl-stata-p4 fra SAS</a></li>
     <li><a class="dropdown-item" href="../../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a></li>
     <li><a class="dropdown-item" href="../../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a></li>
     <li><a class="dropdown-item" href="../../articles/vignette_shiny_ssb.html">Kjøre shiny og Esquisse i Jupyter</a></li>
@@ -66,7 +66,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Kjøre R på sl-stata-p3 fra SAS</h1>
+      <h1>Kjøre R på sl-stata-p4 fra SAS</h1>
                         <h4 data-toc-skip class="author">Susie Jentoft,
 Øyvind Bruer-Skarsbø, Anna-Karin Mevik, Anita Cecilie Dal</h4>
                         
@@ -82,9 +82,9 @@
 fordi det kun er en liten del av en stor produksjonsprosess og det er en
 fordel å kjøre alt innenfor ett miljø (SAS-EG). Per i dag har vi
 forskjellige versjoner av R på de forskjellige serverne. Det kan være en
-fordel å kjøre scriptet på en nyere R-versjon på sl-stata-p3 fra et SAS
+fordel å kjøre scriptet på en nyere R-versjon på sl-stata-p4 fra et SAS
 prosjekt.</p>
-<p><strong>Foreløpig fungerer dette kun med kjøring på sl-stata-p3 og
+<p><strong>Foreløpig fungerer dette kun med kjøring på sl-stata-p4 og
 ikke python server</strong></p>
 <p>Her viser vi et eksempel på hvordan du kan gjøre dette.</p>
 <div class="section level2">
@@ -92,14 +92,14 @@ ikke python server</strong></p>
 </h2>
 <p>Det er laget en (felles) SAS-makro alle kan benytte som ligger
 tilgjengelig på Linux. Makroen heter %RunScriptFromR og er dokumentert
-på SSB sin SAS-wiki (<a href="https://wiki.ssb.no/display/SASDOC/Nyttige+SAS+program" class="external-link uri">https://wiki.ssb.no/display/SASDOC/Nyttige+SAS+program</a>)
+på SSB sin SAS-wiki (<a href="https://statistics-norway.atlassian.net/wiki/spaces/SASDOC/pages/3768288266/Nyttige+SAS+program" class="external-link uri">https://statistics-norway.atlassian.net/wiki/spaces/SASDOC/pages/3768288266/Nyttige+SAS+program</a>)
 og i prodsonen (Q:\Saskurs\Fellesprog\RunScriptFromR.docx). Makroen
 tilbyr kjøring av skript med og uten parametere og håndtering av loggfil
 fra R-kjøringen. Se dokumentasjon for nærmere beskrivelse.</p>
 <p><br> En forenklet utgave av makroen er vist under hvis man ønsker å
 definere den selv i SAS. Eksempel på bruk:</p>
 <p>Kopier følgende inn i prosjektet ditt for å definere macroen.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">%macro</span> RunScriptFromR<span class="er">(</span><span class="va">program</span><span class="op">=</span><span class="st">''</span>, <span class="va">server</span><span class="op">=</span><span class="st">"sl-stata-p3"</span>,param=<span class="st">""</span><span class="kw">);</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash sas"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">%macro</span> RunScriptFromR<span class="er">(</span><span class="va">program</span><span class="op">=</span><span class="st">''</span>, <span class="va">server</span><span class="op">=</span><span class="st">"sl-stata-p4"</span>,param=<span class="st">""</span><span class="kw">);</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="ex">%let</span> server2 = %sysfunc<span class="er">(</span><span class="ex">dequote</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">server.</span><span class="kw">));</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="ex">%let</span> program2 = %sysfunc<span class="er">(</span><span class="ex">dequote</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">program.</span><span class="kw">));</span></span>
@@ -174,7 +174,7 @@ inn data:</p>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>    <span class="va">out</span><span class="op">=</span>test_output<span class="kw">;</span></span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="ex">RUN</span><span class="kw">;</span></span></code></pre></div>
 <p>Da ser vi at data har nå en variabel for predikterte verdiene og en
-variabel som viser at den har kjørt på sl-stata-p3 serveren.</p>
+variabel som viser at den har kjørt på sl-stata-p4 serveren.</p>
 <p><img src="images%2Fsas_output.PNG" width="40%"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
