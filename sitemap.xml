@@ -21,6 +21,8 @@
 <url><loc>/reference/dynarev_uttrekk.html</loc></url>
 <url><loc>/reference/env_check.html</loc></url>
 <url><loc>/reference/esquisser_ssb.html</loc></url>
+<url><loc>/reference/finn_release.html</loc></url>
+<url><loc>/reference/finn_versjon.html</loc></url>
 <url><loc>/reference/fix_file.html</loc></url>
 <url><loc>/reference/fix_files.html</loc></url>
 <url><loc>/reference/gcs.list.files.html</loc></url>
@@ -33,7 +35,10 @@
 <url><loc>/reference/get_standard_files_offline.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/initialer_funk.html</loc></url>
+<url><loc>/reference/lag_versjonert_filsti.html</loc></url>
+<url><loc>/reference/logg_kjoring.html</loc></url>
 <url><loc>/reference/open_dataset.html</loc></url>
+<url><loc>/reference/opprett_mappestruktur.html</loc></url>
 <url><loc>/reference/pipe.html</loc></url>
 <url><loc>/reference/read_SSB.html</loc></url>
 <url><loc>/reference/read_csv.html</loc></url>
@@ -48,6 +53,11 @@
 <url><loc>/reference/safe_data.html</loc></url>
 <url><loc>/reference/scale_colour_ssb.html</loc></url>
 <url><loc>/reference/scale_fill_ssb.html</loc></url>
+<url><loc>/reference/sjekk_endring.html</loc></url>
+<url><loc>/reference/sjekk_endring_datatype.html</loc></url>
+<url><loc>/reference/sjekk_endring_rader_kolonner.html</loc></url>
+<url><loc>/reference/sjekk_endring_sum.html</loc></url>
+<url><loc>/reference/sjekk_endring_verdier.html</loc></url>
 <url><loc>/reference/ssb_colours.html</loc></url>
 <url><loc>/reference/ssb_palettes.html</loc></url>
 <url><loc>/reference/ssb_rproject.html</loc></url>
@@ -55,12 +65,14 @@
 <url><loc>/reference/statbank_lasting.html</loc></url>
 <url><loc>/reference/statbank_uttaksbeskrivelse.html</loc></url>
 <url><loc>/reference/theme_ssb.html</loc></url>
+<url><loc>/reference/versjoner_filer.html</loc></url>
 <url><loc>/reference/write_SSB.html</loc></url>
 <url><loc>/reference/write_csv.html</loc></url>
 <url><loc>/reference/write_dataset.html</loc></url>
 <url><loc>/reference/write_feather.html</loc></url>
 <url><loc>/reference/write_parquet.html</loc></url>
 <url><loc>/reference/write_rds.html</loc></url>
+<url><loc>/reference/write_sas_prog.html</loc></url>
 <url><loc>/reference/write_sf_parquet.html</loc></url>
 </urlset>
 
