@@ -1,8 +1,8 @@
 #' Opprett mappestruktur
 #'
-#' Funksjonen oppretter en standard mappestruktur basert på en filstien til en arbeidsmappe, og lager variabler
-#' som peker på stien til hver undermappe i det globale miljøet. Det er også mulig å spesifisere en
-#' valgfri parameter `periode` for å opprette en undermappe med det navnet i hver av hovedmappene.
+#' Funksjonen oppretter en standard mappestruktur basert på en filsti til en arbeidsmappe, og returnerer en liste
+#' som inneholder stiene til hver undermappe. Det er også mulig å spesifisere en valgfri parameter `periode`
+#' for å opprette en undermappe med det navnet i hver av hovedmappene.
 #'
 #' @param arbeidsmappe En karakterstreng som spesifiserer hovedmappen der de nye undermappene skal opprettes.
 #' Hvis denne stien slutter med en skråstrek (`/`), fjernes den automatisk. Dersom `arbeidsmappe` ikke
@@ -20,66 +20,85 @@
 #' - Hvis `periode` er spesifisert, oppretter funksjonen også en undermappe med navnet spesifisert av `periode`
 #'   i hver hovedmappe.
 #' - Erstatt bindestreker i undermappenavn med understrek for å lage gyldige variabelnavn.
-#' - Tilordner hver undermappe-sti som en variabel i det globale miljøet (bruker `assign`).
+#' - Samler hver undermappe-sti i en liste og returnerer denne listen.
 #'
-#' Variabelnavnene som opprettes har formatet `mappe_navn_mappe`, der eventuelle bindestreker i mappe-navn
+#' Variabelnavnene i listen har formatet `mappe_navn_mappe`, der eventuelle bindestreker i mappe-navn
 #' erstattes med understrek.
 #'
-#' @return Ingen returverdi, men funksjonen oppretter mapper på filsystemet og lager variabler i det globale miljøet.
+#' @return En liste der hver nøkkel er navnet på en undermappe (med understrek i stedet for bindestreker),
+#' og verdiene er de fulle stiene til de respektive mappene.
 #'
 #' @examples
 #' # Opprett standard mappestruktur i en mappe "prosjekt"
-#' opprett_mappestruktur("prosjekt")
+#' mapper <- opprett_mappestruktur("prosjekt")
+#' print(mapper)
 #'
 #' # Opprett en egendefinert mappestruktur
-#' opprett_mappestruktur("analyse", mapper = c("data", "output", "figurer"))
+#' mapper <- opprett_mappestruktur("analyse", mapper = c("data", "output", "figurer"))
+#' print(mapper)
 #'
 #' # Opprett mappestruktur med en spesifikk periode (f.eks. "2024" eller "2024-Q1")
-#' opprett_mappestruktur("prosjekt", periode = "2024")
+#' mapper <- opprett_mappestruktur("prosjekt", periode = "2024")
+#' print(mapper)
+#'
+#' # Eksempel på hvordan stiene fra listen kan tilordnes til individuelle variabler
+#' mappestruktur <- opprett_mappestruktur("prosjekt")
+#' 
+#' inndata_mappe <- mappestruktur$inndata_mappe
+#' klargjorte_data_mappe <- mappestruktur$klargjorte_data_mappe
+#' statistikk_mappe <- mappestruktur$statistikk_mappe
+#' utdata_mappe <- mappestruktur$utdata_mappe
 #'
 #' @export
 opprett_mappestruktur <- function(arbeidsmappe,
                                   mapper = c("inndata", "klargjorte-data", "statistikk", "utdata"),
                                   periode = NULL) {
-
+  
   # Fjerner eventuell avsluttende "/" fra arbeidsmappe først
   arbeidsmappe <- sub("/$", "", arbeidsmappe)
-
+  
+  # Opprett en tom liste for å lagre stier
+  mapper_liste <- list()
+  
   # Itererer over listen av mapper
   for (mappe in mapper) {
     # Lag full sti til mappen
     full_mappe_path <- file.path(arbeidsmappe, mappe)
-
+    
     # Oppretter mappen om den ikke finnes
     if (!dir.exists(full_mappe_path)) {
       dir.create(full_mappe_path, recursive = TRUE)
     }
-
+    
     # Hvis 'periode' er spesifisert, opprett undermappe med det navnet og oppdater stien
     if (!is.null(periode)) {
       full_mappe_path <- file.path(full_mappe_path, periode)
-
+      
       # Oppretter undermappen om den ikke finnes
       if (!dir.exists(full_mappe_path)) {
         dir.create(full_mappe_path, recursive = TRUE)
       }
     }
-
+    
     # Sørg for at stien slutter med "/"
     full_mappe_path <- paste0(rtrim(full_mappe_path, "/"), "/")
-
+    
     # Erstatt bindestrek med understrek i variabelnavn
     var_navn <- gsub("-", "_", paste0(mappe, "_mappe"))  # F.eks. "klargjorte_data_mappe"
-
-    # Tilordner den oppdaterte fullstien som en variabel i det globale miljøet
-    assign(var_navn, full_mappe_path, envir = .GlobalEnv)  # Oppretter variabel i globalt miljø
+    
+    # Legg stien inn i listen
+    mapper_liste[[var_navn]] <- full_mappe_path
   }
+  
+  # Returnerer listen med mapper
+  return(mapper_liste)
 }
 
 # Hjelpefunksjon for å fjerne avsluttende skråstreker fra en filsti
 rtrim <- function(x, char = "/") {
   sub(paste0(char, "$"), "", x)
 }
+
 
 #' Finn versjonsnummer fra et filnavn
 #'
