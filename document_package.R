@@ -2,6 +2,8 @@
 # Roxygen documentation
 devtools::document()
 
+# renv::init()
+
 # +
 # # Add imports
 # usethis::use_pipe()
@@ -25,6 +27,7 @@ devtools::document()
 # usethis::use_package("rlang", type = "imports")
 # usethis::use_package("stringr", type = "imports")
 # usethis::use_package("sfarrow", type = "imports")
+usethis::use_package("arsenal", type = "imports")
 # -
 
 # sfarrow?
