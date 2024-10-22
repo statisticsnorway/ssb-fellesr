@@ -27,7 +27,9 @@ Den sjekker først om det har skjedd endringer i kolonnene, deretter i datatypen
 Hvis det oppdages en endring på noen av disse områdene, returnerer funksjonen \code{TRUE}. Hvis ingen endringer oppdages, returneres \code{FALSE}.
 }
 \examples{
+\dontrun{
 # Sjekk om det er noen endringer mellom siste versjon og ny fil
 sjekk_endring("prosjekt/data.parquet")
 
+}
 }

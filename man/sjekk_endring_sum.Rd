@@ -18,12 +18,14 @@ Denne funksjonen sjekker om det har skjedd noen endringer i summene av de numeri
 Funksjonen sammenligner datasett ved å beregne summen av numeriske kolonner i hvert sett, og deretter sjekke om det finnes forskjeller.
 }
 \details{
-Funksjonen benytter seg av Arrow-pakken for å åpne datasettene med lazy loading og Arsenal-pakken for å sammenligne dataene.
+Funksjonen benytter seg av Arrow-pakken for å åpne datasettene med lazy loading og arsenal-pakken for å sammenligne dataene.
 Den håndterer kolonner som er numeriske (int eller float) og summerer disse før sammenligning.
 Dersom det er noen forskjeller i summene mellom de to datasettene, returnerer funksjonen \code{TRUE}.
 }
 \examples{
+\dontrun{
 # Sjekk om det er endringer i verdiene mellom siste versjon og ny fil
 sjekk_endring_sum("prosjekt/data.parquet")
 
+}
 }

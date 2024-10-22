@@ -43,7 +43,7 @@
 #'
 #' # Eksempel på hvordan stiene fra listen kan tilordnes til individuelle variabler
 #' mappestruktur <- opprett_mappestruktur("prosjekt")
-#' 
+#'
 #' inndata_mappe <- mappestruktur$inndata_mappe
 #' klargjorte_data_mappe <- mappestruktur$klargjorte_data_mappe
 #' statistikk_mappe <- mappestruktur$statistikk_mappe
@@ -53,43 +53,43 @@
 opprett_mappestruktur <- function(arbeidsmappe,
                                   mapper = c("inndata", "klargjorte-data", "statistikk", "utdata"),
                                   periode = NULL) {
-  
+
   # Fjerner eventuell avsluttende "/" fra arbeidsmappe først
   arbeidsmappe <- sub("/$", "", arbeidsmappe)
-  
+
   # Opprett en tom liste for å lagre stier
   mapper_liste <- list()
-  
+
   # Itererer over listen av mapper
   for (mappe in mapper) {
     # Lag full sti til mappen
     full_mappe_path <- file.path(arbeidsmappe, mappe)
-    
+
     # Oppretter mappen om den ikke finnes
     if (!dir.exists(full_mappe_path)) {
       dir.create(full_mappe_path, recursive = TRUE)
     }
-    
+
     # Hvis 'periode' er spesifisert, opprett undermappe med det navnet og oppdater stien
     if (!is.null(periode)) {
       full_mappe_path <- file.path(full_mappe_path, periode)
-      
+
       # Oppretter undermappen om den ikke finnes
       if (!dir.exists(full_mappe_path)) {
         dir.create(full_mappe_path, recursive = TRUE)
       }
     }
-    
+
     # Sørg for at stien slutter med "/"
     full_mappe_path <- paste0(rtrim(full_mappe_path, "/"), "/")
-    
+
     # Erstatt bindestrek med understrek i variabelnavn
     var_navn <- gsub("-", "_", paste0(mappe, "_mappe"))  # F.eks. "klargjorte_data_mappe"
-    
+
     # Legg stien inn i listen
     mapper_liste[[var_navn]] <- full_mappe_path
   }
-  
+
   # Returnerer listen med mapper
   return(mapper_liste)
 }
@@ -404,11 +404,11 @@ sjekk_endring_datatype <- function(filsti){
 #' @import arrow dplyr arsenal
 #'
 #' @examples
-#' \dontrun{                                 
+#' \dontrun{
 #' # Sjekk om det er endringer i verdiene mellom siste versjon og ny fil
 #' sjekk_endring_sum("prosjekt/data.parquet")
 #'
-#'}                                 
+#'}
 #' @export
 sjekk_endring_sum <- function(filsti) {
 
@@ -477,11 +477,11 @@ sjekk_endring_sum <- function(filsti) {
 #' }
 #'
 #' @examples
-#' \dontrun{                                          
+#' \dontrun{
 #' # Sjekk om det er endringer i verdiene mellom siste versjon og ny fil
 #' sjekk_endring_verdier("prosjekt/data.parquet")
 #'
-#'}                                          
+#'}
 #' @export
 sjekk_endring_verdier <- function(filsti){
 
@@ -524,11 +524,11 @@ sjekk_endring_verdier <- function(filsti){
 #' }
 #'
 #' @examples
-#' \dontrun{                                          
+#' \dontrun{
 #' # Sjekk om det er noen endringer mellom siste versjon og ny fil
 #' sjekk_endring("prosjekt/data.parquet")
 #'
-#'}                                          
+#'}
 #' @export
 sjekk_endring <- function(filsti){
   endring_rader_kolonner <- sjekk_endring_rader_kolonner(filsti = filsti)
@@ -590,7 +590,7 @@ sjekk_endring <- function(filsti){
 #' @return Returnerer den oppdaterte loggen som en liste. Hvis ingen endringer ble oppdaget, returnerer funksjonen uten å oppdatere loggen.
 #'
 #' @examples
-#' \dontrun{                                          
+#' \dontrun{
 #' # Versjoner filstier og loggfør kjøringen
 #' filstier <- c("data1.parquet", "data2.parquet")
 #' resultat <- versjoner_filer(filstier)
@@ -599,9 +599,9 @@ sjekk_endring <- function(filsti){
 #' # Hvis ingen endringer siden forrige kjøring, blir loggfilen ikke oppdatert
 #' logg <- logg_kjoring(resultat, arbeidsmappe = "prosjekt/logg")
 #'
+#'}
 #' @seealso \code{\link{versjoner_filer}} for generering av resultatet.
 #'
-#'}                                          
 #' @export
 logg_kjoring <- function(resultat,
                          logg_fil = "versjonering_logg.json",
@@ -691,12 +691,12 @@ logg_kjoring <- function(resultat,
 #' @return En liste som inneholder filstiene til de siste versjonene av de versjonerte filene.
 #'
 #' @examples
-#' \dontrun{                                          
+#' \dontrun{
 #' # Lag versjonerte filstier for en liste med filnavn
 #' filstier <- c("filsti1", "filsti2")
 #' versjoner_filer(filstier)
 #'
-#'}                                          
+#'}
 #' @export
 versjoner_filer <- function(filstier,
                             logg_fil = "versjonering_logg.json",
@@ -769,7 +769,7 @@ versjoner_filer <- function(filstier,
 #' @return Returnerer en liste over releaser som samsvarer med kriteriene, eller `NULL` hvis ingen releaser ble funnet eller hvis loggfilen ikke eksisterer.
 #'
 #' @examples
-#' \dontrun{                                          
+#' \dontrun{
 #' # Finn siste release
 #' finn_release(release = "siste", arbeidsmappe = "prosjekt")
 #'
@@ -785,7 +785,7 @@ versjoner_filer <- function(filstier,
 #' # Finn releaser innenfor et datointervall
 #' finn_release(dato_start = "2023-01-01", dato_slutt = "2023-01-31", arbeidsmappe = "prosjekt")
 #'
-#'}                                          
+#'}
 #' @seealso \code{\link{logg_kjoring}} for å loggføre kjøringer i loggfilen.
 #'
 #' @export
