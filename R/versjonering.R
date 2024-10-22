@@ -188,6 +188,7 @@ finn_versjon <- function(fil) {
 #' den ikke kan finne eller opprette en versjonert filsti i henhold til de angitte kriteriene.
 #'
 #' @examples
+#' \dontrun{
 #' # Lag en ny versjon av filen "data.parquet" i mappen "prosjekt"
 #' lag_versjonert_filsti("prosjekt/data_v1.parquet", versjon = "ny")
 #'
@@ -197,6 +198,7 @@ finn_versjon <- function(fil) {
 #' # Hent stien til en spesifikk versjon (versjon 3) av filen "data.parquet"
 #' lag_versjonert_filsti("prosjekt/data_v1.parquet", versjon = 3)
 #'
+#'}
 #' @export
 lag_versjonert_filsti <- function(fil,
                                   versjon = c("siste", "ny", integer(1))) {
@@ -291,9 +293,11 @@ lag_versjonert_filsti <- function(fil,
 #' }
 #'
 #' @examples
+#' \dontrun{
 #' # Sjekk om det er endringer i rader eller kolonner mellom siste versjon og ny fil
 #' sjekk_endring_rader_kolonner("prosjekt/data.parquet")
 #'
+#'}
 #' @export
 sjekk_endring_rader_kolonner <- function(filsti) {
 
@@ -349,9 +353,11 @@ sjekk_endring_rader_kolonner <- function(filsti) {
 #' }
 #'
 #' @examples
+#' \dontrun{
 #' # Sjekk om det er endringer i datatypene mellom siste versjon og ny fil
 #' sjekk_endring_datatype("prosjekt/data.parquet")
 #'
+#'}
 #' @export
 sjekk_endring_datatype <- function(filsti){
 
@@ -398,9 +404,11 @@ sjekk_endring_datatype <- function(filsti){
 #' @import arrow dplyr arsenal
 #'
 #' @examples
+#' \dontrun{                                 
 #' # Sjekk om det er endringer i verdiene mellom siste versjon og ny fil
 #' sjekk_endring_sum("prosjekt/data.parquet")
 #'
+#'}                                 
 #' @export
 sjekk_endring_sum <- function(filsti) {
 
@@ -469,9 +477,11 @@ sjekk_endring_sum <- function(filsti) {
 #' }
 #'
 #' @examples
+#' \dontrun{                                          
 #' # Sjekk om det er endringer i verdiene mellom siste versjon og ny fil
 #' sjekk_endring_verdier("prosjekt/data.parquet")
 #'
+#'}                                          
 #' @export
 sjekk_endring_verdier <- function(filsti){
 
@@ -514,9 +524,11 @@ sjekk_endring_verdier <- function(filsti){
 #' }
 #'
 #' @examples
+#' \dontrun{                                          
 #' # Sjekk om det er noen endringer mellom siste versjon og ny fil
 #' sjekk_endring("prosjekt/data.parquet")
 #'
+#'}                                          
 #' @export
 sjekk_endring <- function(filsti){
   endring_rader_kolonner <- sjekk_endring_rader_kolonner(filsti = filsti)
@@ -578,6 +590,7 @@ sjekk_endring <- function(filsti){
 #' @return Returnerer den oppdaterte loggen som en liste. Hvis ingen endringer ble oppdaget, returnerer funksjonen uten å oppdatere loggen.
 #'
 #' @examples
+#' \dontrun{                                          
 #' # Versjoner filstier og loggfør kjøringen
 #' filstier <- c("data1.parquet", "data2.parquet")
 #' resultat <- versjoner_filer(filstier)
@@ -588,6 +601,7 @@ sjekk_endring <- function(filsti){
 #'
 #' @seealso \code{\link{versjoner_filer}} for generering av resultatet.
 #'
+#'}                                          
 #' @export
 logg_kjoring <- function(resultat,
                          logg_fil = "versjonering_logg.json",
@@ -677,10 +691,12 @@ logg_kjoring <- function(resultat,
 #' @return En liste som inneholder filstiene til de siste versjonene av de versjonerte filene.
 #'
 #' @examples
+#' \dontrun{                                          
 #' # Lag versjonerte filstier for en liste med filnavn
 #' filstier <- c("filsti1", "filsti2")
 #' versjoner_filer(filstier)
 #'
+#'}                                          
 #' @export
 versjoner_filer <- function(filstier,
                             logg_fil = "versjonering_logg.json",
@@ -753,6 +769,7 @@ versjoner_filer <- function(filstier,
 #' @return Returnerer en liste over releaser som samsvarer med kriteriene, eller `NULL` hvis ingen releaser ble funnet eller hvis loggfilen ikke eksisterer.
 #'
 #' @examples
+#' \dontrun{                                          
 #' # Finn siste release
 #' finn_release(release = "siste", arbeidsmappe = "prosjekt")
 #'
@@ -768,6 +785,7 @@ versjoner_filer <- function(filstier,
 #' # Finn releaser innenfor et datointervall
 #' finn_release(dato_start = "2023-01-01", dato_slutt = "2023-01-31", arbeidsmappe = "prosjekt")
 #'
+#'}                                          
 #' @seealso \code{\link{logg_kjoring}} for å loggføre kjøringer i loggfilen.
 #'
 #' @export
