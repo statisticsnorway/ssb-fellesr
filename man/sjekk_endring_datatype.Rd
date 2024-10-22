@@ -28,7 +28,9 @@ kolonnene har endret seg mellom den siste versjonen og den nye filen. Hvis det e
 Hvis ingen endringer oppdages, returneres \code{FALSE}.
 }
 \examples{
+\dontrun{
 # Sjekk om det er endringer i datatypene mellom siste versjon og ny fil
 sjekk_endring_datatype("prosjekt/data.parquet")
 
+}
 }

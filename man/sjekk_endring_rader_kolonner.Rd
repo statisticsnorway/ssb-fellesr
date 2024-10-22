@@ -29,7 +29,9 @@ har endret seg. Hvis det er en endring i enten antall rader, antall kolonner ell
 Hvis ingen endringer oppdages, returneres \code{FALSE}.
 }
 \examples{
+\dontrun{
 # Sjekk om det er endringer i rader eller kolonner mellom siste versjon og ny fil
 sjekk_endring_rader_kolonner("prosjekt/data.parquet")
 
+}
 }

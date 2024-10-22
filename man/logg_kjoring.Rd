@@ -35,6 +35,7 @@ Objektet \code{resultat} fra \code{\link{versjoner_filer}} er en liste der hver 
 Funksjonen skriver denne informasjonen til loggen hvis en endring oppdages.
 }
 \examples{
+\dontrun{
 # Versjoner filstier og loggfør kjøringen
 filstier <- c("data1.parquet", "data2.parquet")
 resultat <- versjoner_filer(filstier)
@@ -43,6 +44,7 @@ logg <- logg_kjoring(resultat, arbeidsmappe = "prosjekt/logg")
 # Hvis ingen endringer siden forrige kjøring, blir loggfilen ikke oppdatert
 logg <- logg_kjoring(resultat, arbeidsmappe = "prosjekt/logg")
 
+}
 }
 \seealso{
 \code{\link{versjoner_filer}} for generering av resultatet.

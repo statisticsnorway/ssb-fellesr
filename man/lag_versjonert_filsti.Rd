@@ -32,6 +32,7 @@ Hvis \code{versjon = "siste"}, returneres stien til den siste versjonen av filen
 vil funksjonen returnere stien til denne versjonen hvis den eksisterer.
 }
 \examples{
+\dontrun{
 # Lag en ny versjon av filen "data.parquet" i mappen "prosjekt"
 lag_versjonert_filsti("prosjekt/data_v1.parquet", versjon = "ny")
 
@@ -41,4 +42,5 @@ lag_versjonert_filsti("prosjekt/data_v1.parquet", versjon = "siste")
 # Hent stien til en spesifikk versjon (versjon 3) av filen "data.parquet"
 lag_versjonert_filsti("prosjekt/data_v1.parquet", versjon = 3)
 
+}
 }

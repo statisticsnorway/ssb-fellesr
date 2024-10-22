@@ -26,7 +26,9 @@ Den sjekker om det finnes rader som er forskjellige mellom de to datasettene. Hv
 Hvis ingen forskjeller oppdages, returneres \code{FALSE}.
 }
 \examples{
+\dontrun{
 # Sjekk om det er endringer i verdiene mellom siste versjon og ny fil
 sjekk_endring_verdier("prosjekt/data.parquet")
 
+}
 }
