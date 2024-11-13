@@ -37,8 +37,10 @@ Etter hver kjøring, oppdateres loggfilen med informasjon om hvilke versjoner av
 (\code{kjoring_id} og \code{dato_tid}) ved hjelp av \code{\link{logg_kjoring}}.
 }
 \examples{
+\dontrun{
 # Lag versjonerte filstier for en liste med filnavn
 filstier <- c("filsti1", "filsti2")
 versjoner_filer(filstier)
 
+}
 }

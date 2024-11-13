@@ -22,12 +22,13 @@ eksisterer, vil funksjonen automatisk opprette den.}
 Hvis denne ikke er spesifisert (default er \code{NULL}), opprettes ingen slike undermapper.}
 }
 \value{
-Ingen returverdi, men funksjonen oppretter mapper på filsystemet og lager variabler i det globale miljøet.
+En liste der hver nøkkel er navnet på en undermappe (med understrek i stedet for bindestreker),
+og verdiene er de fulle stiene til de respektive mappene.
 }
 \description{
-Funksjonen oppretter en standard mappestruktur basert på en filstien til en arbeidsmappe, og lager variabler
-som peker på stien til hver undermappe i det globale miljøet. Det er også mulig å spesifisere en
-valgfri parameter \code{periode} for å opprette en undermappe med det navnet i hver av hovedmappene.
+Funksjonen oppretter en standard mappestruktur basert på en filsti til en arbeidsmappe, og returnerer en liste
+som inneholder stiene til hver undermappe. Det er også mulig å spesifisere en valgfri parameter \code{periode}
+for å opprette en undermappe med det navnet i hver av hovedmappene.
 }
 \details{
 Denne funksjonen går gjennom en liste av mapper, og for hver mappe:
@@ -38,20 +39,31 @@ Denne funksjonen går gjennom en liste av mapper, og for hver mappe:
 \item Hvis \code{periode} er spesifisert, oppretter funksjonen også en undermappe med navnet spesifisert av \code{periode}
 i hver hovedmappe.
 \item Erstatt bindestreker i undermappenavn med understrek for å lage gyldige variabelnavn.
-\item Tilordner hver undermappe-sti som en variabel i det globale miljøet (bruker \code{assign}).
+\item Samler hver undermappe-sti i en liste og returnerer denne listen.
 }
 
-Variabelnavnene som opprettes har formatet \code{mappe_navn_mappe}, der eventuelle bindestreker i mappe-navn
+Variabelnavnene i listen har formatet \code{mappe_navn_mappe}, der eventuelle bindestreker i mappe-navn
 erstattes med understrek.
 }
 \examples{
 # Opprett standard mappestruktur i en mappe "prosjekt"
-opprett_mappestruktur("prosjekt")
+mapper <- opprett_mappestruktur("prosjekt")
+print(mapper)
 
 # Opprett en egendefinert mappestruktur
-opprett_mappestruktur("analyse", mapper = c("data", "output", "figurer"))
+mapper <- opprett_mappestruktur("analyse", mapper = c("data", "output", "figurer"))
+print(mapper)
 
 # Opprett mappestruktur med en spesifikk periode (f.eks. "2024" eller "2024-Q1")
-opprett_mappestruktur("prosjekt", periode = "2024")
+mapper <- opprett_mappestruktur("prosjekt", periode = "2024")
+print(mapper)
+
+# Eksempel på hvordan stiene fra listen kan tilordnes til individuelle variabler
+mappestruktur <- opprett_mappestruktur("prosjekt")
+
+inndata_mappe <- mappestruktur$inndata_mappe
+klargjorte_data_mappe <- mappestruktur$klargjorte_data_mappe
+statistikk_mappe <- mappestruktur$statistikk_mappe
+utdata_mappe <- mappestruktur$utdata_mappe
 
 }

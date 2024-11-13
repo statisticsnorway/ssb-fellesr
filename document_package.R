@@ -2,7 +2,7 @@
 # Roxygen documentation
 devtools::document()
 
-# renv::init()
+renv::init()
 
 # +
 # # Add imports

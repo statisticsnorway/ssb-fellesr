@@ -50,6 +50,7 @@ Du kan søke etter:
 Hvis flere kriterier er oppgitt (f.eks. både \code{release} og \code{dato}), vil \code{release}-kriteriet ha prioritet.
 }
 \examples{
+\dontrun{
 # Finn siste release
 finn_release(release = "siste", arbeidsmappe = "prosjekt")
 
@@ -65,6 +66,7 @@ finn_release(dato = "2023-01-01", arbeidsmappe = "prosjekt")
 # Finn releaser innenfor et datointervall
 finn_release(dato_start = "2023-01-01", dato_slutt = "2023-01-31", arbeidsmappe = "prosjekt")
 
+}
 }
 \seealso{
 \code{\link{logg_kjoring}} for å loggføre kjøringer i loggfilen.
