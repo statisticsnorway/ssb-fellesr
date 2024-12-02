@@ -286,7 +286,7 @@ initialer_funk <- function(lastefil) {
     initialer <- gsub("@ssb.no", "", Sys.getenv('JUPYTERHUB_USER'))
   }
   if (grepl("DAPLA_LAB", user_agent())) {
-    initialer <- gsub("user-ssb-", "", Sys.getenv("KUBERNETES_NAMESPACE"))
+    initialer <- gsub("@ssb.no", "", Sys.getenv('DAPLA_USER'))
   }
   if (!exists("initialer")) {
     warning("Finner ikke initialer")
