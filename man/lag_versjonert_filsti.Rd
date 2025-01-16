@@ -4,7 +4,7 @@
 \alias{lag_versjonert_filsti}
 \title{Lag versjonert filsti}
 \usage{
-lag_versjonert_filsti(fil, versjon = c("siste", "ny", integer(1)))
+lag_versjonert_filsti(fil, versjon = "siste")
 }
 \arguments{
 \item{fil}{En karakterstreng som representerer filstien til filen som skal versjoneres.}

@@ -41,5 +41,6 @@ detach_package(fellesr)
 options(pkgdown.internet = FALSE) # OBS: denne må kjøres i prodsonen for at byggingen av pakken ikke feiler
 pkgdown::build_site()
 
+testthat::test_local()
 
 
