@@ -138,14 +138,14 @@ finn_versjon <- function(fil) {
 
   # Sjekk om filnavnet inneholder stor "V"
   if (grepl("_V", fil)) {
-    warning("Filnavnet inneholder stor 'V' i stedet for liten 'v'. Funksjonen forventer '_v' med små bokstaver.")
+    stop("Filnavnet inneholder stor 'V' i stedet for liten 'v'. Funksjonen forventer '_v' med små bokstaver.")
 
       versjon <- FALSE
 
   } else if (!grepl(".*_v\\d{1,}\\..*$", fil)) {
 
     # Gi en advarsel om at filen ikke er versjonert riktig, men bare hvis det ikke var en stor 'V'
-    warning("Filen er ikke versjonert i henhold til navnestandarden. ",
+    stop("Filen er ikke versjonert i henhold til navnestandarden. ",
             "Se https://manual.dapla.ssb.no/statistikkere/navnestandard.html for mer informasjon.")
 
     versjon <- FALSE
@@ -201,7 +201,7 @@ finn_versjon <- function(fil) {
 #'}
 #' @export
 lag_versjonert_filsti <- function(fil,
-                                  versjon = c("siste", "ny", integer(1))) {
+                                  versjon = "siste") {
 
   mappe <- dirname(fil)
 
@@ -229,7 +229,7 @@ lag_versjonert_filsti <- function(fil,
     # Ingen versjonerte filer funnet
     if (versjon == "ny") {
       ny_versjon <- 1
-    } else if (versjon == "siste" | is.integer(versjon)) {
+    } else if (versjon == "siste" || ((versjon %% 1) == 0)) {
       stop("Fant ingen versjonerte filer i ", mappe, ".")
     }
   } else {
@@ -239,7 +239,7 @@ lag_versjonert_filsti <- function(fil,
       ny_versjon <- max(versjoner) + 1
     } else if (versjon == "siste") {
       ny_versjon <- max(versjoner)
-    } else if (is.integer(versjon)) {
+    } else if ((versjon %% 1) == 0) {
       if (!versjon %in% versjoner) {
         stop("Fant ikke versjon ", versjon, ".")
       } else {
@@ -259,7 +259,7 @@ lag_versjonert_filsti <- function(fil,
     } else {
       return(ny_filsti)
     }
-  } else if (versjon == "siste" | is.integer(versjon)) {
+  } else if (versjon == "siste" || ((versjon %% 1) == 0)) {
     if (!file.exists(ny_filsti)) {
       stop("Klarte ikke å finne siste versjon. ",
            "Pass på at alle filer i mappen slutter med ",
