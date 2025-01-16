@@ -36,6 +36,7 @@ pakker <- c("DBI",
   "GaussSuppression",
   "GISSB",
   "tidyfst",
+  "yaml",          
   "ReGenesees", # Github (fork)
   "struktuR", # Github
   "SSBpris", # Github
