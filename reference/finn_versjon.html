@@ -91,13 +91,11 @@ versjonsnummeret skal markeres med små bokstaver (<code>_v</code>).</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Filnavn uten versjonsnummer (advarsel vil gis)</span></span></span>
 <span class="r-in"><span><span class="fu">finn_versjon</span><span class="op">(</span><span class="st">"rapport.csv"</span><span class="op">)</span>  <span class="co"># Returnerer advarsel og FALSE</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Filen er ikke versjonert i henhold til navnestandarden. Se https://manual.dapla.ssb.no/statistikkere/navnestandard.html for mer informasjon.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in finn_versjon("rapport.csv"):</span> Filen er ikke versjonert i henhold til navnestandarden. Se https://manual.dapla.ssb.no/statistikkere/navnestandard.html for mer informasjon.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Filnavn med stor "V" (advarsel vil gis)</span></span></span>
 <span class="r-in"><span><span class="fu">finn_versjon</span><span class="op">(</span><span class="st">"rapport_V2.csv"</span><span class="op">)</span>  <span class="co"># Returnerer advarsel og FALSE</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Filnavnet inneholder stor 'V' i stedet for liten 'v'. Funksjonen forventer '_v' med små bokstaver.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in finn_versjon("rapport_V2.csv"):</span> Filnavnet inneholder stor 'V' i stedet for liten 'v'. Funksjonen forventer '_v' med små bokstaver.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
