@@ -19,7 +19,6 @@ pakker <- c("DBI",
   "readr",
   "knitr",
   "rmarkdown",
-  "fellesr",
   "RCurl",
   "here",
   "esquisse",
@@ -36,7 +35,8 @@ pakker <- c("DBI",
   "GaussSuppression",
   "GISSB",
   "tidyfst",
-  "yaml",          
+  "fellesr", # Github          
+  "pickmdl", # Github          
   "ReGenesees", # Github (fork)
   "struktuR", # Github
   "SSBpris", # Github
