@@ -28,19 +28,17 @@ Pakken er installert i Jupyterlab (DAPLA og produksjonssonen) og i RStudio Serve
 
 ```{r, eval=FALSE}
 renv::init()
-renv::install("statisticsnorway/fellesr")
+renv::install("statisticsnorway/ssb-fellesr")
 ```
 
 
-### Wrapper-funksjoner fra `arrow`/`googleCloudStorageR`
+### Wrapper-funksjoner fra `arrow`
 
 #### Funksjonen `read_SSB` inneholder følgende wrapper-funksjoner:
 + `read_parquet`
 + `read_parquet_sf`
 + `read_feather` 
 + `read_csv`
-+ `read_rds`
-+ `read_xml`
 + `read_json`
 + `open_dataset`
 
@@ -50,58 +48,74 @@ renv::install("statisticsnorway/fellesr")
 + `write_sf_parquet`
 + `write_feather`
 + `write_csv`
-+ `write_rds`
 + `write_dataset`
 
 #### Andre funksjoner
 + `gcs.list.files`
-+ `gcs_list_objects`
-+ `gcs_delete_object`
 + `gcs_bucket`
 
 
 ## Se innholdet i buckets på Google Cloud Storage
 
-Funksjonene `list.files` og `gcs_list_objects` kan brukes til å liste opp filene som finnes i Google Cloud Storage buckets. `list.files` kan brukes på alle mapper og undermapper, mens `gcs_list_objects` kun fungerer på "bøttenivå". Til gjengjeld vises også filstørrelse og endringsdato.
+På Dapla Lab kan man bruke vanlige R-funksjoner for mappene du har tilgjengelig i filsystemet, dvs. bøtten du har tilgang til via Dapla-teamet ditt. Base-R funksjonen `list.files()` kan brukes til å se innholdet i mapper eller undermapper under `"/buckets/"`.
 
 ```{r, eval=FALSE}
-fellesr::gcs.list.files("ssb-prod-dapla-felles-data-delt/R_smoke_test/")
+list.files("/buckets/produkt/R_smoke_test")
 
-fellesr::gcs_list_objects("ssb-prod-dapla-felles-data-delt/R_smoke_test") %>% dplyr::arrange(desc(updated))
+### Legg til filstørrelse og endringsdato
+
+# Angi stien til mappen du vil undersøke
+mappe_sti <- "/buckets/produkt/R_smoke_test"
+
+# Hente alle filnavn med full sti
+filnavn <- list.files(path = mappe_sti, full.names = TRUE)
+
+# Hente filinformasjon
+filinfo <- file.info(filnavn)
+
+# Lage en dataframe som inneholder filnavn, størrelse og sist endret dato
+oversikt <- data.frame(
+  file = basename(filnavn),
+  size = filinfo$size,
+  mtime = as.POSIXct(filinfo$mtime, origin = "1970-01-01")
+) %>% 
+  dplyr::arrange(desc(mtime))
+
+print(oversikt)
+```
+
+Funksjonen `fellesr::gcs.list.files()` kan brukes til å liste opp filene som finnes i alle bøtter teamet ditt har tilgang til, f.eks. delt-bøtter fra andre team.
+
+```{r, eval=FALSE}
+fellesr::gcs.list.files("ssb-dapla-felles-data-produkt-prod/R_smoke_test/")
 ```
 
 ## Slette filer fra Google Cloud Storage
 
-Funksjonen `gcs_delete_object` kan brukes til å slette filer fra en Google Cloud Storage bucket.
+På Dapla Lab er det kun mulig å slette filer som du har tilgang til via filsystemet, dvs. bøtten til Dapla-teamet ditt. For å slette en fil kan man bruke base-R funksjonen `file.remove()`.
 
 ```{r, eval=FALSE}
-fellesr::gcs_delete_object("ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+file.remove("/buckets/produkt/R_smoke_test/fil_som_skal_slettes.parquet")
 ```
 
 ## Lese inn data fra Google Cloud Storage
 
-Funksjonen `read_SSB` kan brukes til å lese inn .parquet-, .feather-, .csv-, .rds-, .xml- og json-filer fra Google Cloud Storage ved å oppgi full sti til "bøtten" + filnavn. Det er også mulig å kun lese inn valgte kolonner og kolonnenavnene spesifiseres i `col_select`. Dersom filen er lagret som en "multifile dataset" (partitioned), dvs. en fil som ser ut som en mappe, kan denne lese inn ved å skrive navnet på mappen (uten endelsen .parquet). 
+Funksjonen `read_SSB` kan brukes til å lese inn .parquet-, .feather-, .csv- og json-filer fra Google Cloud Storage ved å oppgi full sti til "bøtten" + filnavn. Det er også mulig å kun lese inn valgte kolonner og kolonnenavnene spesifiseres i `col_select`. Dersom filen er lagret som en "multifile dataset" (partitioned), dvs. en fil som ser ut som en mappe, kan denne lese inn ved å skrive navnet på mappen (uten endelsen .parquet). 
 
 ```{r, eval=FALSE}
 # Parquet
-read_SSB_parquet <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet")
-read_SSB_parquet <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.parquet", col_select = c("Year", "Month"))
-read_SSB_mfd <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/enda_en_ny_mappe") # OBS: mangler eksempeldata
+read_SSB_parquet <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/R_smoke_test/1987.parquet")
+read_SSB_parquet <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/R_smoke_test/1987.parquet", col_select = c("Year", "Month"))
+read_SSB_mfd <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/R_smoke_test/enda_en_ny_mappe") # OBS: mangler eksempeldata
 
 # Feather
-read_SSB_feather <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.feather")
+read_SSB_feather <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/R_smoke_test/1987.feather")
 
 # CSV
-read_SSB_csv <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.csv")
+read_SSB_csv <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/R_smoke_test/1987.csv")
 
 # JSON
-read_SSB_json <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/XXX.json") # OBS: mangler eksempeldata
-
-# XML
-read_SSB_xml <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/XXX.xml") # OBS: mangler eksempeldata
-
-# RDS
-read_SSB_rds <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987.rds")
+read_SSB_json <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/R_smoke_test/XXX.json") # OBS: mangler eksempeldata
 ```
 
 ### Lese inn kartdata lagret som .parquet-filer
@@ -109,7 +123,7 @@ read_SSB_rds <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/R_smoke_test/
 For å laste inn kartdata lagret som .parquet-filer må man spesifisere `sf = TRUE` i funksjonen `read_SSB`. For mer informasjon om hvordan å jobbe med kartdata på DAPLA, se [Kartdata i DAPLA-manualen](https://manual.dapla.ssb.no/kartdata.html#r).
 
 ```{r, eval=FALSE}
-data <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/GIS/testdata/veger_oslo.parquet", sf = TRUE)
+data <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/GIS/testdata/veger_oslo.parquet", sf = TRUE)
 ```
 
 ### Lese inn deler av datasett (.parquet-filer m.m.)
@@ -117,7 +131,7 @@ data <- fellesr::read_SSB("ssb-prod-dapla-felles-data-delt/GIS/testdata/veger_os
 Funksjonen `open_dataset` kan brukes til å lese deler av datasett (bl.a. .parquet-, .feather- og .csv-filer) fra Google Cloud Storage. Det lages en forbindelse til mappen der filen ligger og deretter kan man bruke argumenter fra `dplyr`, som f.eks. `filter` og `select`, før man bruker `collect` til å lese inn dataene i R. For øyeblikket er det ikke mulig å kun lese inn én fil som ligger i en mappe så dersom dataene ikke er "partitioned" må filen ligge i en egen undermappe dersom den skal lese inn alene.
 
 ```{r, eval=FALSE}
-data <- fellesr::open_dataset("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dataset") %>%
+data <- fellesr::open_dataset("ssb-dapla-felles-data-produkt-prod/R_smoke_test/1987_1996_dataset") %>%
  dplyr::filter(Year == 1996 & TailNum == "N2823W") %>%
  dplyr::select(Year, Month, DayofMonth, TailNum) %>%
  dplyr::collect()
@@ -134,23 +148,20 @@ data <- fellesr::open_dataset("ssb-prod-dapla-felles-data-delt/GIS/Kart/2023/ABA
 
 ## Skrive data til Google Cloud Storage
 
-Funksjonen `write_SSB` kan brukes til å skrive .parquet-, .feather-, .csv- og .rds-filer til Google Cloud Storage.
+Funksjonen `write_SSB` kan brukes til å skrive .parquet-, .feather- og .csv-filer til Google Cloud Storage.
 
 ```{r, eval=FALSE}
 # PARQUET
-fellesr::write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.parquet")
+fellesr::write_SSB(data, "ssb-dapla-felles-data-produkt-prod/R_smoke_test/write_SSB_parquet_test.parquet")
 
 # "Multifile" datasett
-fellesr::write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_multifile_dataset_test", partitioning = TRUE)
+fellesr::write_SSB(data, "ssb-dapla-felles-data-produkt-prod/R_smoke_test/write_SSB_multifile_dataset_test", partitioning = TRUE)
 
 # FEATHER
-fellesr::write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.feather")
+fellesr::write_SSB(data, "ssb-dapla-felles-data-produkt-prod/R_smoke_test/write_SSB_parquet_test.feather")
 
 # CSV
-fellesr::write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_parquet_test.csv")
-
-# RDS
-fellesr::write_SSB(data, "ssb-prod-dapla-felles-data-delt/R_smoke_test/write_SSB_rds_test.rds")
+fellesr::write_SSB(data, "ssb-dapla-felles-data-produkt-prod/R_smoke_test/write_SSB_parquet_test.csv")
 ```
 
 
