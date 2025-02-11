@@ -443,15 +443,25 @@ sjekk_endring_sum <- function(filsti) {
   resultat_ny <- summarized_ny %>% collect()
 
   # Sammenlign dataene mellom siste og ny fil
-  comparison <- arsenal::comparedf(resultat_siste, resultat_ny, by = NULL)
+  # comparison <- arsenal::comparedf(resultat_siste, resultat_ny, by = NULL)
+  comparison <- all.equal(resultat_siste, resultat_ny, tolerance = .Machine$double.eps^0.5)
 
-  forskjeller <- summary(comparison)$diffs.table
+  print(comparison)
 
-  # Sjekk om det er forskjeller i dataene
-  if (nrow(forskjeller) > 0){
-    endring_sum <- TRUE
-  } else {
+  # forskjeller <- summary(comparison)$diffs.table
+
+  # # Sjekk om det er forskjeller i dataene
+  # if (nrow(forskjeller) > 0){
+  #   endring_sum <- TRUE
+  # } else {
+  #   endring_sum <- FALSE
+  # }
+
+  if (comparison == TRUE){
     endring_sum <- FALSE
+  } else {
+    endring_sum <- TRUE
+
   }
 
   return(endring_sum)
@@ -490,15 +500,23 @@ sjekk_endring_verdier <- function(filsti){
   data_ny <- arrow::read_parquet(filsti)
 
   # Sammenlign dataene mellom siste og ny fil
-  comparison <- arsenal::comparedf(data_siste, data_ny, by = NULL)
+  # comparison <- arsenal::comparedf(data_siste, data_ny, by = NULL)
+  comparison <- all.equal(data_siste, data_ny)
 
-  forskjeller <- summary(comparison)$diffs.table
+  # forskjeller <- summary(comparison)$diffs.table
 
-  # Sjekk om det er forskjeller i dataene
-  if (nrow(forskjeller) > 0){
-    endring_verdier <- TRUE
-  } else {
+  # # Sjekk om det er forskjeller i dataene
+  # if (nrow(forskjeller) > 0){
+  #   endring_verdier <- TRUE
+  # } else {
+  #   endring_verdier <- FALSE
+  # }
+
+  if (comparison == TRUE){
     endring_verdier <- FALSE
+  } else {
+    endring_verdier <- TRUE
+
   }
 
   return(endring_verdier)
