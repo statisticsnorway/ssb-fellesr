@@ -442,11 +442,12 @@ sjekk_endring_sum <- function(filsti) {
   resultat_siste <- summarized_siste %>% collect()
   resultat_ny <- summarized_ny %>% collect()
 
+                                          
+                                          
+                                          
   # Sammenlign dataene mellom siste og ny fil
   # comparison <- arsenal::comparedf(resultat_siste, resultat_ny, by = NULL)
   comparison <- all.equal(resultat_siste, resultat_ny, tolerance = .Machine$double.eps^0.5)
-
-  print(comparison)
 
   # forskjeller <- summary(comparison)$diffs.table
 
