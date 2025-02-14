@@ -442,9 +442,9 @@ sjekk_endring_sum <- function(filsti) {
   resultat_siste <- summarized_siste %>% collect()
   resultat_ny <- summarized_ny %>% collect()
 
-                                          
-                                          
-                                          
+
+
+
   # Sammenlign dataene mellom siste og ny fil
   # comparison <- arsenal::comparedf(resultat_siste, resultat_ny, by = NULL)
   comparison <- all.equal(resultat_siste, resultat_ny, tolerance = .Machine$double.eps^0.5)
@@ -458,7 +458,7 @@ sjekk_endring_sum <- function(filsti) {
   #   endring_sum <- FALSE
   # }
 
-  if (comparison == TRUE){
+  if (any(comparison == TRUE)){
     endring_sum <- FALSE
   } else {
     endring_sum <- TRUE
@@ -513,7 +513,7 @@ sjekk_endring_verdier <- function(filsti){
   #   endring_verdier <- FALSE
   # }
 
-  if (comparison == TRUE){
+  if (any(comparison == TRUE)){
     endring_verdier <- FALSE
   } else {
     endring_verdier <- TRUE
