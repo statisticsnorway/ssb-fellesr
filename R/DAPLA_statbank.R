@@ -354,6 +354,10 @@ statbank_lasting <- function(lastefil,
   if (as.POSIXlt(publiseringsdato)-as.POSIXlt(Sys.Date()) > 120) {
     print("OBS: publiseringsdato kan ikke settes mer enn 120 dager frem i tid")
   }
+    
+  if (as.POSIXlt(publiseringsdato, tz = Sys.timezone()) < as.POSIXlt(Sys.Date())) {
+    print("OBS: publiseringsdato må settes til en dato frem i tid")
+  }
 
 
   if (any(class(lastefil) %in% c("data.frame", "tibble", "tbl_df", "tbl", "spec_tbl_df"))) {
