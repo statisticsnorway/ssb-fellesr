@@ -203,6 +203,10 @@ finn_versjon <- function(fil) {
 lag_versjonert_filsti <- function(fil,
                                   versjon = "siste") {
 
+  if (versjon == "uversjonert"){
+      return(fil)
+  }  
+    
   mappe <- dirname(fil)
 
   # Sjekk om mappen eksisterer
@@ -299,14 +303,16 @@ lag_versjonert_filsti <- function(fil,
 #'
 #'}
 #' @export
-sjekk_endring_rader_kolonner <- function(filsti) {
-
+sjekk_endring_rader_kolonner <- function(filsti, 
+                                         versjon_1 = "uversjonert",
+                                         versjon_2 = "siste") {
+    
   # Hent antall rader og kolonner fra siste versjonerte fil
-  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, "siste"))
+  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2))
   dim_siste <- dim(data_siste)
 
   # Hent antall rader og kolonner fra ny fil
-  data_ny <- arrow::open_dataset(filsti)
+  data_ny <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_1))
   dim_ny <- dim(data_ny)
 
   # Sjekk om antall rader eller kolonner er forskjellige
@@ -359,16 +365,18 @@ sjekk_endring_rader_kolonner <- function(filsti) {
 #'
 #'}
 #' @export
-sjekk_endring_datatype <- function(filsti){
+sjekk_endring_datatype <- function(filsti, 
+                                   versjon_1 = "uversjonert",
+                                   versjon_2 = "siste"){
 
   # Hent datatyper fra siste versjonerte fil
-  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, "siste"))$schema
+  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2))$schema
   kolonnenavn_siste <- data_siste$names
   kolonne_datatyper_siste <- sapply(data_siste$fields, function(x) x$type$ToString())
   datatyper_siste <- data.frame(Kolonne = kolonnenavn_siste, Datatype = kolonne_datatyper_siste)
 
   # Hent datatyper fra ny fil
-  data_ny <- arrow::open_dataset(filsti)$schema
+  data_ny <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_1))$schema
   kolonnenavn_ny <- data_ny$names
   kolonne_datatyper_ny <- sapply(data_ny$fields, function(x) x$type$ToString())
   datatyper_ny <- data.frame(Kolonne = kolonnenavn_ny, Datatype = kolonne_datatyper_ny)
@@ -410,11 +418,13 @@ sjekk_endring_datatype <- function(filsti){
 #'
 #'}
 #' @export
-sjekk_endring_sum <- function(filsti) {
+sjekk_endring_sum <- function(filsti,
+                              versjon_1 = "uversjonert",
+                              versjon_2 = "siste") {
 
   # Åpne datasettene med lazy loading
-  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, "siste"))
-  data_ny <- arrow::open_dataset(filsti)
+  data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2))
+  data_ny <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_1))
 
   # Funksjon for å sjekke om en kolonne er numerisk (integer eller float/double)
   is_numeric_column <- function(dataset, column_name) {
@@ -494,11 +504,13 @@ sjekk_endring_sum <- function(filsti) {
 #'
 #'}
 #' @export
-sjekk_endring_verdier <- function(filsti){
+sjekk_endring_verdier <- function(filsti, 
+                                  versjon_1 = "uversjonert",
+                                  versjon_2 = "siste"){
 
   # Hent data fra siste versjonerte fil og ny fil
-  data_siste <- arrow::read_parquet(lag_versjonert_filsti(filsti, "siste"))
-  data_ny <- arrow::read_parquet(filsti)
+  data_siste <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_2))
+  data_ny <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_1))
 
   # Sammenlign dataene mellom siste og ny fil
   # comparison <- arsenal::comparedf(data_siste, data_ny, by = NULL)
@@ -549,8 +561,13 @@ sjekk_endring_verdier <- function(filsti){
 #'
 #'}
 #' @export
-sjekk_endring <- function(filsti){
-  endring_rader_kolonner <- sjekk_endring_rader_kolonner(filsti = filsti)
+sjekk_endring <- function(filsti, 
+                          versjon_1 = "uversjonert",
+                          versjon_2 = "siste"){
+    
+  endring_rader_kolonner <- sjekk_endring_rader_kolonner(filsti = filsti,
+                                                         versjon_1 = versjon_1,
+                                                         versjon_2 = versjon_2)
 
   if (endring_rader_kolonner == TRUE){
     endring <- TRUE
@@ -558,7 +575,9 @@ sjekk_endring <- function(filsti){
     return(endring)  # Avslutt funksjonen uten feilmelding hvis kolonner har endret seg
   }
 
-  endring_datatype <- sjekk_endring_datatype(filsti = filsti)
+  endring_datatype <- sjekk_endring_datatype(filsti = filsti,
+                                                         versjon_1 = versjon_1,
+                                                         versjon_2 = versjon_2)
 
   if (endring_datatype == TRUE){
     endring <- TRUE
@@ -566,7 +585,9 @@ sjekk_endring <- function(filsti){
     return(endring)  # Avslutt funksjonen uten feilmelding hvis datatyper har endret seg
   }
 
-  endring_sum <- sjekk_endring_sum(filsti = filsti)
+  endring_sum <- sjekk_endring_sum(filsti = filsti,
+                                                         versjon_1 = versjon_1,
+                                                         versjon_2 = versjon_2)
 
   if (endring_sum == TRUE){
     endring <- TRUE
@@ -574,7 +595,9 @@ sjekk_endring <- function(filsti){
     return(endring)  # Avslutt funksjonen uten feilmelding hvis datatyper har endret seg
   }
 
-  endring_verdier <- sjekk_endring_verdier(filsti = filsti)
+  endring_verdier <- sjekk_endring_verdier(filsti = filsti,
+                                                         versjon_1 = versjon_1,
+                                                         versjon_2 = versjon_2)
 
   if (endring_verdier == TRUE){
     endring <- TRUE
