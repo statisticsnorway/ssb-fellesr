@@ -2,68 +2,31 @@
 % Please edit documentation in R/ssb_format.R
 \name{ssb_format}
 \alias{ssb_format}
-\title{SSB-format-klasse}
+\title{SSB-format}
 \description{
-Denne klassen gir funksjonalitet for å kartlegge kategoriske og intervallbaserte verdier
+Klassen \code{ssb_format} gir funksjonalitet for å mappe kategoriske og intervallbaserte verdier
 i henhold til en forhåndsdefinert kodeliste.
 }
 \examples{
 
 ## ------------------------------------------------
-## Method `ssb_format$update_format`
-## ------------------------------------------------
-
-\dontrun{
-format <- ssb_format$new(dict = list("10-20" = "A", "21-30" = "B"), is_range_format = TRUE)
-}
-
-## ------------------------------------------------
-## Method `ssb_format$map_values_range`
+## Method `ssb_format$map_range`
 ## ------------------------------------------------
 
 \dontrun{
 format <- ssb_format$new(dict = list("10-20" = "A", "21-30" = "B", "other" = "C"), is_range_format = TRUE)
-format$map_values_range(c(15, 25, 35))
+format$map_range(c(15, 25, 35))
 }
 
 ## ------------------------------------------------
-## Method `ssb_format$map_values_cat`
+## Method `ssb_format$map_cat`
 ## ------------------------------------------------
 
 \dontrun{
 format <- ssb_format$new(dict = list("A" = "Alpha", "B" = "Beta"), is_range_format = FALSE)
-format$map_values_cat(c("A", "B"))
+format$map_cat(c("A", "B"))
 }
 }
-\keyword{"other"-nøkkelen}
-\keyword{Ekstraherer}
-\keyword{Konverterer}
-\keyword{Lagrer}
-\keyword{NA}
-\keyword{NA-verdi}
-\keyword{Setter}
-\keyword{Sjekker}
-\keyword{bokstaver}
-\keyword{den}
-\keyword{en}
-\keyword{er}
-\keyword{finnes}
-\keyword{for}
-\keyword{fra}
-\keyword{i}
-\keyword{internal}
-\keyword{intervaller}
-\keyword{intervallgrenser.}
-\keyword{kodelista}
-\keyword{manglende}
-\keyword{nøkler}
-\keyword{og}
-\keyword{om}
-\keyword{små}
-\keyword{til}
-\keyword{validerer}
-\keyword{vektor/verdi}
-\keyword{verdiene}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
@@ -71,12 +34,11 @@ format$map_values_cat(c("A", "B"))
 
 \item{\code{is_range_format}}{Boolsk verdi som angir om formatet er intervallbasert.}
 
-\item{\code{na_value}}{Verdi som representerer manglende data.}
+\item{\code{na_value}}{Verdi som representerer manglende data utledet fra \code{dict}.}
 
-\item{\code{breaks}}{En vektor av grenseverdier for intervallbasert mapping.}
+\item{\code{breaks}}{En vektor av grenseverdier for intervallbasert mapping utledet fra \code{dict}.}
 
-\item{\code{labels}}{En vektor med labeller for intervallene.
-Initialiserer SSB-format-klassen}
+\item{\code{labels}}{En vektor med labeler for intervallene utledet fra \code{dict}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -84,9 +46,8 @@ Initialiserer SSB-format-klassen}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-ssb_format-new}{\code{ssb_format$new()}}
-\item \href{#method-ssb_format-update_format}{\code{ssb_format$update_format()}}
-\item \href{#method-ssb_format-map_values_range}{\code{ssb_format$map_values_range()}}
-\item \href{#method-ssb_format-map_values_cat}{\code{ssb_format$map_values_cat()}}
+\item \href{#method-ssb_format-map_range}{\code{ssb_format$map_range()}}
+\item \href{#method-ssb_format-map_cat}{\code{ssb_format$map_cat()}}
 \item \href{#method-ssb_format-clone}{\code{ssb_format$clone()}}
 }
 }
@@ -94,6 +55,7 @@ Initialiserer SSB-format-klassen}
 \if{html}{\out{<a id="method-ssb_format-new"></a>}}
 \if{latex}{\out{\hypertarget{method-ssb_format-new}{}}}
 \subsection{Method \code{new()}}{
+Initialiserer SSB Format-klassen
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ssb_format$new(dict, is_range_format)}\if{html}{\out{</div>}}
 }
@@ -109,30 +71,12 @@ Initialiserer SSB-format-klassen}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ssb_format-update_format"></a>}}
-\if{latex}{\out{\hypertarget{method-ssb_format-update_format}{}}}
-\subsection{Method \code{update_format()}}{
+\if{html}{\out{<a id="method-ssb_format-map_range"></a>}}
+\if{latex}{\out{\hypertarget{method-ssb_format-map_range}{}}}
+\subsection{Method \code{map_range()}}{
+Mapper numeriske verdier til kategoriske
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ssb_format$update_format()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-format <- ssb_format$new(dict = list("10-20" = "A", "21-30" = "B"), is_range_format = TRUE)
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ssb_format-map_values_range"></a>}}
-\if{latex}{\out{\hypertarget{method-ssb_format-map_values_range}{}}}
-\subsection{Method \code{map_values_range()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ssb_format$map_values_range(vec)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ssb_format$map_range(vec)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -149,7 +93,7 @@ En vektor med kategoriske verdier som er mappet.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 format <- ssb_format$new(dict = list("10-20" = "A", "21-30" = "B", "other" = "C"), is_range_format = TRUE)
-format$map_values_range(c(15, 25, 35))
+format$map_range(c(15, 25, 35))
 }
 }
 \if{html}{\out{</div>}}
@@ -158,11 +102,12 @@ format$map_values_range(c(15, 25, 35))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ssb_format-map_values_cat"></a>}}
-\if{latex}{\out{\hypertarget{method-ssb_format-map_values_cat}{}}}
-\subsection{Method \code{map_values_cat()}}{
+\if{html}{\out{<a id="method-ssb_format-map_cat"></a>}}
+\if{latex}{\out{\hypertarget{method-ssb_format-map_cat}{}}}
+\subsection{Method \code{map_cat()}}{
+Mapper kategorier til kategorier
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ssb_format$map_values_cat(vec)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ssb_format$map_cat(vec)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -179,7 +124,7 @@ En vektor med de mappede verdiene.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 format <- ssb_format$new(dict = list("A" = "Alpha", "B" = "Beta"), is_range_format = FALSE)
-format$map_values_cat(c("A", "B"))
+format$map_cat(c("A", "B"))
 }
 }
 \if{html}{\out{</div>}}

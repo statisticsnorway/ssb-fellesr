@@ -41,6 +41,64 @@ språk uten å måtte skrive formatene på nytt.
 Mapping-metodene fra ssb_format er dessuten mer effektive enn det
 R-funksjonene ifelse og dplyr::case_when er.
 
+### Formater med intervaller
+```{r, eval=FALSE}
+# Eksempeldata
+alder <- sample(1L:100L, size = 10, replace = TRUE)
+
+# Eksempelformat
+age_frmt = list(
+    "low-18" = "-18",
+    "19-25" = "19-25",
+    "26-35" = "26-35",
+    "36-45" = "36-45",
+    "46-55" = "46-55",
+    "56-high" = "56+",
+    "other" = "missing"
+)
+
+# Initier formatet med ssb_format-klassen
+ssb_age_frmt <- ssb_format$new(age_frmt, is_range_format = TRUE)
+
+# Bruk formatet til å lage en ny kategorisk variabel
+alder_kat <- ssb_age_frmt$map_range(alder)
+
+```
+
+### Formater fra kategori til kategori
+```{r, eval=FALSE}
+# Eksempeldata
+ansettelsesform <- sample(c("F", "M", "", "A"), 10, replace = TRUE)
+
+# Eksempelformat
+ansform_frmt = list(
+    "F" = "fast",
+    "M" = "midlertidig",
+    "other" = "annet",
+    "NA" = "ukjent"
+)
+
+# Initier formatet
+ssb_ansform_frmt < ssb_format$new(ansform_frmt, is_range_format = FALSE)
+
+# Bruk formatet til å lage en ny variabel
+ansettelsesform_ny <- ssb_ansform_frmt$map_range(ansettelsesform)
+
+```
+
+### Les format fra JSON og initier
+
+```{r, eval=FALSE}
+ssb_age_frmt <- get_format("data/alder.json", is_range_format = TRUE)
+
+# Eksempeldata
+alder <- sample(1L:100L, size = 10, replace = TRUE)
+
+# Bruk formatet til å lage en ny kategorisk variabel
+alder_kat <- ssb_age_frmt$map_range(alder)
+
+```
+
 ### Noen viktige forskjeller fra SsbFormat og SAS
 
 Klassen fungerer likt som Python-ekvivalenten SsbFormat i den forstand
@@ -53,12 +111,12 @@ for Python-funksjonen
 Ingen av disse klassene tilbyr noen løsning på overlappende intervaller
 slik som i SAS.
 
-#### OBS: Potensiell felle som burde løses
+#### OBS: Potensiell felle
 
 En viktig forskjell er at det kun er de nedre verdiene i intervallene
 som bestemmer kategoriseringen, med unntak av den øverste grenseverdien.
 Dermed kan det gi rare resultater ved bruk av
-ssb_format\$map_values_range() hvor dette er formatet:
+ssb_format\$map_range() hvor dette er formatet:
 
 ``` json
 {
@@ -79,3 +137,7 @@ den øvre grensverdien i et intervall gjerne angis som 9,9999 dersom vi
 nødvendig å runde ned til nærmeste heltall først. I ssb_format vil ikke
 øvre grenseverdi ha noen betydning, og 9,5 vil falle under "1" fordi 9
 \< neste nedre grenseverdi (10).
+
+Dersom en forsøker å initiere klassen med et format som i eksempelet over,
+vil følgende warning trigges: Formatet kategoriserer verdier innenfor 
+[9 > verdi > 10] i intervallet [X-9]
