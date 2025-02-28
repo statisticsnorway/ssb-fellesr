@@ -89,7 +89,7 @@ ansettelsesform_ny <- ssb_ansform_frmt$map_range(ansettelsesform)
 ### Les format fra JSON og initier
 
 ```{r, eval=FALSE}
-ssb_age_frmt <- get_format("data/alder.json", is_range_format = TRUE)
+ssb_age_frmt <- get_format("formats/alder.json", is_range_format = TRUE)
 
 # Eksempeldata
 alder <- sample(1L:100L, size = 10, replace = TRUE)
