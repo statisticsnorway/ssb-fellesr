@@ -1,7 +1,7 @@
 Package: fellesr
 Type: Package
 Title: General R functions for SSB
-Version: 0.3.1
+Version: 0.3.2
 Authors@R: 
   c(person(given = "Susie",
            family = "Jentoft",
@@ -44,7 +44,8 @@ Imports:
     git2r,
     renv,
     pkgdown,
-    arsenal
+    arsenal,
+    fastmatch
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
