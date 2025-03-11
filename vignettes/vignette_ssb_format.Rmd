@@ -1,5 +1,5 @@
 ---
-title: "Uttrekk fra Dynarev til R"
+title: "SSB format"
 author: "Martin Skjæveland"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
