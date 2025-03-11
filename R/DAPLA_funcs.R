@@ -12,12 +12,12 @@
 #'}
 #'@encoding UTF-8
 
-env_check <- function() { 
-  
-  env <- paste0(Sys.getenv("DAPLA_ENVIRONMENT"), "-", 
-                Sys.getenv("DAPLA_REGION"), "-", 
+env_check <- function() {
+
+  env <- paste0(Sys.getenv("DAPLA_ENVIRONMENT"), "-",
+                Sys.getenv("DAPLA_REGION"), "-",
                 Sys.getenv("DAPLA_SERVICE"))
-  
+
   if (Sys.getenv("DAPLA_REGION") == "" | Sys.getenv("DAPLA_ENVIRONMENT") == "" | Sys.getenv("DAPLA_SERVICE") == ""){
     warning("Ukjent miljø. Denne funksjonene fungerer kun på Dapla og i produksjonssonen")
   }
@@ -44,7 +44,7 @@ gcs_bucket <- function(bucket) {
     response <- httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN"))))
     access_token <- httr::content(response)$exchanged_tokens$google$access_token
     expiration <- httr::content(response)$exchanged_tokens$google$exp
-  }  
+  }
   else if (Sys.getenv("DAPLA_REGION") == "DAPLA_LAB"){
 
     response <- httr::POST(Sys.getenv("OIDC_TOKEN_EXCHANGE_URL"),
@@ -129,8 +129,8 @@ gcs_global_bucket <- function(bucket) {
 
 read_parquet <- function(file, ...) {
 
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file)
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file)
 
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
@@ -161,11 +161,11 @@ file <- gsub("gs://", "", file)
 read_parquet_sf <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    
+
     ds <- arrow::read_parquet(gcs_bucket(dirname(file))$path(paste0(basename(file))), as_data_frame = FALSE, ...)
 
     metadata <- ds$metadata
@@ -214,7 +214,7 @@ read_parquet_sf <- function(file, ...) {
 read_feather <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file)
+  file <- gsub("gs://", "", file)
 
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
@@ -252,8 +252,12 @@ file <- gsub("gs://", "", file)
 
 open_dataset <- function(file, ...) {
 
-    # Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file)
+  lifecycle::deprecate_warn(when = "0.3.0",
+                            what = "fellesr::open_dataset()",
+                            details = "Bruk heller arrow::open_dataset()")
+
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file)
 
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
@@ -284,8 +288,8 @@ file <- gsub("gs://", "", file)
 read_json <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
 
     df <- arrow::read_json_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
@@ -317,9 +321,9 @@ read_json <- function(file, ...) {
 read_csv <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
-  # DAPLA  
+  file <- gsub("gs://", "", file)
+
+  # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     df <- arrow::read_delim_arrow(gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
   }
@@ -348,11 +352,11 @@ read_csv <- function(file, ...) {
 read_rds <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
-  # DAPLA 
+  file <- gsub("gs://", "", file)
+
+  # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
-    
+
     gcs_global_bucket(sub("/.*", "", file))
 
     my_parse <- function(obj){
@@ -389,9 +393,9 @@ read_rds <- function(file, ...) {
 read_xml <- function(file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
-  # DAPLA 
+  file <- gsub("gs://", "", file)
+
+  # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
 
     suppressMessages(gcs_global_bucket(sub("/.*", "", file)))
@@ -428,8 +432,8 @@ read_xml <- function(file, ...) {
 
 write_parquet <- function(data, file, ...) {
 
-# Fjerner "gs://" fra filstien dersom det er spesifisert
-file <- gsub("gs://", "", file)
+  # Fjerner "gs://" fra filstien dersom det er spesifisert
+  file <- gsub("gs://", "", file)
 
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
@@ -466,7 +470,7 @@ file <- gsub("gs://", "", file)
 write_dataset <- function(data, file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
+  file <- gsub("gs://", "", file)
 
   arrow::write_dataset(data, gcs_bucket(dirname(file))$path(paste0(basename(file))),
                        partitioning = dplyr::group_vars(data))
@@ -491,8 +495,8 @@ write_dataset <- function(data, file, ...) {
 write_feather <- function(data, file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
     arrow::write_feather(data, gcs_bucket(dirname(file))$path(paste0(basename(file))), ...)
@@ -525,7 +529,7 @@ write_csv <- function(data,
                       file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
+  file <- gsub("gs://", "", file)
 
   # DAPLA
   if (Sys.getenv("DAPLA_REGION") == "BIP" | Sys.getenv("DAPLA_REGION") == "DAPLA_LAB") {
@@ -557,8 +561,8 @@ write_rds <- function(data,
                       file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   f <- function(input, output){
     saveRDS(input, file = output)
   }
@@ -586,9 +590,13 @@ write_rds <- function(data,
 
 gcs.list.files <- function(bucket) {
 
+  lifecycle::deprecate_warn(when = "0.3.0",
+                            what = "fellesr::gcs.list.files()",
+                            details = "Bruk heller base-R funksjonene list.files() og/eller file.info()")
+
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  bucket <- gsub("gs://", "", bucket) 
-  
+  bucket <- gsub("gs://", "", bucket)
+
   gcs_bucket(bucket)$ls(recursive = T)
 }
 
@@ -614,9 +622,13 @@ gcs.list.files <- function(bucket) {
 
 gcs_list_objects <- function(bucket) {
 
+  lifecycle::deprecate_warn(when = "0.3.0",
+                            what = "fellesr::gcs_list_objects()",
+                            details = "Bruk heller base-R funksjonene list.files() og/eller file.info()")
+
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  bucket <- gsub("gs://", "", bucket)  
-  
+  bucket <- gsub("gs://", "", bucket)
+
   if (dirname(bucket) == "."){
     gcs_global_bucket(bucket)
     googleCloudStorageR::gcs_list_objects(bucket)
@@ -643,8 +655,8 @@ gcs_list_objects <- function(bucket) {
 gcs_delete_object <- function(file) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   gcs_global_bucket(sub("/.*", "", file))
   googleCloudStorageR::gcs_delete_object(sub(paste0(".*", sub("/.*", "", file), "/"), "", file))
 }
@@ -670,8 +682,8 @@ gcs_delete_object <- function(file) {
 write_sf_parquet <- function(data, file, ...) {
 
   # Fjerner "gs://" fra filstien dersom det er spesifisert
-  file <- gsub("gs://", "", file) 
-  
+  file <- gsub("gs://", "", file)
+
   geo_metadata <- sfarrow:::create_metadata(data)
   df <- sfarrow:::encode_wkb(data)
   tbl <- arrow::Table$create(df)
@@ -712,6 +724,11 @@ write_sf_parquet <- function(data, file, ...) {
 #'@encoding UTF-8
 
 read_SSB <- function(file, sf = FALSE, ...) {
+
+  lifecycle::deprecate_warn(when = "0.3.0",
+                            what = "fellesr::read_SSB()",
+                            details = "Bruk heller vanlige R-funksjoner, som f.eks. arrow::read_parquet(), for å lese inn data på Dapla Lab.")
+
 
   if(grepl("\\.parquet", basename(file)) & sf == FALSE){
     df <- read_parquet(file, ...)
@@ -766,6 +783,11 @@ read_SSB <- function(file, sf = FALSE, ...) {
 #'@encoding UTF-8
 
 write_SSB <- function(data, file, partitioning = FALSE, sf = FALSE, ...) { # OBS: legge til mulighet for partitioning?
+
+  lifecycle::deprecate_warn(when = "0.3.0",
+                            what = "fellesr::write_SSB()",
+                            details = "Bruk heller vanlige R-funksjoner, som f.eks. arrow::write_parquet(), for å lagre data på Dapla Lab.")
+
   if (grepl("\\.parquet", basename(file)) & sf == FALSE){
     write_parquet(data, file, ...)
   } else if (grepl("\\.parquet", basename(file)) & sf == TRUE){
