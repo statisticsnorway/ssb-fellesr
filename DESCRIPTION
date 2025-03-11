@@ -44,7 +44,8 @@ Imports:
     git2r,
     renv,
     pkgdown,
-    arsenal
+    arsenal,
+    fastmatch
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
