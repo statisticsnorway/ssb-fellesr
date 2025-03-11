@@ -9,6 +9,7 @@
 <url><loc>/articles/vignette__DAPLA_jukseark.html</loc></url>
 <url><loc>/articles/vignette_dynarev_uttrekk.html</loc></url>
 <url><loc>/articles/vignette_shiny_ssb.html</loc></url>
+<url><loc>/articles/vignette_ssb_format.html</loc></url>
 <url><loc>/articles/vignette_statbank_lasting.html</loc></url>
 <url><loc>/articles/web_only/bygge-en-r-tilleggspakke.html</loc></url>
 <url><loc>/articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html</loc></url>
@@ -31,6 +32,7 @@
 <url><loc>/reference/gcs_global_bucket.html</loc></url>
 <url><loc>/reference/gcs_list_objects.html</loc></url>
 <url><loc>/reference/get_files.html</loc></url>
+<url><loc>/reference/get_format.html</loc></url>
 <url><loc>/reference/get_standard_files.html</loc></url>
 <url><loc>/reference/get_standard_files_offline.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
@@ -59,6 +61,7 @@
 <url><loc>/reference/sjekk_endring_sum.html</loc></url>
 <url><loc>/reference/sjekk_endring_verdier.html</loc></url>
 <url><loc>/reference/ssb_colours.html</loc></url>
+<url><loc>/reference/ssb_format.html</loc></url>
 <url><loc>/reference/ssb_palettes.html</loc></url>
 <url><loc>/reference/ssb_rproject.html</loc></url>
 <url><loc>/reference/ssb_rtemplate.html</loc></url>
