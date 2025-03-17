@@ -82,7 +82,7 @@ ansform_frmt = list(
 ssb_ansform_frmt < ssb_format$new(ansform_frmt, is_range_format = FALSE)
 
 # Bruk formatet til å lage en ny variabel
-ansettelsesform_ny <- ssb_ansform_frmt$map_range(ansettelsesform)
+ansettelsesform_ny <- ssb_ansform_frmt$map_cat(ansettelsesform)
 
 ```
 

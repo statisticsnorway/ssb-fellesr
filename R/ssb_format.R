@@ -44,8 +44,14 @@ ssb_format <- R6::R6Class("ssb_format",
                             num_vec <- as.numeric(vec)
 
                             na_mask <- private$check_if_na(vec)
-                            result <- rep(NA_character_)
-                            result[na_mask] <- self$na_value
+                            result <- NA_character_
+
+                            if (!is.null(self$na_value)) {
+                              result[na_mask] <- self$na_value
+                            }
+                            else if (any(na_mask)) {
+                              warning("Vektoren inneholder manglende verdier, mens formatet ikke spesifiserer hvordan disse skal behandles.")
+                            }
 
                             valid_numbers <- which(!na_mask & !is.na(num_vec))
                             if (length(valid_numbers) > 0) {
@@ -86,11 +92,16 @@ ssb_format <- R6::R6Class("ssb_format",
                             result[!is.na(vec_matched)] <- unname(unlist(self$frmt_list[vec_matched]))
 
                             na_mask <- private$check_if_na(vec)
-                            result[na_mask] <- self$na_value
+                            if (!is.null(self$na_value)) {
+                              result[na_mask] <- self$na_value
+                            }
+                            else if (any(na_mask)) {
+                              warning("Vektoren inneholder manglende verdier, mens formatet ikke spesifiserer hvordan disse skal behandles.")
+                            }
 
                             unmatched_mask <- is.na(result)
                             if (any(unmatched_mask) && is.null(self$frmt_list[["other"]])) {
-                              stop(paste("No 'other' specified and values not in format:", paste(unique(vec[unmatched_mask]), collapse=", ")))
+                              stop(paste("Ingen 'other' spesifisert, og verdier ikke i format:", paste(unique(vec[unmatched_mask]), collapse=", ")))
                             }
                             result[unmatched_mask] <- self$frmt_list[["other"]]
 
