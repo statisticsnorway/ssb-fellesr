@@ -9,7 +9,7 @@ i henhold til en forhåndsdefinert kodeliste."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@ i henhold til en forhåndsdefinert kodeliste.</p>
 
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
-    <p></p><div class="r6-fields"><dl><dt><code>dict</code></dt>
+    <p></p><div class="r6-fields"><dl><dt><code>frmt_list</code></dt>
 <dd><p>En navngitt liste som spesifiserer mappingen.</p></dd>
 
 
@@ -63,15 +63,15 @@ i henhold til en forhåndsdefinert kodeliste.</p>
 
 
 <dt><code>na_value</code></dt>
-<dd><p>Verdi som representerer manglende data utledet fra <code>dict</code>.</p></dd>
+<dd><p>Verdi som representerer manglende data, utledet fra <code>frmt_list</code>.</p></dd>
 
 
 <dt><code>breaks</code></dt>
-<dd><p>En vektor av grenseverdier for intervallbasert mapping utledet fra <code>dict</code>.</p></dd>
+<dd><p>En vektor av grenseverdier for intervallbasert mapping, utledet fra <code>frmt_list</code>.</p></dd>
 
 
 <dt><code>labels</code></dt>
-<dd><p>En vektor med labeler for intervallene utledet fra <code>dict</code>.</p></dd>
+<dd><p>En vektor med labeler for intervallene, utledet fra <code>frmt_list</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -90,12 +90,12 @@ i henhold til en forhåndsdefinert kodeliste.</p>
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Initialiserer SSB Format-klassen</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/ssb_format.html">ssb_format</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">dict</span>, <span class="va">is_range_format</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/ssb_format.html">ssb_format</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">frmt_list</span>, <span class="va">is_range_format</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>dict</code></dt>
+<p></p><div class="arguments"><dl><dt><code>frmt_list</code></dt>
 <dd><p>En "named list" (tilsvarende dictionary i python) som spesifiserer mappingen.</p></dd>
 
 
@@ -128,7 +128,7 @@ i henhold til en forhåndsdefinert kodeliste.</p>
 <div class="section">
 <h4 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-format &lt;- ssb_format$new(dict = list("10-20" = "A", "21-30" = "B", "other" = "C"), is_range_format = TRUE)
+format &lt;- ssb_format$new(frmt_list = list("10-20" = "A", "21-30" = "B", "other" = "C"), is_range_format = TRUE)
 format$map_range(c(15, 25, 35))
 }
 </code></pre></div><p></p></div>
@@ -157,7 +157,7 @@ format$map_range(c(15, 25, 35))
 <div class="section">
 <h4 id="examples-1">Examples<a class="anchor" aria-label="anchor" href="#examples-1"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-format &lt;- ssb_format$new(dict = list("A" = "Alpha", "B" = "Beta"), is_range_format = FALSE)
+format &lt;- ssb_format$new(frmt_list = list("A" = "Alpha", "B" = "Beta"), is_range_format = FALSE)
 format$map_cat(c("A", "B"))
 }
 </code></pre></div><p></p></div>
@@ -192,7 +192,7 @@ format$map_cat(c("A", "B"))
 <span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">format</span> <span class="op">&lt;-</span> <span class="va">ssb_format</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>dict <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"10-20"</span> <span class="op">=</span> <span class="st">"A"</span>, <span class="st">"21-30"</span> <span class="op">=</span> <span class="st">"B"</span>, <span class="st">"other"</span> <span class="op">=</span> <span class="st">"C"</span><span class="op">)</span>, is_range_format <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">format</span> <span class="op">&lt;-</span> <span class="va">ssb_format</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>frmt_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"10-20"</span> <span class="op">=</span> <span class="st">"A"</span>, <span class="st">"21-30"</span> <span class="op">=</span> <span class="st">"B"</span>, <span class="st">"other"</span> <span class="op">=</span> <span class="st">"C"</span><span class="op">)</span>, is_range_format <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">format</span><span class="op">$</span><span class="fu">map_range</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">25</span>, <span class="fl">35</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
@@ -201,7 +201,7 @@ format$map_cat(c("A", "B"))
 <span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">format</span> <span class="op">&lt;-</span> <span class="va">ssb_format</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>dict <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="st">"Alpha"</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="st">"Beta"</span><span class="op">)</span>, is_range_format <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">format</span> <span class="op">&lt;-</span> <span class="va">ssb_format</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>frmt_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="st">"Alpha"</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="st">"Beta"</span><span class="op">)</span>, is_range_format <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">format</span><span class="op">$</span><span class="fu">map_cat</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>

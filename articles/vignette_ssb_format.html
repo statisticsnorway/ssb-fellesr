@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@
                         <h4 data-toc-skip class="author">Martin
 Skjæveland</h4>
             
-            <h4 data-toc-skip class="date">2025-03-11</h4>
+            <h4 data-toc-skip class="date">2025-03-18</h4>
       
 
       <div class="d-none name"><code>vignette_ssb_format.Rmd</code></div>
@@ -138,7 +138,7 @@ R-funksjonene ifelse og dplyr::case_when er.</p>
 <span><span class="va">ssb_ansform_frmt</span> <span class="op">&lt;</span> <span class="va"><a href="../reference/ssb_format.html">ssb_format</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">ansform_frmt</span>, is_range_format <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Bruk formatet til å lage en ny variabel</span></span>
-<span><span class="va">ansettelsesform_ny</span> <span class="op">&lt;-</span> <span class="va">ssb_ansform_frmt</span><span class="op">$</span><span class="fu">map_range</span><span class="op">(</span><span class="va">ansettelsesform</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">ansettelsesform_ny</span> <span class="op">&lt;-</span> <span class="va">ssb_ansform_frmt</span><span class="op">$</span><span class="fu">map_cat</span><span class="op">(</span><span class="va">ansettelsesform</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="les-format-fra-json-og-initier">Les format fra JSON og initier<a class="anchor" aria-label="anchor" href="#les-format-fra-json-og-initier"></a>
