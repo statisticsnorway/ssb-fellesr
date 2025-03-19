@@ -14,7 +14,7 @@ i henhold til en forhåndsdefinert kodeliste.
 ## ------------------------------------------------
 
 \dontrun{
-format <- ssb_format$new(dict = list("10-20" = "A", "21-30" = "B", "other" = "C"), is_range_format = TRUE)
+format <- ssb_format$new(frmt_list = list("10-20" = "A", "21-30" = "B", "other" = "C"), is_range_format = TRUE)
 format$map_range(c(15, 25, 35))
 }
 
@@ -23,22 +23,22 @@ format$map_range(c(15, 25, 35))
 ## ------------------------------------------------
 
 \dontrun{
-format <- ssb_format$new(dict = list("A" = "Alpha", "B" = "Beta"), is_range_format = FALSE)
+format <- ssb_format$new(frmt_list = list("A" = "Alpha", "B" = "Beta"), is_range_format = FALSE)
 format$map_cat(c("A", "B"))
 }
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{dict}}{En navngitt liste som spesifiserer mappingen.}
+\item{\code{frmt_list}}{En navngitt liste som spesifiserer mappingen.}
 
 \item{\code{is_range_format}}{Boolsk verdi som angir om formatet er intervallbasert.}
 
-\item{\code{na_value}}{Verdi som representerer manglende data utledet fra \code{dict}.}
+\item{\code{na_value}}{Verdi som representerer manglende data, utledet fra \code{frmt_list}.}
 
-\item{\code{breaks}}{En vektor av grenseverdier for intervallbasert mapping utledet fra \code{dict}.}
+\item{\code{breaks}}{En vektor av grenseverdier for intervallbasert mapping, utledet fra \code{frmt_list}.}
 
-\item{\code{labels}}{En vektor med labeler for intervallene utledet fra \code{dict}.}
+\item{\code{labels}}{En vektor med labeler for intervallene, utledet fra \code{frmt_list}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -57,13 +57,13 @@ format$map_cat(c("A", "B"))
 \subsection{Method \code{new()}}{
 Initialiserer SSB Format-klassen
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ssb_format$new(dict, is_range_format)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ssb_format$new(frmt_list, is_range_format)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{dict}}{En "named list" (tilsvarende dictionary i python) som spesifiserer mappingen.}
+\item{\code{frmt_list}}{En "named list" (tilsvarende dictionary i python) som spesifiserer mappingen.}
 
 \item{\code{is_range_format}}{Boolsk verdi som angir om formatet er intervallbasert.}
 }
@@ -92,7 +92,7 @@ En vektor med kategoriske verdier som er mappet.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-format <- ssb_format$new(dict = list("10-20" = "A", "21-30" = "B", "other" = "C"), is_range_format = TRUE)
+format <- ssb_format$new(frmt_list = list("10-20" = "A", "21-30" = "B", "other" = "C"), is_range_format = TRUE)
 format$map_range(c(15, 25, 35))
 }
 }
@@ -123,7 +123,7 @@ En vektor med de mappede verdiene.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-format <- ssb_format$new(dict = list("A" = "Alpha", "B" = "Beta"), is_range_format = FALSE)
+format <- ssb_format$new(frmt_list = list("A" = "Alpha", "B" = "Beta"), is_range_format = FALSE)
 format$map_cat(c("A", "B"))
 }
 }

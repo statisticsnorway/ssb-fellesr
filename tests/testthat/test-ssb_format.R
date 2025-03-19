@@ -111,3 +111,17 @@ test_that("Validering av lister med intervaller", {
   # Nøkler skal alltid inneholde enten 'other', en NA-verdi (., "" osv) eller to verdier med bindestrek mellom ([VERDI]-[VERDI])
   expect_error(ssb_format$new(sample_list5, is_range_format = TRUE), "er ikke støttet som en nøkkel")
 })
+
+sample_list6 <- list(
+  "0-0" = "0",
+  "1-9"= "1"
+)
+
+
+fmt5 <- ssb_format$new(sample_list6, is_range_format = TRUE)
+fmt6 <- ssb_format$new(sample_list6, is_range_format = FALSE)
+
+test_that("Tilbakemelding om manglende verdier i vektor, men ikke i format", {
+  expect_error(suppressWarnings(fmt5$map_range(c(NA, 50))), "Ingen 'other' spesifisert")
+  expect_error(suppressWarnings(fmt6$map_cat(c(NA, 50))), "Ingen 'other' spesifisert")
+})
