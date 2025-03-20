@@ -10,7 +10,8 @@ statbank_uttaksbeskrivelse(
   laste_bruker,
   ask = TRUE,
   username_encryptedpassword = "",
-  boundary = 12345
+  boundary = 12345,
+  db = NULL
 )
 }
 \arguments{

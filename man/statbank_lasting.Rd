@@ -17,7 +17,8 @@ statbank_lasting(
   boundary = 12345,
   ask = TRUE,
   username_encryptedpassword = "",
-  validering = TRUE
+  validering = TRUE,
+  db = NULL
 )
 }
 \arguments{

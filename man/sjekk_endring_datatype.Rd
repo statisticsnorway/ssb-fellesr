@@ -4,7 +4,7 @@
 \alias{sjekk_endring_datatype}
 \title{Sjekk for endringer i datatyper mellom siste og nyeste versjon av en fil}
 \usage{
-sjekk_endring_datatype(filsti)
+sjekk_endring_datatype(filsti, versjon_1 = "uversjonert", versjon_2 = "siste")
 }
 \arguments{
 \item{filsti}{En karakterstreng som representerer filstien til den nyeste versjonen av filen.

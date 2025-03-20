@@ -4,7 +4,7 @@
 \alias{sjekk_endring_sum}
 \title{Sjekk for endringer i sum for numeriske kolonner mellom siste og nyeste versjon av en fil}
 \usage{
-sjekk_endring_sum(filsti)
+sjekk_endring_sum(filsti, versjon_1 = "uversjonert", versjon_2 = "siste")
 }
 \arguments{
 \item{filsti}{En tekststreng som spesifiserer filstien til den nye datasetten som skal sammenlignes.
