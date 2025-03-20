@@ -3,33 +3,45 @@
 # user_agent
 user_agent <- function() {
 
-  user_agent <- paste0(Sys.getenv("DAPLA_ENVIRONMENT"), "-", 
-                       Sys.getenv("DAPLA_REGION"), "-", 
-                       Sys.getenv("DAPLA_SERVICE"), "-", 
+  user_agent <- paste0(Sys.getenv("DAPLA_ENVIRONMENT"), "-",
+                       Sys.getenv("DAPLA_REGION"), "-",
+                       Sys.getenv("DAPLA_SERVICE"), "-",
                        httr:::default_ua())
-  
+
   if (Sys.getenv("DAPLA_REGION") == "" | Sys.getenv("DAPLA_ENVIRONMENT") == "" | Sys.getenv("DAPLA_SERVICE") == ""){
     warning("Ukjent miljø. Denne funksjonene fungerer kun på Dapla og i produksjonssonen")
   }
-  
+
   return(user_agent)
 }
 
 # statbank_encrypt_request
 
-statbank_encrypt_request <- function(laste_bruker) {
+statbank_encrypt_request <- function(laste_bruker,
+                                     db = NULL) {
 
-  if (Sys.getenv("DAPLA_ENVIRONMENT") == "PROD") {
-    db <- "PROD"
-  } else {
-    db <- "TEST"
+  if (is.null(db)){
+    if (Sys.getenv("DAPLA_ENVIRONMENT") == "PROD") {
+      db <- "PROD"
+    } else {
+      db <- "TEST"
+    }
   }
 
+  print(paste0("statbank_encrypt_request ", db))
+  # print(db)
+
+  if (db == "PROD"){
+    statbank_encrypt_env <- 'STATBANK_ENCRYPT_URL'
+
+  } else if (db == "TEST"){
+    statbank_encrypt_env <- 'STATBANK_TEST_ENCRYPT_URL'
+  }
 
   # Prodsonen
   if (Sys.getenv('LOCAL_USER_PATH') == "") {
     encrypt_request <- httr::POST(
-      Sys.getenv('STATBANK_ENCRYPT_URL'),
+      Sys.getenv(statbank_encrypt_env),
       httr::add_headers(
         "Content-Type" = "application/json"),
       body = list(message = getPass::getPass(paste0("Lastepassord for ",  laste_bruker, " (", db, "):"))),
@@ -38,8 +50,20 @@ statbank_encrypt_request <- function(laste_bruker) {
 
     # DAPLA
   } else {
+
+
+    print(paste0("statbank_encrypt_request ", db))
+
+    if (db == "PROD"){
+      statbank_encrypt_env <- 'STATBANK_ENCRYPT_URL'
+    } else if (db == "TEST"){
+      statbank_encrypt_env <- 'STATBANK_TEST_ENCRYPT_URL'
+    }
+
+    print(statbank_encrypt_env)
+
     encrypt_request <- httr::POST(
-      Sys.getenv('STATBANK_ENCRYPT_URL'),
+      Sys.getenv(statbank_encrypt_env),
       httr::add_headers(
         "Content-Type" = "application/json",
         "Authorization" = paste0("Bearer ", httr::content(httr::GET(Sys.getenv('LOCAL_USER_PATH'), httr::add_headers('Authorization' = paste0('token ', Sys.getenv("JUPYTERHUB_API_TOKEN")))))$access_token)),
@@ -91,12 +115,31 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
                                        laste_bruker,
                                        ask = TRUE,
                                        username_encryptedpassword = "",
-                                       boundary = 12345) {
+                                       boundary = 12345,
+                                       db = NULL) {
   if (ask == TRUE){
-    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
+    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker, db = db)
   }
 
-  URL <- paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/uttaksbeskrivelse?', "tableId=", tabell_id)
+  if (is.null(db)){
+    if (Sys.getenv("DAPLA_ENVIRONMENT") == "PROD") {
+      db <- "PROD"
+    } else {
+      db <- "TEST"
+    }
+  }
+
+  print(paste0("statbank_uttaksbeskrivelse ", db))
+
+  if (db == "TEST"){
+    statbank_base_url_env <- "STATBANK_TEST_BASE_URL"
+  } else {
+    statbank_base_url_env <- "STATBANK_BASE_URL"
+  }
+
+  # print()
+
+  URL <- paste0(Sys.getenv(statbank_base_url_env), 'statbank/sos/v1/uttaksbeskrivelse?', "tableId=", tabell_id)
 
   uttaksbeskrivelse <- httr::GET(URL,
                                  httr::add_headers(
@@ -108,15 +151,15 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
                                  ))
 
   uttaksbeskrivelse <- tryCatch({
-  jsonlite::fromJSON(httr::content(uttaksbeskrivelse, as = "text"))
-}, error = function(e) {
-  uttaksbeskrivelse <- rvest::html_nodes(rvest::read_html(uttaksbeskrivelse), "body") %>%
-    as.character()
-  uttaksbeskrivelse <- gsub("<.*?>", "", uttaksbeskrivelse)
-  uttaksbeskrivelse <- gsub("\t", "", uttaksbeskrivelse)
+    jsonlite::fromJSON(httr::content(uttaksbeskrivelse, as = "text"))
+  }, error = function(e) {
+    uttaksbeskrivelse <- rvest::html_nodes(rvest::read_html(uttaksbeskrivelse), "body") %>%
+      as.character()
+    uttaksbeskrivelse <- gsub("<.*?>", "", uttaksbeskrivelse)
+    uttaksbeskrivelse <- gsub("\t", "", uttaksbeskrivelse)
     jsonlite::fromJSON(uttaksbeskrivelse)
-})
-    
+  })
+
   return(uttaksbeskrivelse)
 }
 
@@ -136,7 +179,10 @@ statbank_body <- function(data,
 
   for (i in 1:length(data)) {
 
-    filename <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = ask, username_encryptedpassword = username_encryptedpassword)$DeltabellTitler$Filnavn[i]
+    filename <- statbank_uttaksbeskrivelse(tabell_id = tabell_id,
+                                           ask = ask,
+                                           db = db,
+                                           username_encryptedpassword = username_encryptedpassword)$DeltabellTitler$Filnavn[i]
     start <- paste0("--", boundary, "\r\nContent-Disposition:form-data; filename=", filename, "\r\nContent-type:text/plain\r\n\r\n")
 
     data_1 <- data.frame(data[i])
@@ -161,9 +207,22 @@ statbank_validering <- function(data,
                                 tabell_id,
                                 laste_bruker,
                                 username_encryptedpassword = "",
-                                ask = FALSE) {
+                                ask = FALSE,
+                                db = NULL) {
 
-  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, laste_bruker = laste_bruker, ask = ask, username_encryptedpassword = username_encryptedpassword)
+  if (is.null(db)){
+    if (Sys.getenv("DAPLA_ENVIRONMENT") == "PROD") {
+      db <- "PROD"
+    } else {
+      db <- "TEST"
+    }
+  }
+
+  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id,
+                                                  laste_bruker = laste_bruker,
+                                                  ask = ask,
+                                                  username_encryptedpassword = username_encryptedpassword,
+                                                  db = db)
 
   problemer_alle <- data.frame()
   dubletter_alle <- data.frame()
@@ -175,10 +234,10 @@ statbank_validering <- function(data,
   for (i in 1:length(data)) {
 
     data_1 <- data.frame(data[i])
-      
-if (any(is.na(data_1)) == TRUE){
-print(data_1[!complete.cases(data_1), ] )
-    stop("NA (manglende verdier) er ikke tillatt i statistikkbanken. Fjern disse eller erstatt disse med gyldige verdier")
+
+    if (any(is.na(data_1)) == TRUE){
+      print(data_1[!complete.cases(data_1), ] )
+      stop("NA (manglende verdier) er ikke tillatt i statistikkbanken. Fjern disse eller erstatt disse med gyldige verdier")
     }
 
     variabler <- data.frame(uttaksbeskrivelse$deltabller$variabler[i]) # OBS: kan det finnes flere i listen?
@@ -341,7 +400,18 @@ statbank_lasting <- function(lastefil,
                              boundary = 12345,
                              ask = TRUE,
                              username_encryptedpassword = "",
-                             validering = TRUE) {
+                             validering = TRUE,
+                             db = NULL) {
+
+  if (is.null(db)){
+    if (Sys.getenv("DAPLA_ENVIRONMENT") == "PROD") {
+      db <- "PROD"
+    } else {
+      db <- "TEST"
+    }
+  }
+
+
 
   if (class(tabell_id) == "numeric"){
     print("OBS: tabell-ID er numerisk, denne maa ha en karakterverdi (legg til fnutter)")
@@ -354,7 +424,7 @@ statbank_lasting <- function(lastefil,
   if (as.POSIXlt(publiseringsdato)-as.POSIXlt(Sys.Date()) > 120) {
     print("OBS: publiseringsdato kan ikke settes mer enn 120 dager frem i tid")
   }
-    
+
   if (as.POSIXlt(publiseringsdato, tz = Sys.timezone()) < as.POSIXlt(Sys.Date())) {
     print("OBS: publiseringsdato må settes til en dato frem i tid")
   }
@@ -381,7 +451,7 @@ statbank_lasting <- function(lastefil,
   }
 
   if (ask == TRUE){
-    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker)
+    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker, db = db)
   }
 
 
@@ -390,7 +460,8 @@ statbank_lasting <- function(lastefil,
                                       tabell_id = tabell_id,
                                       laste_bruker = laste_bruker,
                                       username_encryptedpassword = username_encryptedpassword,
-                                      ask = FALSE)
+                                      ask = FALSE,
+                                      db = db)
 
     if (length(validering)>1) {
       print(paste0("Ugyldige verdier eller dubletter finnes for tabell ", tabell_id, ". Lasteoppdrag ikke startet."))
@@ -401,7 +472,10 @@ statbank_lasting <- function(lastefil,
   }
 
 
-  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
+  uttaksbeskrivelse <- statbank_uttaksbeskrivelse(tabell_id = tabell_id,
+                                                  ask = FALSE,
+                                                  username_encryptedpassword = username_encryptedpassword,
+                                                  db = db)
 
   if ((any(class(lastefil) %in% c("data.frame", "tibble", "tbl_df", "tbl", "spec_tbl_df")) & length(uttaksbeskrivelse$DeltabellTitler$Filnavn) != 1) |
       (any(class(lastefil) %in% c("list") & length(uttaksbeskrivelse$DeltabellTitler$Filnavn) != length(lastefil)))){
@@ -412,7 +486,18 @@ statbank_lasting <- function(lastefil,
 
   body <- statbank_body(data = lastefil, tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
 
-  url_transfer <- paste0(paste0(Sys.getenv('STATBANK_BASE_URL'), 'statbank/sos/v1/DataLoader?'),
+  # print(db)
+  print(paste0("statbank_lasting ", db))
+
+  if (db == "PROD"){
+    statbank_base_url_env <- 'STATBANK_BASE_URL'
+
+  } else if (db == "TEST"){
+    statbank_base_url_env <- 'STATBANK_TEST_BASE_URL'
+  }
+
+
+  url_transfer <- paste0(paste0(Sys.getenv(statbank_base_url_env), 'statbank/sos/v1/DataLoader?'),
                          "initialier=", initialer,
                          # "&hovedtabell=", tabell_id, # Skal ogsaa fungere med tabell_id (men gjoer ikke det i PROD)
                          "&hovedtabell=", uttaksbeskrivelse$Huvudtabell,
@@ -434,19 +519,19 @@ statbank_lasting <- function(lastefil,
                              body = list(raw = body))
 
 
-    
+
   if (httr::content(transfer_log)$TotalResult$Status == "Success") {
     print("Lasting vellykket!")
     return(transfer_log)
     stop()
   }
-    
 
-    if (httr::content(transfer_log)$TotalResult$Status == "Failure") {
+
+  if (httr::content(transfer_log)$TotalResult$Status == "Failure") {
     print("Lasting mislyktes")
     return(transfer_log)
-  }    
-    
+  }
+
 
   if (httr::content(transfer_log)$TotalResult$Status == "Failure" & try(grepl("brudd paa unik skranke", httr::content(transfer_log)$ItemResults[[1]]$Exception$Message))) {
     print("Lasting mislyktes. Kan skyldes at forrige opplasting ikke er ferdig. Vent noen minutter og proev igjen.")
