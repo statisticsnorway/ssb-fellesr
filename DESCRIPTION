@@ -37,13 +37,6 @@ Imports:
     rlang,
     stringr,
     sfarrow,
-    usethis,
-    roxygen2,
-    gh,
-    stats,
-    git2r,
-    renv,
-    pkgdown,
     arsenal,
     fastmatch
 License: Apache license 2.0
