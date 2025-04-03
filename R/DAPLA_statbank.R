@@ -425,7 +425,7 @@ statbank_lasting <- function(lastefil,
     print("OBS: publiseringsdato kan ikke settes mer enn 120 dager frem i tid")
   }
 
-  if (as.POSIXlt(publiseringsdato, tz = Sys.timezone()) < as.POSIXlt(Sys.Date())) {
+  if (as.POSIXlt(publiseringsdato, tz = "UTC") < as.POSIXlt(Sys.Date(), tz = "UTC")) {
     print("OBS: publiseringsdato må settes til en dato frem i tid")
   }
 
