@@ -28,9 +28,6 @@ statbank_encrypt_request <- function(laste_bruker,
     }
   }
 
-  print(paste0("statbank_encrypt_request ", db))
-  # print(db)
-
   if (db == "PROD"){
     statbank_encrypt_env <- 'STATBANK_ENCRYPT_URL'
 
@@ -51,16 +48,11 @@ statbank_encrypt_request <- function(laste_bruker,
     # DAPLA
   } else {
 
-
-    print(paste0("statbank_encrypt_request ", db))
-
     if (db == "PROD"){
       statbank_encrypt_env <- 'STATBANK_ENCRYPT_URL'
     } else if (db == "TEST"){
       statbank_encrypt_env <- 'STATBANK_TEST_ENCRYPT_URL'
     }
-
-    print(statbank_encrypt_env)
 
     encrypt_request <- httr::POST(
       Sys.getenv(statbank_encrypt_env),
@@ -117,19 +109,18 @@ statbank_uttaksbeskrivelse <- function(tabell_id,
                                        username_encryptedpassword = "",
                                        boundary = 12345,
                                        db = NULL) {
-  if (ask == TRUE){
-    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker, db = db)
-  }
-
-  if (is.null(db)){
+    
+      if (is.null(db)){
     if (Sys.getenv("DAPLA_ENVIRONMENT") == "PROD") {
       db <- "PROD"
     } else {
       db <- "TEST"
     }
   }
-
-  print(paste0("statbank_uttaksbeskrivelse ", db))
+    
+  if (ask == TRUE){
+    username_encryptedpassword <- statbank_encrypt_request(laste_bruker = laste_bruker, db = db)
+  }
 
   if (db == "TEST"){
     statbank_base_url_env <- "STATBANK_TEST_BASE_URL"
@@ -169,7 +160,16 @@ statbank_body <- function(data,
                           tabell_id,
                           ask = TRUE,
                           username_encryptedpassword = "",
-                          boundary = 12345) {
+                          boundary = 12345, 
+                          db = NULL) {
+    
+    if (is.null(db)){
+    if (Sys.getenv("DAPLA_ENVIRONMENT") == "PROD") {
+      db <- "PROD"
+    } else {
+      db <- "TEST"
+    }
+  }  
 
   data_all <- ""
 
@@ -425,7 +425,7 @@ statbank_lasting <- function(lastefil,
     print("OBS: publiseringsdato kan ikke settes mer enn 120 dager frem i tid")
   }
 
-  if (as.POSIXlt(publiseringsdato, tz = Sys.timezone()) < as.POSIXlt(Sys.Date())) {
+  if (as.POSIXlt(publiseringsdato, tz = "UTC") < as.POSIXlt(Sys.Date(), tz = "UTC")) {
     print("OBS: publiseringsdato må settes til en dato frem i tid")
   }
 
@@ -486,8 +486,6 @@ statbank_lasting <- function(lastefil,
 
   body <- statbank_body(data = lastefil, tabell_id = tabell_id, ask = FALSE, username_encryptedpassword = username_encryptedpassword)
 
-  # print(db)
-  print(paste0("statbank_lasting ", db))
 
   if (db == "PROD"){
     statbank_base_url_env <- 'STATBANK_BASE_URL'
