@@ -18,6 +18,7 @@
 <url><loc>/reference/dynarev_uttrekk.html</loc></url>
 <url><loc>/reference/env_check.html</loc></url>
 <url><loc>/reference/esquisser_ssb.html</loc></url>
+<url><loc>/reference/find_project_root.html</loc></url>
 <url><loc>/reference/finn_release.html</loc></url>
 <url><loc>/reference/finn_versjon.html</loc></url>
 <url><loc>/reference/gcs.list.files.html</loc></url>
@@ -45,6 +46,7 @@
 <url><loc>/reference/runExample_ssb.html</loc></url>
 <url><loc>/reference/scale_colour_ssb.html</loc></url>
 <url><loc>/reference/scale_fill_ssb.html</loc></url>
+<url><loc>/reference/set_project_root.html</loc></url>
 <url><loc>/reference/sjekk_endring.html</loc></url>
 <url><loc>/reference/sjekk_endring_datatype.html</loc></url>
 <url><loc>/reference/sjekk_endring_rader_kolonner.html</loc></url>
