@@ -11,3 +11,4 @@
 ^SECURITY\.md$
 ^document_package\.R$
 ^fellesr-package\.R$
+^scripts$
