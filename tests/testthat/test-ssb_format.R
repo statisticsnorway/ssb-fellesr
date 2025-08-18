@@ -125,3 +125,20 @@ test_that("Tilbakemelding om manglende verdier i vektor, men ikke i format", {
   expect_error(suppressWarnings(fmt5$map_range(c(NA, 50))), "Ingen 'other' spesifisert")
   expect_error(suppressWarnings(fmt6$map_cat(c(NA, 50))), "Ingen 'other' spesifisert")
 })
+
+
+sample_list7 <- list(
+  "low-9" = "1",
+  "10-19" = "2",
+  "20-30" = "3",
+  "31-40" = "2"
+)
+
+fmt7 <- ssb_format$new(sample_list7, is_range_format = TRUE)
+test_that("Det er mulig å ha samme målverdi i format for ulike intervaller", {
+  input_vec <- c(5, 10, 30, 32)
+  expected_output <- c("1", "2", "3", "2")
+  expect_equal(suppressWarnings(fmt7$map_range(input_vec)), expected_output)
+})
+
+
