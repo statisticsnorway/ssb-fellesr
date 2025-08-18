@@ -142,36 +142,60 @@ ssb_format <- R6::R6Class("ssb_format",
                             # Ekstraherer og validerer intervallgrenser.
                             store_ranges = function() {
                               top_val <- NULL
-                              breaks_labels <- c()
-                              top_values <- c()
+
+                              bottoms <- numeric()
+                              tops    <- numeric()
+                              labels  <- character()
 
                               for (key in names(self$frmt_list)) {
-                                if (grepl("-", key)) {
-                                  parts <- strsplit(key, "-")[[1]]
+                                if (grepl("-", key, fixed = TRUE)) {
+                                  parts  <- strsplit(key, "-", fixed = TRUE)[[1]]
+                                  if (length(parts) < 2L) {
+                                    stop(sprintf("Ugyldig nøkkel '%s' – forventer 'bottom-top'.", key))
+                                  }
                                   bottom <- trimws(parts[1])
-                                  top <- trimws(parts[2])
+                                  top    <- trimws(parts[2])
 
-                                  bottom_val <- ifelse(tolower(bottom) == "low", -Inf, as.numeric(bottom))
+                                  bottom_val <- if (tolower(bottom) == "low")  -Inf else suppressWarnings(as.numeric(bottom))
+                                  top_next   <- if (tolower(top)    == "high")  Inf else suppressWarnings(as.numeric(top))
 
-                                  if (!is.null(top_val)) {private$trigger_gap_in_frmt_list_warning(bottom_val, top_val)}
+                                  if (!is.null(top_val)) private$trigger_gap_in_frmt_list_warning(bottom_val, top_val)
 
-                                  top_val <- ifelse(tolower(top) == "high", Inf, as.numeric(top))
-                                  top_values <- c(top_values, top_val)
-
-                                  if (top_val < bottom_val) {
-                                    stop(paste("Øvre verdi", top_val, "er mindre enn nedre verdi", bottom_val))
+                                  # validate range order
+                                  if (top_next < bottom_val) {
+                                    stop(sprintf("Øvre verdi %s er mindre enn nedre verdi %s (nøkkel '%s').", top_next, bottom_val, key))
                                   }
 
-                                  if (!is.na(bottom_val)) {
-                                    label <- self$frmt_list[[key]]
-                                    breaks_labels[label] <- bottom_val
-                                  }
+                                  # store
+                                  label   <- self$frmt_list[[key]]
+                                  bottoms <- c(bottoms, bottom_val)
+                                  tops    <- c(tops,    top_next)
+                                  labels  <- c(labels,  label)
+
+                                  # advance
+                                  top_val <- top_next
                                 }
                               }
 
-                              breaks_labels <- sort(breaks_labels)
-                              self$breaks <- c(unname(unlist(breaks_labels)), max(top_values))
-                              self$labels <- names(breaks_labels)
+                              # Sort by bottom to get consistent order
+                              ord <- order(bottoms, tops)
+                              bottoms <- bottoms[ord]
+                              tops    <- tops[ord]
+                              labels  <- labels[ord]
+
+                              # Optional: sanity checks that help cut()/findInterval later
+                              if (any(diff(bottoms) < 0)) {
+                                stop("‘bottoms’ må være ikke-synkende etter sortering.")
+                              }
+                              if (any(bottoms[-1] < tops[-length(tops)])) {
+                                warning("Overlapp mellom intervaller oppdaget.")
+                              }
+
+                              # Final outputs: breaks has one more element than labels
+                              self$breaks <- c(unname(bottoms), max(tops))
+                              self$labels <- labels
+
+                              invisible(NULL)
                             },
 
                             # Konverterer "other"-nøkkelen til små bokstaver om den finnes
