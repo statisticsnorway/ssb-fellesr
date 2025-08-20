@@ -37,6 +37,6 @@ fi
 Rscript -e 'if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv", repos = Sys.getenv("CRAN"))'
 Rscript -e 'if (!requireNamespace("rstudioapi", quietly = TRUE)) install.packages("rstudioapi", repos = Sys.getenv("CRAN"))'
 
-Rscript -e 'rstudioapi::openProject("$RPROJECT_DIR/$RPROJ_FILE")'
+# Rscript -e 'rstudioapi::openProject("$RPROJECT_DIR/$RPROJ_FILE")'
 
 echo "Personal init script completed. RStudio will auto-restore renv environment via .Rprofile."
