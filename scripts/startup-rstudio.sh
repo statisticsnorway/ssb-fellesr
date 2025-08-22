@@ -28,7 +28,7 @@ echo $(ls "/home/onyxia/.local/share/rstudio")
 echo $(ls $PROJECTS_SETTINGS)
 echo $(ls $LASTPROJ_FILE)
 
-mkdir -p "/home/onyxia/.local/share/rstudio/"
+mkdir -p "/home/onyxia/.local/share/rstudio_test/"
 
 # mkdir -p "$PROJECTS_SETTINGS"
 # touch "$LASTPROJ_FILE"
