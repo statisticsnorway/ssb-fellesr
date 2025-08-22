@@ -16,8 +16,10 @@ if [ ! -d "$PROJECT_DIR" ]; then
 fi
 
 RPROFILE_FILE="$PROJECT_DIR/.Rprofile"
+LASTPROJ_FILE="/home/onyxia/.local/share/rstudio/projects_settings/last-project-path"
 
-echo "/home/onyxia/work/$REPO_NAME/$RPROJ_FILE" > "/home/onyxia/.local/share/rstudio/projects_settings/last-project-path"
+touch "$LASTPROJ_FILE"
+echo "/home/onyxia/work/$REPO_NAME/$RPROJ_FILE" > "$LASTPROJ_FILE"
 
 
 # cd $PROJECT_DIR
