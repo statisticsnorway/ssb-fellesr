@@ -18,7 +18,7 @@ fi
 RPROFILE_FILE="$PROJECT_DIR/.Rprofile"
 
 cd $PROJECT_DIR
-Rscript -e 'install.packages("renv", repos = Sys.getenv("CRAN")); Sys.setenv("RENV_CONFIG_REPOS_OVERRIDE" = Sys.getenv("CRAN"); renv::restore(prompt = FALSE)'
+Rscript -e 'install.packages("renv", repos = Sys.getenv("CRAN")); Sys.setenv("RENV_CONFIG_REPOS_OVERRIDE" = Sys.getenv("CRAN")); renv::restore(prompt = FALSE)'
 
 # Sørg for at fila finnes
 touch "$RPROFILE_FILE"
