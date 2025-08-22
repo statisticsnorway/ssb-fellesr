@@ -16,9 +16,22 @@ if [ ! -d "$PROJECT_DIR" ]; then
 fi
 
 RPROFILE_FILE="$PROJECT_DIR/.Rprofile"
+
+# Sørg for at fila finnes
+touch "$RPROFILE_FILE"
+
+# Legg til RENV_CONFIG_REPOS_OVERRIDE helt først hvis det ikke allerede finnes
+if ! grep -q "RENV_CONFIG_REPOS_OVERRIDE" "$RPROFILE_FILE"; then
+  { 
+    echo 'Sys.setenv("RENV_CONFIG_REPOS_OVERRIDE" = Sys.getenv("CRAN"))'
+    cat "$RPROFILE_FILE"
+  } > "$RPROFILE_FILE.tmp" && mv "$RPROFILE_FILE.tmp" "$RPROFILE_FILE"
+fi
+
+# Legg til auto-restore-blokken hvis den ikke finnes fra før
 if ! grep -q "renv::restore" "$RPROFILE_FILE"; then
   cat << 'EOF' >> "$RPROFILE_FILE"
-  
+
 # Auto-restore renv environment on R session startup
 if (requireNamespace("renv", quietly = TRUE)) {
   tryCatch({
