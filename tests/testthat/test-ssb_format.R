@@ -141,4 +141,14 @@ test_that("Det er mulig å ha samme målverdi i format for ulike intervaller", {
   expect_equal(suppressWarnings(fmt7$map_range(input_vec)), expected_output)
 })
 
+sample_list8 <- list(
+  "low-9" = "1",
+  "other" = "annet"
+)
 
+fmt8 <- ssb_format$new(sample_list8, is_range_format = TRUE)
+test_that("Det er mulig å ha other uten NA", {
+  input_vec <- c("5", "10", "30", "32")
+  expected_output <- c("1", "annet", "annet", "annet")
+  expect_equal(suppressWarnings(fmt8$map_range(input_vec)), expected_output)
+})
