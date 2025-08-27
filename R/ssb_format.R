@@ -240,6 +240,9 @@ ssb_format <- R6::R6Class("ssb_format",
 #' }
 #' @export
 get_format <- function(filepath, is_range_format) {
+  if (!file.exists(filepath)) {
+    stop(paste("File does not exist:", filepath))
+  }
   json_data <- jsonlite::fromJSON(filepath, simplifyVector = FALSE)
   return(ssb_format$new(json_data, is_range_format))
 }
