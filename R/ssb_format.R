@@ -41,10 +41,10 @@ ssb_format <- R6::R6Class("ssb_format",
                           map_range = function(vec){
                             if(!self$is_range_format) stop("Dette ssb-format-objektet er ikke angitt som et intervallformat. Bruk map_cat")
 
-                            num_vec <- as.numeric(vec)
+                            num_vec <- suppressWarnings(as.numeric(vec))
 
                             na_mask <- private$check_if_na(vec)
-                            result <- NA_character_
+                            result <- rep(NA_character_, length(vec))
 
                             if (!is.null(self$na_value)) {
                               result[na_mask] <- self$na_value
@@ -240,6 +240,9 @@ ssb_format <- R6::R6Class("ssb_format",
 #' }
 #' @export
 get_format <- function(filepath, is_range_format) {
+  if (!file.exists(filepath)) {
+    stop(paste("File does not exist:", filepath))
+  }
   json_data <- jsonlite::fromJSON(filepath, simplifyVector = FALSE)
   return(ssb_format$new(json_data, is_range_format))
 }
