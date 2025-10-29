@@ -5,6 +5,7 @@
 #'
 #' @param data Datasettet som skal eksporteres til SAS-format. Dette kan være en data.frame eller tibble.
 #' @param filsti En karakterstreng som spesifiserer banen der filene skal lagres (både datafilen og SAS-programmet).
+#' @param filsti_innlesning En karakterstreng som spesifiserer banen der filen skal leses fra fra SAS-programmet. Dersom filen lages på Dapla og skal kjøres i SAS i produksjonsonen må mappen filen skal legges i spesifiseres her.
 #' @param filnavn En karakterstreng som spesifiserer navnet på filene som skal genereres. Hvis ikke angitt, brukes navnet på objektet `data`.
 #' @param libname En karakterstreng som spesifiserer navnet på SAS-libnavn som skal brukes i SAS-programmet. Standard er `"wd"`.
 #'
