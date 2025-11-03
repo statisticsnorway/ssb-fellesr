@@ -4,12 +4,20 @@
 \alias{write_sas_prog}
 \title{Eksporter data frame til tekstfil og lag SAS-program for innlesning}
 \usage{
-write_sas_prog(data, filsti, filnavn = NULL, libname = "wd")
+write_sas_prog(
+  data,
+  filsti,
+  filsti_innlesning = NULL,
+  filnavn = NULL,
+  libname = "wd"
+)
 }
 \arguments{
 \item{data}{Datasettet som skal eksporteres til SAS-format. Dette kan være en data.frame eller tibble.}
 
 \item{filsti}{En karakterstreng som spesifiserer banen der filene skal lagres (både datafilen og SAS-programmet).}
+
+\item{filsti_innlesning}{En karakterstreng som spesifiserer banen der filen skal leses fra fra SAS-programmet. Dersom filen lages på Dapla og skal kjøres i SAS i produksjonsonen må mappen filen skal legges i spesifiseres her.}
 
 \item{filnavn}{En karakterstreng som spesifiserer navnet på filene som skal genereres. Hvis ikke angitt, brukes navnet på objektet \code{data}.}
 
