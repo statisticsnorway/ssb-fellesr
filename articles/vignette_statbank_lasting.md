@@ -1,0 +1,72 @@
+# Lasting til statistikkbanken
+
+![](images/statbank.PNG)
+
+Her finner du eksempler på hvordan å laste opp en tabell til
+statistikkbanken fra Jupyterlab i R. Funksjonen ligger i pakken
+`fellesr` og fungerer både på DAPLA og i produksjonssonen. Du trenger
+`fellesr` versjon \>= 0.1.2.
+
+``` r
+library(fellesr)
+```
+
+Pakken inneholder en hovedfunksjon
+[`statbank_lasting()`](../reference/statbank_lasting.md). Denne
+funksjonen laster opp én eller flere objekter man allerede har lastet
+inn i R. Det er også mulig å angi filstier til én eller flere
+.parquet-filer som funksjonen først leser inn og deretter laster opp til
+statistikkbanken.
+
+Funksjonen krever at filen(e) som skal lastes opp er angitt i argumentet
+`lastefil`.
+
+Tabell-ID oppgis i `tabell_id` og seksjonens lastebruker må oppgis under
+`laste_bruker`.
+
+Dato for publisering angis i `publiseringsdato` (i formatet
+“YYYY-MM-DD”).
+
+Argumentet `initialer` kan spesifiseres ved behov dersom det er noen
+andre enn brukeren som kjører programmet som skal motta lastelogg per
+e-post. Dersom denne ikke er spesifisert hentes initialene til brukeren
+som er pålogget fra en miljøvariabel i Jupyterlab.
+
+Her er et eksempel:
+
+``` r
+statbank_lasting(lastefil = roykalderkj1,
+                 tabell_id = "05307",
+                 laste_bruker = "LAST330",
+                 publiseringsdato = "2022-12-31")
+```
+
+Det er også mulig å oppgi filsti til mappen der lastefilen har blitt
+lagret i .parquet-format:
+
+``` r
+statbank_lasting(lastefil = "roykalderkj1.parquet",
+                 lastefilsti = "ssb-prod-spesh-personell-data-kilde",
+                 tabell_id = "05307",
+                 laste_bruker = "LAST330",
+                 publiseringsdato = "2022-12-31")
+```
+
+Flere filer kan lastes opp samtidig ved å spesifiere en filene i en
+liste. For eksempel:
+
+``` r
+statbank_lasting(lastefil = list(speshelse08fylker1, speshelse08kommun1, speshelse08landet1),
+                 tabell_id = "13772",
+                 laste_bruker = "LAST330",
+                 publiseringsdato = "2022-12-31")
+```
+
+Funksjonen [`statbank_lasting()`](../reference/statbank_lasting.md)
+inneholder en valideringssjekk for å oppdage vanlige lastefeil før
+tabellen lastes opp. Dette inkluderer antall kolonner i tabellen og
+ugyldige verdier i tabellen som ikke finnes i kodelisten. Dersom det
+oppdages feil som vil føre til lastefeil gis det beskjed om dette i
+Jupyterlab og programmet stopper før tabellen lastes opp. Om man ikke
+ønsker å ha med valideringen før opplasting kan man legge til argumentet
+`validering = FALSE`.

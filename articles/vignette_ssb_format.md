@@ -1,0 +1,123 @@
+# SSB format
+
+Klassen ssb_format tilbyr mapping av enten numeriske eller kategoriske
+variabler i henhold til en forhåndsdefinert JSON-fil eller liste.
+Klassen etterligner noe funskjonalitet fra SAS og klassen SsbFormat fra
+Python-biblioteket ssb-fagfunksjoner.
+
+### Hvorfor bruke denne klassen?
+
+I statistikk brukes en rekke ulike kodelister, og det er behov for å få
+korrespondanse mellom dem, f.eks. ved aggregering eller ved omkoding fra
+datakilde til koder i Statistikkbanken. Det er også behov for å enkelt
+kunne mappe numeriske verdier til kategoriske variabler. JSON-filer er
+godt egnet for å lagre denne typen mapping mellom en kodelister samt
+mellom intervaller og kategorier. Denne klassen gjør det enkelt å bruke
+applisere mappingen fra JSON-filene på data.
+
+Denne klassen og SsbFormat fra Python takler JSON-filer i samme format,
+noe som gjør formatene gjenbrukbare. Dermed er det mulig å bytte mellom
+språk uten å måtte skrive formatene på nytt.
+
+Mapping-metodene fra ssb_format er dessuten mer effektive enn det
+R-funksjonene ifelse og dplyr::case_when er.
+
+### Formater med intervaller
+
+``` r
+# Eksempeldata
+alder <- sample(1L:100L, size = 10, replace = TRUE)
+
+# Eksempelformat
+age_frmt = list(
+    "low-18" = "-18",
+    "19-25" = "19-25",
+    "26-35" = "26-35",
+    "36-45" = "36-45",
+    "46-55" = "46-55",
+    "56-high" = "56+",
+    "other" = "missing"
+)
+
+# Initier formatet med ssb_format-klassen
+ssb_age_frmt <- ssb_format$new(age_frmt, is_range_format = TRUE)
+
+# Bruk formatet til å lage en ny kategorisk variabel
+alder_kat <- ssb_age_frmt$map_range(alder)
+```
+
+### Formater fra kategori til kategori
+
+``` r
+# Eksempeldata
+ansettelsesform <- sample(c("F", "M", "", "A"), 10, replace = TRUE)
+
+# Eksempelformat
+ansform_frmt = list(
+    "F" = "fast",
+    "M" = "midlertidig",
+    "other" = "annet",
+    "NA" = "ukjent"
+)
+
+# Initier formatet
+ssb_ansform_frmt < ssb_format$new(ansform_frmt, is_range_format = FALSE)
+
+# Bruk formatet til å lage en ny variabel
+ansettelsesform_ny <- ssb_ansform_frmt$map_cat(ansettelsesform)
+```
+
+### Les format fra JSON og initier
+
+``` r
+ssb_age_frmt <- get_format("formats/alder.json", is_range_format = TRUE)
+
+# Eksempeldata
+alder <- sample(1L:100L, size = 10, replace = TRUE)
+
+# Bruk formatet til å lage en ny kategorisk variabel
+alder_kat <- ssb_age_frmt$map_range(alder)
+```
+
+### Noen viktige forskjeller fra SsbFormat og SAS
+
+Klassen fungerer likt som Python-ekvivalenten SsbFormat i den forstand
+at den kan lese inn et JSON-lignende objekt og bruke dette til å mappe
+numeriske verdier til kategorier basert på dette. I tillegg er det lagt
+opp til at R-klassen å kategori-til-kategori-mapping for å kompensere
+for Python-funksjonen
+[map](https://docs.python.org/3/library/functions.html#map).
+
+Ingen av disse klassene tilbyr noen løsning på overlappende intervaller
+slik som i SAS.
+
+#### OBS: Potensiell felle
+
+En viktig forskjell er at det kun er de nedre verdiene i intervallene
+som bestemmer kategoriseringen, med unntak av den øverste grenseverdien.
+Dermed kan det gi rare resultater ved bruk av ssb_format\$map_range()
+hvor dette er formatet:
+
+``` json
+{
+  "0-9": "1", 
+  "10-20": "2", 
+  "22-30": "3", 
+  "other": "4" 
+}
+```
+
+21 vil bli “2” fordi den neste nedre grenseverdien etter 10 er 22. 31
+vil imidlertid gi “4” fordi den øverste grenseverdien er 30.
+
+Python-klassen SsbFormat fungerer ikke med desimaltall. Det gjør
+ssb_format. Det virker imidlertid annerledes fra formater i SAS, hvor
+den øvre grensverdien i et intervall gjerne angis som 9,9999 dersom vi
+ønsker at 9,5 skal falle under “1”. Ved bruk av SsbFormat er det
+nødvendig å runde ned til nærmeste heltall først. I ssb_format vil ikke
+øvre grenseverdi ha noen betydning, og 9,5 vil falle under “1” fordi 9
+\< neste nedre grenseverdi (10).
+
+Dersom en forsøker å initiere klassen med et format som i eksempelet
+over, vil følgende warning trigges: Formatet kategoriserer verdier
+innenfor \[9 \> verdi \> 10\] i intervallet \[X-9\]

@@ -1,0 +1,42 @@
+# Funksjon for aa laste inn "multifile" datasett fra Google Cloud Storage bucket
+
+Funksjonen `open_dataset` kan brukes til aa lese deler av datasett
+(bl.a. .parquet-, .feather- og .csv-filer) fra Google Cloud Storage. Det
+lages en forbindelse til mappen der filen ligger og deretter kan man
+bruke argumenter fra `dplyr`, som `filter` og `select`, foer man bruker
+`collect` til aa lese inn dataene i R. `open_dataset` kan ogsaa brukes
+til aa lese inn sf-objekter (lagret som .parquet-fil med pakken
+`sfarrow`).
+
+## Usage
+
+``` r
+open_dataset(file, ...)
+```
+
+## Arguments
+
+- file:
+
+  Full sti og navn paa filen som skal leses inn fra Google Cloud Storage
+  bucket.
+
+- ...:
+
+  Flere parametere (se:
+  https://arrow.apache.org/docs/r/reference/open_dataset.html)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+data <- open_dataset("ssb-prod-dapla-felles-data-delt/R_smoke_test/1987_1996_dataset") %>%
+ dplyr::filter(Year == 1996 & TailNum == "N2823W") %>%
+ dplyr::select(Year, Month, DayofMonth, TailNum) %>%
+ dplyr::collect()
+
+data <- open_dataset("ssb-prod-dapla-felles-data-delt/GIS/Vegnett/2022") %>%
+ dplyr::filter(municipality == "301") %>%
+ sfarrow::read_sf_dataset()
+ } # }
+```

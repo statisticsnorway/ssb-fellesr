@@ -15,7 +15,10 @@
 <url><loc>/articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/reference/arrow_to_sf.html</loc></url>
+<url><loc>/reference/create_metadata.html</loc></url>
 <url><loc>/reference/dynarev_uttrekk.html</loc></url>
+<url><loc>/reference/encode_wkb.html</loc></url>
 <url><loc>/reference/env_check.html</loc></url>
 <url><loc>/reference/esquisser_ssb.html</loc></url>
 <url><loc>/reference/find_project_root.html</loc></url>
@@ -41,6 +44,7 @@
 <url><loc>/reference/read_parquet.html</loc></url>
 <url><loc>/reference/read_parquet_sf.html</loc></url>
 <url><loc>/reference/read_rds.html</loc></url>
+<url><loc>/reference/read_sf_dataset.html</loc></url>
 <url><loc>/reference/read_xml.html</loc></url>
 <url><loc>/reference/runApp_ssb.html</loc></url>
 <url><loc>/reference/runExample_ssb.html</loc></url>
@@ -55,9 +59,14 @@
 <url><loc>/reference/ssb_colours.html</loc></url>
 <url><loc>/reference/ssb_format.html</loc></url>
 <url><loc>/reference/ssb_palettes.html</loc></url>
+<url><loc>/reference/st_read_feather.html</loc></url>
+<url><loc>/reference/st_read_parquet.html</loc></url>
+<url><loc>/reference/st_write_feather.html</loc></url>
+<url><loc>/reference/st_write_parquet.html</loc></url>
 <url><loc>/reference/statbank_lasting.html</loc></url>
 <url><loc>/reference/statbank_uttaksbeskrivelse.html</loc></url>
 <url><loc>/reference/theme_ssb.html</loc></url>
+<url><loc>/reference/validate_metadata.html</loc></url>
 <url><loc>/reference/versjoner_filer.html</loc></url>
 <url><loc>/reference/write_SSB.html</loc></url>
 <url><loc>/reference/write_csv.html</loc></url>
@@ -66,6 +75,7 @@
 <url><loc>/reference/write_parquet.html</loc></url>
 <url><loc>/reference/write_rds.html</loc></url>
 <url><loc>/reference/write_sas_prog.html</loc></url>
+<url><loc>/reference/write_sf_dataset.html</loc></url>
 <url><loc>/reference/write_sf_parquet.html</loc></url>
 </urlset>
 
