@@ -205,8 +205,8 @@ lag_versjonert_filsti <- function(fil,
 
   if (versjon == "uversjonert"){
       return(fil)
-  }  
-    
+  }
+
   mappe <- dirname(fil)
 
   # Sjekk om mappen eksisterer
@@ -303,10 +303,10 @@ lag_versjonert_filsti <- function(fil,
 #'
 #'}
 #' @export
-sjekk_endring_rader_kolonner <- function(filsti, 
+sjekk_endring_rader_kolonner <- function(filsti,
                                          versjon_1 = "uversjonert",
                                          versjon_2 = "siste") {
-    
+
   # Hent antall rader og kolonner fra siste versjonerte fil
   data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2))
   dim_siste <- dim(data_siste)
@@ -365,7 +365,7 @@ sjekk_endring_rader_kolonner <- function(filsti,
 #'
 #'}
 #' @export
-sjekk_endring_datatype <- function(filsti, 
+sjekk_endring_datatype <- function(filsti,
                                    versjon_1 = "uversjonert",
                                    versjon_2 = "siste"){
 
@@ -504,13 +504,25 @@ sjekk_endring_sum <- function(filsti,
 #'
 #'}
 #' @export
-sjekk_endring_verdier <- function(filsti, 
+sjekk_endring_verdier <- function(filsti,
                                   versjon_1 = "uversjonert",
                                   versjon_2 = "siste"){
 
   # Hent data fra siste versjonerte fil og ny fil
-  data_siste <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_2))
-  data_ny <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_1))
+  # data_siste <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_2))
+  # data_ny <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_1))
+
+  metadata <- arrow::open_dataset(filsti)$metadata
+
+    if (length(metadata) == 0) {
+      data_siste <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_2))
+      data_ny <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_1))
+    } else {
+      data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2)) %>%
+        read_sf_dataset()
+      data_ny <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_1)) %>%
+        read_sf_dataset()
+    }
 
   # Sammenlign dataene mellom siste og ny fil
   # comparison <- arsenal::comparedf(data_siste, data_ny, by = NULL)
@@ -561,10 +573,10 @@ sjekk_endring_verdier <- function(filsti,
 #'
 #'}
 #' @export
-sjekk_endring <- function(filsti, 
+sjekk_endring <- function(filsti,
                           versjon_1 = "uversjonert",
                           versjon_2 = "siste"){
-    
+
   endring_rader_kolonner <- sjekk_endring_rader_kolonner(filsti = filsti,
                                                          versjon_1 = versjon_1,
                                                          versjon_2 = versjon_2)
@@ -751,18 +763,37 @@ versjoner_filer <- function(filstier,
    # Itererer over hver filsti
   updated_filstier <- purrr::map(filstier_liste, function(filsti) {
 
+    metadata <- arrow::open_dataset(filsti)$metadata
+
     # Sjekker først om finn_versjon er FALSE eller versjon 1 skal opprettes
     if (finn_versjon(lag_versjonert_filsti(filsti, versjon = "ny")) == 1) {
-      data <- arrow::read_parquet(filsti)
-      arrow::write_parquet(data, lag_versjonert_filsti(filsti, versjon = "ny"))
+
+      if (length(metadata) == 0) {
+        data <- arrow::read_parquet(filsti)
+        arrow::write_parquet(data, lag_versjonert_filsti(filsti, versjon = "ny"))
+      } else {
+        data <- arrow::open_dataset(filsti) %>%
+          read_sf_dataset()
+        st_write_parquet(obj = data, dsn = lag_versjonert_filsti(filsti, versjon = "ny"))  # OBS: fjern fellesr
+      }
+
+
       # Hvis versjon 1 opprettes, returner stien til den nye versjonen
       return(lag_versjonert_filsti(filsti, versjon = "siste"))
     }
 
     # Sjekker om det er en endring for denne filstien
     if (sjekk_endring(filsti = filsti)) {
-      data <- arrow::read_parquet(filsti)
-      arrow::write_parquet(data, lag_versjonert_filsti(filsti, versjon = "ny"))
+
+      if (length(metadata) == 0) {
+        data <- arrow::read_parquet(filsti)
+        arrow::write_parquet(data, lag_versjonert_filsti(filsti, versjon = "ny"))
+      } else {
+        data <- arrow::open_dataset(filsti) %>%
+          read_sf_dataset()
+        st_write_parquet(obj = data, dsn = lag_versjonert_filsti(filsti, versjon = "ny"))  # OBS: fjern fellesr
+      }
+
       # Hvis det er en endring, oppdater filstien med ny versjon
       return(lag_versjonert_filsti(filsti, versjon = "siste"))
     } else {
