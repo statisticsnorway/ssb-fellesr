@@ -9,12 +9,12 @@
 ## Citation
 
 Jentoft S, Haugen S (2025). *fellesr: General R functions for SSB*. R
-package version 0.3.7, <https://statisticsnorway.github.io/fellesr/>.
+package version 0.3.8, <https://statisticsnorway.github.io/fellesr/>.
 
     @Manual{,
       title = {fellesr: General R functions for SSB},
       author = {Susie Jentoft and Sindre Haugen},
       year = {2025},
-      note = {R package version 0.3.7},
+      note = {R package version 0.3.8},
       url = {https://statisticsnorway.github.io/fellesr/},
     }
