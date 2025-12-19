@@ -53,43 +53,43 @@
 opprett_mappestruktur <- function(arbeidsmappe,
                                   mapper = c("inndata", "klargjorte-data", "statistikk", "utdata"),
                                   periode = NULL) {
-
+  
   # Fjerner eventuell avsluttende "/" fra arbeidsmappe først
   arbeidsmappe <- sub("/$", "", arbeidsmappe)
-
+  
   # Opprett en tom liste for å lagre stier
   mapper_liste <- list()
-
+  
   # Itererer over listen av mapper
   for (mappe in mapper) {
     # Lag full sti til mappen
     full_mappe_path <- file.path(arbeidsmappe, mappe)
-
+    
     # Oppretter mappen om den ikke finnes
     if (!dir.exists(full_mappe_path)) {
       dir.create(full_mappe_path, recursive = TRUE)
     }
-
+    
     # Hvis 'periode' er spesifisert, opprett undermappe med det navnet og oppdater stien
     if (!is.null(periode)) {
       full_mappe_path <- file.path(full_mappe_path, periode)
-
+      
       # Oppretter undermappen om den ikke finnes
       if (!dir.exists(full_mappe_path)) {
         dir.create(full_mappe_path, recursive = TRUE)
       }
     }
-
+    
     # Sørg for at stien slutter med "/"
     full_mappe_path <- paste0(rtrim(full_mappe_path, "/"), "/")
-
+    
     # Erstatt bindestrek med understrek i variabelnavn
     var_navn <- gsub("-", "_", paste0(mappe, "_mappe"))  # F.eks. "klargjorte_data_mappe"
-
+    
     # Legg stien inn i listen
     mapper_liste[[var_navn]] <- full_mappe_path
   }
-
+  
   # Returnerer listen med mapper
   return(mapper_liste)
 }
@@ -135,31 +135,31 @@ rtrim <- function(x, char = "/") {
 #'
 #' @export
 finn_versjon <- function(fil) {
-
+  
   # Sjekk om filnavnet inneholder stor "V"
   if (grepl("_V", fil)) {
     stop("Filnavnet inneholder stor 'V' i stedet for liten 'v'. Funksjonen forventer '_v' med små bokstaver.")
-
-      versjon <- FALSE
-
+    
+    versjon <- FALSE
+    
   } else if (!grepl(".*_v\\d{1,}\\..*$", fil)) {
-
+    
     # Gi en advarsel om at filen ikke er versjonert riktig, men bare hvis det ikke var en stor 'V'
     stop("Filen er ikke versjonert i henhold til navnestandarden. ",
-            "Se https://manual.dapla.ssb.no/statistikkere/navnestandard.html for mer informasjon.")
-
+         "Se https://manual.dapla.ssb.no/statistikkere/navnestandard.html for mer informasjon.")
+    
     versjon <- FALSE
-
+    
   } else {
-
+    
     ## Vi henter ut versjonsnummeret ved å erstatte hele filnavnet med
     ## tallene etter "_v"
-
+    
     versjon <- as.integer(gsub(pattern = ".*_v(\\d{1,})\\..*$",
                                replacement = "\\1",
                                x = fil))
   }
-
+  
   return(versjon)
 }
 
@@ -202,33 +202,33 @@ finn_versjon <- function(fil) {
 #' @export
 lag_versjonert_filsti <- function(fil,
                                   versjon = "siste") {
-
+  
   if (versjon == "uversjonert"){
-      return(fil)
+    return(fil)
   }
-
+  
   mappe <- dirname(fil)
-
+  
   # Sjekk om mappen eksisterer
   if (!dir.exists(mappe)) stop("Fant ikke angitt mappe: ", mappe)
-
+  
   # Fjern eventuell versjonsinformasjon fra basenavnet
   basenavn <- gsub(pattern = "_v\\d{1,}$",
                    replacement = "",
                    x = tools::file_path_sans_ext(basename(fil)))
-
+  
   filendelse <- tools::file_ext(fil)
-
+  
   # Hent alle filer i mappen som matcher basenavnet
   filer <- list.files(mappe, basenavn)
-
+  
   # Hvis vi skal lage en ny versjon og det ikke finnes filer fra før
   if (versjon != "ny" & length(filer) == 0) {
     stop("Fant ingen filer som matchet ", basenavn, " i ", mappe, ".")
   }
-
+  
   versjonerte_filer <- filer[grepl("_v\\d{1,}\\..*$", filer)]
-
+  
   if (length(versjonerte_filer) == 0) {
     # Ingen versjonerte filer funnet
     if (versjon == "ny") {
@@ -252,10 +252,10 @@ lag_versjonert_filsti <- function(fil,
       }
     }
   }
-
+  
   # Lag den nye filstien basert på versjonen
   ny_filsti <- paste0(mappe, "/", basenavn, "_v", ny_versjon, ".", filendelse)
-
+  
   # Håndtering for ny versjon
   if (versjon == "ny") {
     if (file.exists(ny_filsti)) {
@@ -306,26 +306,26 @@ lag_versjonert_filsti <- function(fil,
 sjekk_endring_rader_kolonner <- function(filsti,
                                          versjon_1 = "uversjonert",
                                          versjon_2 = "siste") {
-
+  
   # Hent antall rader og kolonner fra siste versjonerte fil
   data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2))
   dim_siste <- dim(data_siste)
-
+  
   # Hent antall rader og kolonner fra ny fil
   data_ny <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_1))
   dim_ny <- dim(data_ny)
-
+  
   # Sjekk om antall rader eller kolonner er forskjellige
   if (!identical(dim_siste, dim_ny)) {
     return(TRUE)  # Returnerer TRUE hvis antall rader eller kolonner er forskjellige
   }
-
+  
   # Hent kolonner fra siste versjonerte fil
   kolonnenavn_siste <- data_siste$schema$names
-
+  
   # Hent kolonner fra ny fil
   kolonnenavn_ny <- data_ny$schema$names
-
+  
   # Sjekk om det er endringer i kolonnenavn eller antall kolonner
   if ((length(kolonnenavn_siste) != length(kolonnenavn_ny)) |
       !identical(sort(kolonnenavn_siste), sort(kolonnenavn_ny))) {
@@ -333,7 +333,7 @@ sjekk_endring_rader_kolonner <- function(filsti,
   } else {
     endring_kolonner <- FALSE
   }
-
+  
   return(endring_kolonner)
 }
 
@@ -368,30 +368,30 @@ sjekk_endring_rader_kolonner <- function(filsti,
 sjekk_endring_datatype <- function(filsti,
                                    versjon_1 = "uversjonert",
                                    versjon_2 = "siste"){
-
+  
   # Hent datatyper fra siste versjonerte fil
   data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2))$schema
   kolonnenavn_siste <- data_siste$names
   kolonne_datatyper_siste <- sapply(data_siste$fields, function(x) x$type$ToString())
   datatyper_siste <- data.frame(Kolonne = kolonnenavn_siste, Datatype = kolonne_datatyper_siste)
-
+  
   # Hent datatyper fra ny fil
   data_ny <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_1))$schema
   kolonnenavn_ny <- data_ny$names
   kolonne_datatyper_ny <- sapply(data_ny$fields, function(x) x$type$ToString())
   datatyper_ny <- data.frame(Kolonne = kolonnenavn_ny, Datatype = kolonne_datatyper_ny)
-
+  
   # Sammenlign datatyper mellom siste og ny fil
   sammenligning_diff <- merge(datatyper_siste, datatyper_ny, by = "Kolonne", suffixes = c("_siste", "_ny")) %>%
     filter(Datatype_siste != Datatype_ny)
-
+  
   # Sjekk om det er forskjeller i datatypene
   if (nrow(sammenligning_diff) > 0){
     endring_datatype <- TRUE
   } else {
     endring_datatype <- FALSE
   }
-
+  
   return(endring_datatype)
 }
 
@@ -421,60 +421,60 @@ sjekk_endring_datatype <- function(filsti,
 sjekk_endring_sum <- function(filsti,
                               versjon_1 = "uversjonert",
                               versjon_2 = "siste") {
-
+  
   # Åpne datasettene med lazy loading
   data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2))
   data_ny <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_1))
-
+  
   # Funksjon for å sjekke om en kolonne er numerisk (integer eller float/double)
   is_numeric_column <- function(dataset, column_name) {
     column_type <- dataset$schema$GetFieldByName(column_name)$type$ToString()  # Konverter til streng
     column_type %in% c("int32", "int64", "float", "double")
   }
-
+  
   # Få kolonnenavn fra datasettene
   columns_siste <- data_siste$schema$names
   columns_ny <- data_ny$schema$names
-
+  
   # Filtrer kolonner som er numeriske for data_siste og data_ny
   numeric_columns_siste <- columns_siste[sapply(columns_siste, function(col) is_numeric_column(data_siste, col))]
   numeric_columns_ny <- columns_ny[sapply(columns_ny, function(col) is_numeric_column(data_ny, col))]
-
+  
   # Dynamisk bygge summarize for data_siste
   summarized_siste <- data_siste %>%
     summarize(across(all_of(numeric_columns_siste), ~ sum(.x, na.rm = TRUE)))
-
+  
   # Dynamisk bygge summarize for data_ny
   summarized_ny <- data_ny %>%
     summarize(across(all_of(numeric_columns_ny), ~ sum(.x, na.rm = TRUE)))
-
+  
   # Samle resultatene inn i minnet med collect()
   resultat_siste <- summarized_siste %>% collect()
   resultat_ny <- summarized_ny %>% collect()
-
-
-
-
+  
+  
+  
+  
   # Sammenlign dataene mellom siste og ny fil
   # comparison <- arsenal::comparedf(resultat_siste, resultat_ny, by = NULL)
   comparison <- all.equal(resultat_siste, resultat_ny, tolerance = .Machine$double.eps^0.5)
-
+  
   # forskjeller <- summary(comparison)$diffs.table
-
+  
   # # Sjekk om det er forskjeller i dataene
   # if (nrow(forskjeller) > 0){
   #   endring_sum <- TRUE
   # } else {
   #   endring_sum <- FALSE
   # }
-
+  
   if (any(comparison == TRUE)){
     endring_sum <- FALSE
   } else {
     endring_sum <- TRUE
-
+    
   }
-
+  
   return(endring_sum)
 }
 
@@ -507,43 +507,43 @@ sjekk_endring_sum <- function(filsti,
 sjekk_endring_verdier <- function(filsti,
                                   versjon_1 = "uversjonert",
                                   versjon_2 = "siste"){
-
+  
   # Hent data fra siste versjonerte fil og ny fil
   # data_siste <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_2))
   # data_ny <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_1))
-
+  
   metadata <- arrow::open_dataset(filsti)$metadata
-
-    if (length(metadata) == 0) {
-      data_siste <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_2))
-      data_ny <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_1))
-    } else {
-      data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2)) %>%
-        read_sf_dataset()
-      data_ny <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_1)) %>%
-        read_sf_dataset()
-    }
-
+  
+  if (length(metadata$geo) == 0) {
+    data_siste <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_2))
+    data_ny <- arrow::read_parquet(lag_versjonert_filsti(filsti, versjon_1))
+  } else {
+    data_siste <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_2)) %>%
+      read_sf_dataset()
+    data_ny <- arrow::open_dataset(lag_versjonert_filsti(filsti, versjon_1)) %>%
+      read_sf_dataset()
+  }
+  
   # Sammenlign dataene mellom siste og ny fil
   # comparison <- arsenal::comparedf(data_siste, data_ny, by = NULL)
   comparison <- all.equal(data_siste, data_ny)
-
+  
   # forskjeller <- summary(comparison)$diffs.table
-
+  
   # # Sjekk om det er forskjeller i dataene
   # if (nrow(forskjeller) > 0){
   #   endring_verdier <- TRUE
   # } else {
   #   endring_verdier <- FALSE
   # }
-
+  
   if (any(comparison == TRUE)){
     endring_verdier <- FALSE
   } else {
     endring_verdier <- TRUE
-
+    
   }
-
+  
   return(endring_verdier)
 }
 
@@ -576,41 +576,41 @@ sjekk_endring_verdier <- function(filsti,
 sjekk_endring <- function(filsti,
                           versjon_1 = "uversjonert",
                           versjon_2 = "siste"){
-
+  
   endring_rader_kolonner <- sjekk_endring_rader_kolonner(filsti = filsti,
                                                          versjon_1 = versjon_1,
                                                          versjon_2 = versjon_2)
-
+  
   if (endring_rader_kolonner == TRUE){
     endring <- TRUE
     print(glue::glue("Endring i rader og/eller kolonner: {filsti}"))
     return(endring)  # Avslutt funksjonen uten feilmelding hvis kolonner har endret seg
   }
-
+  
   endring_datatype <- sjekk_endring_datatype(filsti = filsti,
-                                                         versjon_1 = versjon_1,
-                                                         versjon_2 = versjon_2)
-
+                                             versjon_1 = versjon_1,
+                                             versjon_2 = versjon_2)
+  
   if (endring_datatype == TRUE){
     endring <- TRUE
     print(glue::glue("Endring i datatyper: {filsti}"))
     return(endring)  # Avslutt funksjonen uten feilmelding hvis datatyper har endret seg
   }
-
+  
   endring_sum <- sjekk_endring_sum(filsti = filsti,
-                                                         versjon_1 = versjon_1,
-                                                         versjon_2 = versjon_2)
-
+                                   versjon_1 = versjon_1,
+                                   versjon_2 = versjon_2)
+  
   if (endring_sum == TRUE){
     endring <- TRUE
     print(glue::glue("Endring i summen til numeriske kolonner for: {filsti}"))
     return(endring)  # Avslutt funksjonen uten feilmelding hvis datatyper har endret seg
   }
-
+  
   endring_verdier <- sjekk_endring_verdier(filsti = filsti,
-                                                         versjon_1 = versjon_1,
-                                                         versjon_2 = versjon_2)
-
+                                           versjon_1 = versjon_1,
+                                           versjon_2 = versjon_2)
+  
   if (endring_verdier == TRUE){
     endring <- TRUE
     print(glue::glue("Endring i verdier for: {filsti}"))
@@ -661,22 +661,22 @@ logg_kjoring <- function(resultat,
                          logg_fil = "versjonering_logg.json",
                          arbeidsmappe,
                          periode) {
-
+  
   logg_filsti <- glue::glue("{arbeidsmappe}/{logg_fil}")
-
+  
   # Sjekk om loggfilen allerede eksisterer
   if (file.exists(logg_filsti)) {
     # Les inn eksisterende logg
     logg <- jsonlite::fromJSON(logg_filsti)
-
+    
     # Sjekk om loggen har minst én kjøring
     if (length(logg) > 0) {
       # Hent den siste oppføringen (siste kjøring)
       siste_kjoring <- logg[[length(logg)]]
-
+      
       # Sjekk om den nye kjøringen er identisk med den siste versjonerte filene
       identisk <- identical(siste_kjoring$versjonerte_filer, resultat)
-
+      
       if (identisk) {
         cat("Ingenting har endret seg siden forrige kjøring. Loggen oppdateres ikke.\n")
         return(logg)
@@ -686,16 +686,16 @@ logg_kjoring <- function(resultat,
     # Opprett en tom liste hvis loggfilen ikke finnes
     logg <- list()
   }
-
+  
   # Finn antall kjøringer så langt (lengden på loggen)
   antall_kjoringer <- length(logg) + 1
-
+  
   # Generer en unik ID for denne kjøringen (f.eks. R1, R2, ...)
   kjoring_id <- paste0("R", antall_kjoringer)
-
+  
   # Få gjeldende dato og klokkeslett
   dato_tid <- Sys.time()
-
+  
   # Lag en ny kjøring med 'kjoring_id' og 'dato_tid' som attributter
   ny_kjoring <- list(
     attributes = list(
@@ -705,15 +705,15 @@ logg_kjoring <- function(resultat,
     ),
     versjonerte_filer = resultat
   )
-
+  
   # Legg til den nye kjøringen i loggen
   logg[[kjoring_id]] <- ny_kjoring
-
+  
   # Skriv oppdatert logg til JSON-fil
   jsonlite::write_json(logg, logg_filsti, pretty = TRUE, auto_unbox = TRUE)
-
+  
   cat("Loggen er oppdatert for kjøring", kjoring_id, "\n")
-
+  
   # Returner oppdatert logg
   return(logg)
 }
@@ -756,19 +756,19 @@ versjoner_filer <- function(filstier,
                             logg_fil = "versjonering_logg.json",
                             arbeidsmappe,
                             periode) {
-
+  
   # Lager liste med filstier
   filstier_liste <- setNames(mget(filstier, envir = globalenv()), filstier)
-
-   # Itererer over hver filsti
+  
+  # Itererer over hver filsti
   updated_filstier <- purrr::map(filstier_liste, function(filsti) {
-
+    
     metadata <- arrow::open_dataset(filsti)$metadata
-
+    
     # Sjekker først om finn_versjon er FALSE eller versjon 1 skal opprettes
     if (finn_versjon(lag_versjonert_filsti(filsti, versjon = "ny")) == 1) {
-
-      if (length(metadata) == 0) {
+      
+      if (length(metadata$geo) == 0) {
         data <- arrow::read_parquet(filsti)
         arrow::write_parquet(data, lag_versjonert_filsti(filsti, versjon = "ny"))
       } else {
@@ -776,16 +776,16 @@ versjoner_filer <- function(filstier,
           read_sf_dataset()
         st_write_parquet(obj = data, dsn = lag_versjonert_filsti(filsti, versjon = "ny"))  # OBS: fjern fellesr
       }
-
-
+      
+      
       # Hvis versjon 1 opprettes, returner stien til den nye versjonen
       return(lag_versjonert_filsti(filsti, versjon = "siste"))
     }
-
+    
     # Sjekker om det er en endring for denne filstien
     if (sjekk_endring(filsti = filsti)) {
-
-      if (length(metadata) == 0) {
+      
+      if (length(metadata$geo) == 0) {
         data <- arrow::read_parquet(filsti)
         arrow::write_parquet(data, lag_versjonert_filsti(filsti, versjon = "ny"))
       } else {
@@ -793,7 +793,7 @@ versjoner_filer <- function(filstier,
           read_sf_dataset()
         st_write_parquet(obj = data, dsn = lag_versjonert_filsti(filsti, versjon = "ny"))  # OBS: fjern fellesr
       }
-
+      
       # Hvis det er en endring, oppdater filstien med ny versjon
       return(lag_versjonert_filsti(filsti, versjon = "siste"))
     } else {
@@ -801,15 +801,15 @@ versjoner_filer <- function(filstier,
       return(lag_versjonert_filsti(filsti, versjon = "siste"))
     }
   })
-
+  
   # Beholder de originale navnene for filstiene
   names(updated_filstier) <- names(filstier_liste)
-
+  
   logg_kjoring(resultat = updated_filstier,
-             logg_fil = logg_fil,
-             arbeidsmappe = arbeidsmappe,
-             periode = as.character(periode))
-
+               logg_fil = logg_fil,
+               arbeidsmappe = arbeidsmappe,
+               periode = as.character(periode))
+  
   return(updated_filstier)
 }
 
@@ -869,30 +869,30 @@ finn_release <- function(release = NULL,
                          periode = NULL,
                          arbeidsmappe,
                          logg_fil = "versjonering_logg.json") {
-
+  
   logg_filsti <- glue::glue("{arbeidsmappe}/{logg_fil}")
-
+  
   # Sjekk om loggfilen eksisterer
   if (!file.exists(logg_filsti)) {
     warning("Loggfilen finnes ikke. Ingen versjonerte filer er registrert.")
     return(NULL)
   }
-
+  
   logg <- jsonlite::fromJSON(logg_filsti)
-
+  
   # Sjekk om loggfilen er tom eller ikke inneholder noen versjonerte filer
   if (length(logg) == 0) {
     warning("Ingen versjonerte filer funnet i loggfilen.")
     return(NULL)
   }
-
+  
   resultat <- NULL
-
+  
   # Søk etter spesifikk periode hvis oppgitt
   if (!is.null(periode)) {
     # Filtrer elementer der periode i attributes matcher perioden
     logg <- Filter(function(x) x$attributes$periode == periode, logg)
-
+    
     # Hvis release også er "siste", finn den nyeste innenfor perioden
     if (!is.null(release) && release == "siste") {
       if (length(logg) > 0) {
@@ -906,13 +906,13 @@ finn_release <- function(release = NULL,
       return(resultat)
     }
   }
-
+  
   # Søk etter spesifikk release hvis oppgitt (dersom release != "siste" eller ingen periode)
   if (!is.null(release) && release != "siste") {
     resultat <- logg[[release]]
     return(resultat)
   }
-
+  
   # Hvis release er "siste" uten periode, finn den nyeste uavhengig av periode
   if (!is.null(release) && release == "siste") {
     datoer <- sapply(logg, function(x) as.POSIXct(x$attributes$dato_tid))  # Hent alle dato_tid som POSIXct
@@ -920,7 +920,7 @@ finn_release <- function(release = NULL,
     resultat <- logg[[siste_indeks]]  # Hent det nyeste elementet
     return(resultat)
   }
-
+  
   # Søk etter en spesifikk dato (enten full dato_tid eller bare dato)
   if (!is.null(dato)){
     # Hvis bare dato (uten klokkeslett) er oppgitt
@@ -932,7 +932,7 @@ finn_release <- function(release = NULL,
       resultat <- Filter(function(x) x$attributes$dato_tid == dato, logg)
     }
   }
-
+  
   # Søk etter datoer innenfor et intervall
   if (!is.null(dato_start) & !is.null(dato_slutt)) {
     # Hvis dato_start og dato_slutt er uten klokkeslett, sett default tidspunkter
@@ -941,19 +941,19 @@ finn_release <- function(release = NULL,
     } else {
       dato_start <- as.POSIXct(dato_start)
     }
-
+    
     if (nchar(dato_slutt) == 10) {
       dato_slutt <- as.POSIXct(paste0(dato_slutt, " 23:59:59"))
     } else {
       dato_slutt <- as.POSIXct(dato_slutt)
     }
-
+    
     # Filtrer elementer der dato_tid i attributes er innenfor intervallet
     resultat <- Filter(function(x) {
       dato_tid <- as.POSIXct(x$attributes$dato_tid)
       return(dato_tid >= dato_start & dato_tid <= dato_slutt)
     }, logg)
   }
-
+  
   return(resultat)
 }
