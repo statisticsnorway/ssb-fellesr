@@ -27,7 +27,6 @@ Imports:
     readr,
     gargle,
     googleCloudStorageR,
-    sf,
     jsonlite,
     XML,
     klassR,
@@ -36,7 +35,6 @@ Imports:
     esquisse,
     rlang,
     stringr,
-    sfarrow,
     arsenal,
     fastmatch
 License: Apache license 2.0
@@ -50,6 +48,8 @@ Suggests:
     RODBC,
     ROracle,
     testthat,
-    openssl
+    openssl, 
+    sf,
+    sfarrow
 URL: https://statisticsnorway.github.io/fellesr/
 VignetteBuilder: knitr
