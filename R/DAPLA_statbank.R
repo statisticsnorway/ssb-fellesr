@@ -245,7 +245,7 @@ statbank_validering <- function(data,
 
     # Vektor med kolonnenavn #
     Klassifikasjonsvariabel <- variabler$Klassifikasjonsvariabel
-    statistikkvariabler <- statistikkvariabler$Text
+    statistikkvariabler <- paste0(statistikkvariabler$Text, "_", statistikkvariabler$Enhet)
 
     kolonnenavn <- c(Klassifikasjonsvariabel, statistikkvariabler)
 
