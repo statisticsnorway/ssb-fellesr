@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,34 +118,34 @@ order to create <code><a href="https://r-spatial.github.io/sf/reference/sf.html"
 <span class="r-in"><span><span class="va">nc_d</span> <span class="op">&lt;-</span> <span class="fu">read_sf_dataset</span><span class="op">(</span>dataset <span class="op">=</span> <span class="va">q</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">nc_d</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 36 features and 15 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 33 features and 15 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: MULTIPOLYGON</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -84.32385 ymin: 34.30457 xmax: -75.45698 ymax: 36.58965</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -83.98855 ymin: 33.94867 xmax: -75.45698 ymax: 36.58965</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geodetic CRS:  NAD27</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> First 10 features:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     AREA PERIMETER CNTY_ CNTY_ID       NAME  FIPS FIPSNO CRESS_ID BIR74 SID74</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.114     1.442  1825    1825       Ashe 37009  37009        5  1091     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.143     1.630  1828    1828      Surry 37171  37171       86  3188     5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.097     1.670  1833    1833   Hertford 37091  37091       46  1452     7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.070     2.968  1831    1831  Currituck 37053  37053       27   508     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.124     1.428  1837    1837     Stokes 37169  37169       85  1612     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.114     1.352  1838    1838    Caswell 37033  37033       17  1035     2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.153     1.616  1839    1839 Rockingham 37157  37157       79  4449    16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.072     1.085  1842    1842      Vance 37181  37181       91  2180     4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.190     2.204  1846    1846    Halifax 37083  37083       42  3608    18</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.111     1.392  1904    1904   Alamance 37001  37001        1  4672    13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  0.059     1.319  1927    1927   Mitchell 37121  37121       61   671     0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.122     1.516  1932    1932   Caldwell 37027  37027       14  3609     6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.064     1.213  1892    1892      Avery 37011  37011        6   781     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.086     1.267  1893    1893     Yadkin 37197  37197       99  1269     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  0.128     1.554  1897    1897   Franklin 37069  37069       35  1399     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.142     1.640  1913    1913       Nash 37127  37127       64  4021     8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    NWBIR74 BIR79 SID79 NWBIR79 group                       geometry</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       10  1364     0      19     1 MULTIPOLYGON (((-81.47276 3...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      208  3616     6     260     1 MULTIPOLYGON (((-80.45634 3...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      954  1838     5    1237     1 MULTIPOLYGON (((-76.74506 3...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      123   830     2     145     1 MULTIPOLYGON (((-76.00897 3...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      160  2038     5     176     1 MULTIPOLYGON (((-80.02567 3...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4      550  1253     2     597     1 MULTIPOLYGON (((-79.53051 3...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5     1243  5386     5    1369     1 MULTIPOLYGON (((-79.53051 3...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6     1179  2753     6    1492     1 MULTIPOLYGON (((-78.49252 3...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7     2365  4463    17    2980     1 MULTIPOLYGON (((-77.33221 3...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8     1243  5767    11    1397     1 MULTIPOLYGON (((-79.24619 3...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9        1   919     2       4     1 MULTIPOLYGON (((-82.11885 3...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10     309  4249     9     360     1 MULTIPOLYGON (((-81.32813 3...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7        4   977     0       5     1 MULTIPOLYGON (((-81.94135 3...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8       65  1568     1      76     1 MULTIPOLYGON (((-80.49554 3...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9      736  1863     0     950     1 MULTIPOLYGON (((-78.25455 3...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10    1851  5189     7    2274     1 MULTIPOLYGON (((-78.18693 3...</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">nc_d</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="read_sf_dataset-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
