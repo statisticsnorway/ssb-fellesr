@@ -1,7 +1,7 @@
 Package: fellesr
 Type: Package
 Title: General R functions for SSB
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: 
   c(person(given = "Susie",
            family = "Jentoft",
@@ -36,7 +36,14 @@ Imports:
     rlang,
     stringr,
     arsenal,
-    fastmatch
+    fastmatch,
+    glue,
+    haven,
+    labelled,
+    purrr,
+    sjlabelled,
+    tibble,
+    tidyselect
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
