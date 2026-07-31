@@ -36,7 +36,14 @@ Imports:
     rlang,
     stringr,
     arsenal,
-    fastmatch
+    fastmatch,
+    glue,
+    haven,
+    labelled,
+    purrr,
+    sjlabelled,
+    tibble,
+    tidyselect
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
