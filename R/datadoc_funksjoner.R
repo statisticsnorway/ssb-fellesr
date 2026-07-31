@@ -2,54 +2,9 @@
 # Datadoc-funksjoner
 
 
-#' Hent URL til tjenesten for variabeldefinisjoner
+#' Lag filsti til Datadoc-fil
 #'
-#' Returnerer URL-en til SSBs tjeneste for variabeldefinisjoner.
-#' Det kan velges mellom den eksterne og den interne tjenesten.
-#'
-#' @param status En karakterstreng som angir hvilken tjeneste URL-en skal
-#'   peke til. Gyldige verdier er `"ekstern"` og `"intern"`.
-#'   Standardverdien er `"ekstern"`.
-#'
-#' @return En karakterstreng med URL-en til den valgte tjenesten.
-#'
-#' @details
-#' Den interne URL-en er foreløpig ikke definert. Dersom
-#' `status = "intern"` brukes, stopper funksjonen med en feilmelding.
-#'
-#' @examples
-#' vardef_url()
-#'
-#' vardef_url(status = "ekstern")
-#'
-#' \dontrun{
-#' vardef_url(status = "intern")
-#' }
-#'
-#' @export
-vardef_url <- function(status = "ekstern") {
-
-  status <- match.arg(
-    status,
-    choices = c("ekstern", "intern")
-  )
-
-  if (status == "ekstern") {
-    return(
-      "https://metadata.ssb.no/public/variable-definitions"
-    )
-  }
-
-  stop(
-    "URL-en for den interne tjenesten er ikke definert ennå.",
-    call. = FALSE
-  )
-}
-
-
-#' Lag filsti til DataDoc-fil
-#'
-#' Oppretter filstien til en DataDoc-fil basert på filstien til en
+#' Oppretter filstien til en Datadoc-fil basert på filstien til en
 #' Parquet-fil. Filendelsen `.parquet` erstattes med `__DOC.json`.
 #'
 #' @param filsti En tekststreng eller tegnvektor med filstien til én eller
@@ -59,12 +14,12 @@ vardef_url <- function(status = "ekstern") {
 #'   DataDoc-filen.
 #'
 #' @examples
-#' datadoc_path("data/personell.parquet")
+#' datadoc_path("/buckets/data/personell_v1.parquet")
 #'
 #' datadoc_path(
 #'   c(
-#'     "data/personell_v1.parquet",
-#'     "data/regnskap_v1.parquet"
+#'     "/buckets/data/personell_v1.parquet",
+#'     "/buckets/data/regnskap_v1.parquet"
 #'   )
 #' )
 #'
@@ -77,66 +32,341 @@ datadoc_path <- function(filsti) {
   )
 }
 
+#' Hent URL til tjenesten for variabeldefinisjoner
+#'
+#' Returnerer endepunktet til SSBs tjeneste for variabeldefinisjoner.
+#'
+#' @param status En tekststreng som angir hvilken tjeneste URL-en skal
+#'   peke til. Gyldige verdier er `"ekstern"` og `"intern"`.
+#'
+#' @return En tekststreng med URL-en til den valgte tjenesten.
+#'
+#' @examples
+#' vardef_url()
+#'
+#' vardef_url(status = "intern")
+#'
+#' @export
+vardef_url <- function(status = "ekstern") {
 
-#' Hent alle variabeldefinisjoner
+  status <- match.arg(
+    status,
+    choices = c("ekstern", "intern")
+  )
+
+  switch(
+    status,
+    ekstern = paste0(
+      "https://metadata.ssb.no",
+      "/public/variable-definitions"
+    ),
+    intern = paste0(
+      "https://metadata.intern.ssb.no",
+      "/variable-definitions"
+    )
+  )
+}
+
+.vardef_get <- function(
+    path = NULL,
+    query = list(),
+    status = "ekstern",
+    language = "nb",
+    token = NULL
+) {
+
+  status <- match.arg(
+    status,
+    choices = c("ekstern", "intern")
+  )
+
+  language <- match.arg(
+    language,
+    choices = c("nb", "nn", "en")
+  )
+
+  url <- vardef_url(
+    status = status
+  )
+
+  if (!is.null(path)) {
+
+    if (
+      !is.character(path) ||
+      length(path) != 1L ||
+      is.na(path) ||
+      path == ""
+    ) {
+      stop(
+        "`path` må være én ikke-tom tekststreng.",
+        call. = FALSE
+      )
+    }
+
+    url <- paste0(
+      url,
+      "/",
+      utils::URLencode(
+        path,
+        reserved = TRUE
+      )
+    )
+  }
+
+  headers <- c(
+    `Accept-Language` = language
+  )
+
+  if (!is.null(token)) {
+    headers <- c(
+      headers,
+      Authorization = paste(
+        "Bearer",
+        token
+      )
+    )
+  }
+
+  response <- httr::GET(
+    url = url,
+    query = query,
+    httr::add_headers(
+      .headers = headers
+    )
+  )
+
+  response_text <- httr::content(
+    response,
+    as = "text",
+    encoding = "UTF-8"
+  )
+
+  if (httr::http_error(response)) {
+
+    content_type <- httr::http_type(response)
+
+    problem <- if (
+      content_type %in% c(
+        "application/json",
+        "application/problem+json"
+      )
+    ) {
+      tryCatch(
+        jsonlite::fromJSON(
+          response_text,
+          simplifyVector = TRUE
+        ),
+        error = function(e) NULL
+      )
+    } else {
+      NULL
+    }
+
+    detail <- if (
+      is.list(problem) &&
+      !is.null(problem$detail) &&
+      length(problem$detail) == 1L
+    ) {
+      problem$detail
+    } else if (identical(content_type, "text/html")) {
+      paste0(
+        "Tjenesten returnerte en HTML-side i stedet for et API-svar. ",
+        "Kontroller endepunktet."
+      )
+    } else {
+      "Tjenesten returnerte ingen lesbar feilmelding."
+    }
+
+    stop(
+      paste0(
+        "Forespørselen til Vardef feilet med HTTP-status ",
+        httr::status_code(response),
+        ".\n",
+        "URL: ",
+        response$url,
+        "\n",
+        "Feilmelding: ",
+        detail
+      ),
+      call. = FALSE
+    )
+  }
+
+  if (!nzchar(response_text)) {
+    return(NULL)
+  }
+
+  jsonlite::fromJSON(
+    response_text,
+    simplifyDataFrame = TRUE
+  )
+}
+
+#' Hent variabeldefinisjoner
 #'
-#' Henter alle variabeldefinisjoner som er gyldige på en bestemt dato,
-#' fra SSBs tjeneste for variabeldefinisjoner.
+#' Henter variabeldefinisjoner fra SSBs tjeneste for
+#' variabeldefinisjoner. Dersom en dato oppgis, returneres bare
+#' definisjoner som er gyldige på denne datoen.
 #'
-#' @param date En tekststreng med datoen definisjonene skal være gyldige på,
-#'   angitt på formatet `"YYYY-MM-DD"`. Standardverdien er dagens dato.
+#' @param date `NULL`, et `Date`-objekt eller en tekststreng med dato på
+#'   formatet `"YYYY-MM-DD"`. Dersom verdien er `NULL`, returneres alle
+#'   tilgjengelige variabeldefinisjoner. Dersom en dato oppgis, returneres
+#'   bare definisjoner der datoen ligger mellom `valid_from` og
+#'   `valid_until`. Standardverdien er `NULL`.
 #' @param language En tekststreng med språkkoden som skal brukes for
-#'   tekstinnholdet i responsen. Standardverdien er `"nb"`.
+#'   tekstinnholdet i responsen. Gyldige verdier er `"nb"`, `"nn"` og
+#'   `"en"`. Standardverdien er `"nb"`.
+#' @param status En tekststreng som angir om den eksterne eller interne
+#'   tjenesten skal brukes. Gyldige verdier er `"ekstern"` og `"intern"`.
+#'   Standardverdien er `"ekstern"`.
+#' @param token Et eventuelt bearer-token ved bruk av den interne
+#'   tjenesten. Standardverdien er `NULL`.
 #'
-#' @return Et objekt opprettet fra JSON-responsen fra tjenesten.
-#'   Returtypen avhenger av strukturen i responsen og vil vanligvis være
-#'   en data frame eller en liste.
+#' @return En data frame eller liste opprettet fra JSON-responsen.
+#'   Dersom `date` er oppgitt, returneres en data frame med
+#'   variabeldefinisjonene som er gyldige på den angitte datoen.
 #'
 #' @details
-#' Datoen sendes til tjenesten som parameteren `date_of_validity`.
-#' Språket sendes i HTTP-hodet `Accept-Language`.
+#' Filtreringen på dato gjøres lokalt etter at variabeldefinisjonene er
+#' hentet fra tjenesten. En definisjon regnes som gyldig når
+#' `valid_from` er tidligere enn eller lik den oppgitte datoen, og
+#' `valid_until` enten mangler eller er senere enn eller lik den
+#' oppgitte datoen.
 #'
-#' Funksjonen stopper med en feilmelding dersom tjenesten returnerer
-#' en HTTP-feil.
+#' Manglende verdi i `valid_from` tolkes som at definisjonen ikke har
+#' noen nedre gyldighetsgrense. Manglende verdi i `valid_until` tolkes
+#' som at definisjonen fortsatt er gyldig.
 #'
 #' @examples
 #' \dontrun{
+#' # Hent alle tilgjengelige variabeldefinisjoner
 #' get_all_variable_definitions()
 #'
+#' # Hent alle tilgjengelige variabeldefinisjoner på engelsk
 #' get_all_variable_definitions(
-#'   date = "2025-01-01",
+#'   language = "en"
+#' )
+#'
+#' # Hent definisjoner som er gyldige på en bestemt dato
+#' get_all_variable_definitions(
+#'   date = "2025-01-01"
+#' )
+#'
+#' # Datoen kan også oppgis som et Date-objekt
+#' get_all_variable_definitions(
+#'   date = as.Date("2025-01-01"),
 #'   language = "en"
 #' )
 #' }
 #'
 #' @export
 get_all_variable_definitions <- function(
-    date = format(Sys.Date(), "%Y-%m-%d"),
-    language = "nb"
+    date = NULL,
+    language = "nb",
+    status = "ekstern",
+    token = NULL
 ) {
 
-  response <- httr::GET(
-    url = vardef_url(),
-    query = list(
-      date_of_validity = date
-    ),
-    httr::add_headers(
-      `Accept-Language` = language
-    )
+  variable_definitions <- .vardef_get(
+    status = status,
+    language = language,
+    token = token
   )
 
-  httr::stop_for_status(response)
+  # Returner alle dersom dato ikke er oppgitt
+  if (is.null(date)) {
+    return(variable_definitions)
+  }
 
-  variable_definitions <- jsonlite::fromJSON(
-    httr::content(
-      response,
-      as = "text",
-      encoding = "UTF-8"
+  # Kontroller og konverter dato
+  if (inherits(date, "Date")) {
+
+    if (length(date) != 1L || is.na(date)) {
+      stop(
+        "`date` må inneholde nøyaktig én gyldig dato.",
+        call. = FALSE
+      )
+    }
+
+    filter_date <- date
+
+  } else if (
+    is.character(date) &&
+    length(date) == 1L &&
+    !is.na(date) &&
+    grepl(
+      pattern = "^\\d{4}-\\d{2}-\\d{2}$",
+      x = date
     )
+  ) {
+
+    filter_date <- as.Date(
+      date,
+      format = "%Y-%m-%d"
+    )
+
+  } else {
+
+    stop(
+      paste0(
+        "`date` må være `NULL`, et Date-objekt eller én ",
+        "tekststreng på formatet \"YYYY-MM-DD\"."
+      ),
+      call. = FALSE
+    )
+  }
+
+  if (is.na(filter_date)) {
+    stop(
+      "`date` er ikke en gyldig dato.",
+      call. = FALSE
+    )
+  }
+
+  required_variables <- c(
+    "valid_from",
+    "valid_until"
   )
 
-  return(variable_definitions)
+  missing_variables <- setdiff(
+    required_variables,
+    names(variable_definitions)
+  )
+
+  if (length(missing_variables) > 0L) {
+    stop(
+      paste0(
+        "Responsen mangler følgende variabler: ",
+        paste(
+          missing_variables,
+          collapse = ", "
+        ),
+        "."
+      ),
+      call. = FALSE
+    )
+  }
+
+  variable_definitions |>
+    dplyr::mutate(
+      valid_from = dplyr::na_if(
+        valid_from,
+        ""
+      ),
+      valid_until = dplyr::na_if(
+        valid_until,
+        ""
+      ),
+      valid_from = as.Date(valid_from),
+      valid_until = as.Date(valid_until)
+    ) |>
+    dplyr::filter(
+      is.na(valid_from) | valid_from <= filter_date,
+      is.na(valid_until) | valid_until >= filter_date
+    )
 }
+
+
 
 
 #' Hent variabeldefinisjon etter kortnavn
@@ -168,11 +398,11 @@ get_all_variable_definitions <- function(
 #' @examples
 #' \dontrun{
 #' get_variable_definition_by_shortname(
-#'   short_name = "kjoenn"
+#'   short_name = "sesongjustering"
 #' )
 #'
 #' get_variable_definition_by_shortname(
-#'   short_name = "kjoenn",
+#'   short_name = "sesongjustering",
 #'   date = "2025-01-01",
 #'   language = "en"
 #' )
@@ -242,12 +472,12 @@ get_variable_definition_by_shortname <- function(
 #' @examples
 #' \dontrun{
 #' get_variable_definition_by_id(
-#'   id = "kJgyMLWL"
+#'   id = "91HwKSxr"
 #' )
 #'
 #' get_variable_definition_by_id(
-#'   id = "kJgyMLWL",
-#'   date = "2025-01-01",
+#'   id = "91HwKSxr",
+#'   date = "1814-12-31",
 #'   language = "en"
 #' )
 #' }
@@ -384,22 +614,22 @@ vardef_get_klass_id <- function(variable_definition) {
 }
 
 
-#' Lag oversikt over variabler i en DataDoc-fil
+#' Lag oversikt over variabler i en Datadoc-fil
 #'
-#' Leser variabelmetadata fra en DataDoc-fil og lager en tabellarisk oversikt
+#' Leser variabelmetadata fra en Datadoc-fil og lager en oversikt
 #' over variablene. Dersom en variabel har en referanse til en
 #' variabeldefinisjon, hentes supplerende metadata fra SSBs tjeneste for
 #' variabeldefinisjoner.
 #'
 #' @param filsti En tekststreng med filstien til en Parquet-fil. Filstien til
-#'   den tilhørende DataDoc-filen utledes ved hjelp av [datadoc_path()].
+#'   den tilhørende Datadoc-filen utledes ved hjelp av [datadoc_path()].
 #' @param language En tekststreng med språkkoden som skal brukes ved uthenting
 #'   av navn og annen språkavhengig metadata. Standardverdien er `"nb"`.
 #'
 #' @return En `data.frame` med én rad per variabel og følgende kolonner:
 #'
 #' \describe{
-#'   \item{`short_name`}{Variabelens kortnavn fra DataDoc-filen.}
+#'   \item{`short_name`}{Variabelens kortnavn fra Datadoc-filen.}
 #'   \item{`name`}{Variabelens navn på det valgte språket.}
 #'   \item{`data_type`}{Variabelens datatype.}
 #'   \item{`classification_uri`}{KLASS-ID hentet fra variabelens
@@ -418,7 +648,7 @@ vardef_get_klass_id <- function(variable_definition) {
 #' }
 #'
 #' @details
-#' Funksjonen forventer at DataDoc-filen har samme filsti som Parquet-filen,
+#' Funksjonen forventer at Datadoc-filen har samme filsti som Parquet-filen,
 #' men med filendelsen `.parquet` erstattet med `__DOC.json`.
 #'
 #' Språkavhengige felt kan være lagret som tekstvektorer, data frames eller
@@ -445,11 +675,11 @@ vardef_get_klass_id <- function(variable_definition) {
 #' @examples
 #' \dontrun{
 #' datadoc_variabeloversikt(
-#'   filsti = "data/personell.parquet"
+#'   filsti = "/buckets/data/personell_v1.parquet"
 #' )
 #'
 #' datadoc_variabeloversikt(
-#'   filsti = "data/personell.parquet",
+#'   filsti = "/buckets/data/personell_v1.parquet",
 #'   language = "en"
 #' )
 #' }
@@ -845,18 +1075,18 @@ datadoc_variabeloversikt <- function(
 #' \dontrun{
 #' # Hent variabler med kodeliste
 #' variables_with_classification_uri(
-#'   filsti = "data/personell.parquet"
+#'   filsti = "/buckets/data/personell_v1.parquet"
 #' )
 #'
 #' # Hent variabler uten kodeliste
 #' variables_with_classification_uri(
-#'   filsti = "data/personell.parquet",
+#'   filsti = "/buckets/data/personell_v1.parquet",
 #'   with_codelist = FALSE
 #' )
 #'
 #' # Hent engelskspråklig metadata
 #' variables_with_classification_uri(
-#'   filsti = "data/personell.parquet",
+#'   filsti = "/buckets/data/personell_v1.parquet",
 #'   language = "en"
 #' )
 #' }
@@ -919,7 +1149,7 @@ variables_with_classification_uri <- function(
 #' kodelister fra SSBs klassifikasjonssystem KLASS.
 #'
 #' Funksjonen finner variabler med en tilknyttet kodeliste gjennom
-#' DataDoc-metadata eller en tilknyttet variabeldefinisjon. Kodelistene
+#' Datadoc-metadata eller en tilknyttet variabeldefinisjon. Kodelistene
 #' hentes fra KLASS, og navnene i kodelisten legges til som verdietiketter
 #' ved hjelp av [labelled::set_value_labels()].
 #'
@@ -937,9 +1167,9 @@ variables_with_classification_uri <- function(
 #' Funksjonen bruker [variables_with_classification_uri()] til å finne
 #' variabler med en tilknyttet kodeliste.
 #'
-#' Dersom en KLASS-ID finnes både direkte i DataDoc-filen og i den
-#' tilknyttede variabeldefinisjonen, brukes ID-en fra DataDoc-filen.
-#' ID-en fra variabeldefinisjonen brukes dersom DataDoc-filen ikke
+#' Dersom en KLASS-ID finnes både direkte i Datadoc-filen og i den
+#' tilknyttede variabeldefinisjonen, brukes ID-en fra Datadoc-filen.
+#' ID-en fra variabeldefinisjonen brukes dersom Datadoc-filen ikke
 #' inneholder en KLASS-ID.
 #'
 #' Kodelisten hentes med [klassR::get_klass()]. Verdien i
@@ -961,12 +1191,12 @@ variables_with_classification_uri <- function(
 #' \dontrun{
 #' data_med_labels <- add_value_labels(
 #'   data = personell,
-#'   filsti = "data/personell.parquet"
+#'   filsti = "/buckets/data/personell_v1.parquet"
 #' )
 #'
 #' data_med_labels <- add_value_labels(
 #'   data = personell,
-#'   filsti = "data/personell.parquet",
+#'   filsti = "/buckets/data/personell_v1.parquet",
 #'   language = "en"
 #' )
 #' }
@@ -1284,7 +1514,7 @@ show_column_labels <- function(data) {
 
 
 
-#' Legg til kolonneetiketter fra DataDoc
+#' Legg til kolonneetiketter fra Datadoc
 #'
 #' Legger til kolonneetiketter på variablene i et datasett basert på
 #' variabelnavnene i den tilhørende DataDoc-filen.
@@ -1619,6 +1849,11 @@ values_without_labels <- function(data) {
 #' labelled::var_label(data$kjoenn) <- "Kjønn"
 #' labelled::var_label(data$alder) <- "Alder i år"
 #'
+#' labelled::var_label(
+#'   data,
+#'   unlist = FALSE
+#' )
+#'
 #' data_uten_labels <- remove_all_labels(data)
 #'
 #' labelled::var_label(
@@ -1640,7 +1875,7 @@ remove_all_labels <- function(data) {
 }
 
 
-#' Hent metadata for én variabel fra DataDoc
+#' Hent metadata for én variabel fra Datadoc
 #'
 #' Leser en DataDoc-fil og henter det fullstendige metadataobjektet for
 #' en bestemt variabel.
@@ -1741,14 +1976,21 @@ metadata_variable <- function(
 #' Kopierer metadata for én eller flere variabler fra en original
 #' DataDoc-fil til en annen DataDoc-fil.
 #'
+#' Filstiene kan oppgis enten som filstier til DataDoc-filer med
+#' filendelsen `.json`, eller som filstier til Parquet-filer med
+#' filendelsen `.parquet`. Parquet-filstier konverteres automatisk til
+#' tilhørende DataDoc-filstier med [datadoc_path()].
+#'
 #' Hele metadataobjektet for hver valgt variabel erstattes. Variabelens
 #' `short_name` beholdes imidlertid slik det er angitt i DataDoc-filen
 #' som metadataene kopieres til.
 #'
 #' @param filsti_datadoc_egen En tekststreng med filstien til DataDoc-filen
-#'   som skal oppdateres.
+#'   som skal oppdateres, eller til den tilhørende Parquet-filen.
+#'   Filstien må slutte på `.json` eller `.parquet`.
 #' @param filsti_datadoc_original En tekststreng med filstien til DataDoc-filen
-#'   som metadataene skal kopieres fra.
+#'   som metadataene skal kopieres fra, eller til den tilhørende
+#'   Parquet-filen. Filstien må slutte på `.json` eller `.parquet`.
 #' @param variabler En tekstvektor som angir hvilke variabler metadata skal
 #'   kopieres for. En unavngitt verdi tolkes som at variabelen har samme
 #'   `short_name` i begge filer. I en navngitt vektor angir navnet
@@ -1756,10 +1998,18 @@ metadata_variable <- function(
 #'   `short_name` i originalfilen.
 #'
 #' @return Den oppdaterte DataDoc-strukturen som en liste. Den oppdaterte
-#'   strukturen skrives samtidig til filen angitt i
+#'   strukturen skrives samtidig til DataDoc-filen som svarer til
 #'   `filsti_datadoc_egen`.
 #'
 #' @details
+#' Dersom en filsti slutter på `.parquet`, erstattes filendelsen med
+#' `__DOC.json` ved hjelp av [datadoc_path()]. Filstier som allerede
+#' slutter på `.json`, brukes uendret.
+#'
+#' De endelige JSON-filstiene skrives ut før filene leses. Funksjonen
+#' stopper med en feilmelding dersom én eller begge DataDoc-filene ikke
+#' finnes. Alle manglende filer oppgis i samme feilmelding.
+#'
 #' Begge DataDoc-filene leses med [jsonlite::fromJSON()] med
 #' `simplifyVector = FALSE`.
 #'
@@ -1771,6 +2021,9 @@ metadata_variable <- function(
 #' Følgende kontroller utføres før filen endres:
 #'
 #' \itemize{
+#'   \item filstiene må være ikke-tomme tekststrenger som slutter på
+#'     `.json` eller `.parquet`;
+#'   \item begge DataDoc-filene må finnes;
 #'   \item `variabler` må være en ikke-tom tekstvektor;
 #'   \item samme variabel i mottakerfilen kan ikke oppgis flere ganger;
 #'   \item `short_name` må være unik i begge DataDoc-filene; og
@@ -1778,29 +2031,29 @@ metadata_variable <- function(
 #' }
 #'
 #' Den oppdaterte DataDoc-strukturen skrives tilbake med
-#' [jsonlite::write_json()]. Den eksisterende filen angitt i
-#' `filsti_datadoc_egen` overskrives.
+#' [jsonlite::write_json()]. Den eksisterende DataDoc-filen som svarer
+#' til `filsti_datadoc_egen`, overskrives.
 #'
 #' @examples
 #' \dontrun{
-#' # Variablene har samme navn i begge filer
+#' # Oppgi Parquet-filstier
 #' copy_metadata_variable(
-#'   filsti_datadoc_egen = "data/egen__DOC.json",
-#'   filsti_datadoc_original = "data/original__DOC.json",
+#'   filsti_datadoc_egen = "/buckets/data/egen_v1.parquet",
+#'   filsti_datadoc_original = "/buckets/data/original_v1.parquet",
 #'   variabler = c("kjoenn", "alder")
 #' )
 #'
-#' # Variabelen heter `kjoenn` i egen fil og `sex` i originalfilen
+#' # Oppgi DataDoc-filstier
 #' copy_metadata_variable(
-#'   filsti_datadoc_egen = "data/egen__DOC.json",
-#'   filsti_datadoc_original = "data/original__DOC.json",
+#'   filsti_datadoc_egen = "/buckets/data/egen__DOC.json",
+#'   filsti_datadoc_original = "/buckets/data/original__DOC.json",
 #'   variabler = c(kjoenn = "sex")
 #' )
 #'
-#' # Kombinasjon av like og ulike variabelnavn
+#' # Kombiner Parquet- og DataDoc-filsti
 #' copy_metadata_variable(
-#'   filsti_datadoc_egen = "data/egen__DOC.json",
-#'   filsti_datadoc_original = "data/original__DOC.json",
+#'   filsti_datadoc_egen = "/buckets/data/egen.parquet",
+#'   filsti_datadoc_original = "/buckets/data/original__DOC.json",
 #'   variabler = c(
 #'     kjoenn = "sex",
 #'     "alder"
@@ -1809,7 +2062,8 @@ metadata_variable <- function(
 #' }
 #'
 #' @seealso
-#' [jsonlite::fromJSON()] for å lese DataDoc-filene og
+#' [datadoc_path()] for å opprette en DataDoc-filsti fra en
+#' Parquet-filsti, [jsonlite::fromJSON()] for å lese DataDoc-filene og
 #' [jsonlite::write_json()] for å skrive den oppdaterte filen.
 #'
 #' @export
@@ -1818,6 +2072,108 @@ copy_metadata_variable <- function(
     filsti_datadoc_original,
     variabler
 ) {
+
+  resolve_datadoc_path <- function(filsti, argument) {
+
+    if (
+      !is.character(filsti) ||
+      length(filsti) != 1L ||
+      is.na(filsti) ||
+      !nzchar(trimws(filsti))
+    ) {
+      stop(
+        "`",
+        argument,
+        "` må være én ikke-tom tekststreng.",
+        call. = FALSE
+      )
+    }
+
+    filsti <- trimws(filsti)
+
+    if (
+      grepl(
+        pattern = "\\.parquet$",
+        x = filsti,
+        ignore.case = TRUE
+      )
+    ) {
+      return(
+        datadoc_path(filsti)
+      )
+    }
+
+    if (
+      grepl(
+        pattern = "\\.json$",
+        x = filsti,
+        ignore.case = TRUE
+      )
+    ) {
+      return(filsti)
+    }
+
+    stop(
+      "`",
+      argument,
+      "` må slutte på `.json` eller `.parquet`.",
+      call. = FALSE
+    )
+  }
+
+  filsti_datadoc_egen <- resolve_datadoc_path(
+    filsti = filsti_datadoc_egen,
+    argument = "filsti_datadoc_egen"
+  )
+
+  filsti_datadoc_original <- resolve_datadoc_path(
+    filsti = filsti_datadoc_original,
+    argument = "filsti_datadoc_original"
+  )
+
+  datadoc_filstier <- c(
+    filsti_datadoc_egen = filsti_datadoc_egen,
+    filsti_datadoc_original = filsti_datadoc_original
+  )
+
+  message(
+    "Forsøker å lese følgende DataDoc-filer:\n",
+    paste0(
+      "- ",
+      names(datadoc_filstier),
+      ": ",
+      unname(datadoc_filstier),
+      collapse = "\n"
+    )
+  )
+
+  filer_finnes <- file.exists(
+    datadoc_filstier
+  )
+
+  if (any(!filer_finnes)) {
+
+    manglende_filer <- datadoc_filstier[
+      !filer_finnes
+    ]
+
+    stop(
+      "Følgende DataDoc-fil",
+      if (length(manglende_filer) == 1L) {
+        " finnes ikke:\n"
+      } else {
+        "er finnes ikke:\n"
+      },
+      paste0(
+        "- ",
+        names(manglende_filer),
+        ": ",
+        unname(manglende_filer),
+        collapse = "\n"
+      ),
+      call. = FALSE
+    )
+  }
 
   datadoc_egen <- jsonlite::fromJSON(
     filsti_datadoc_egen,
@@ -1846,9 +2202,14 @@ copy_metadata_variable <- function(
   variabelnavn <- names(variabler)
 
   if (is.null(variabelnavn)) {
-    variabelnavn <- rep("", length(variabler))
+    variabelnavn <- rep(
+      "",
+      length(variabler)
+    )
   } else {
-    variabelnavn <- trimws(variabelnavn)
+    variabelnavn <- trimws(
+      variabelnavn
+    )
   }
 
   # Elementer uten navn tolkes som samme variabelnavn i begge filer.
@@ -1858,16 +2219,22 @@ copy_metadata_variable <- function(
     variabelnavn
   )
 
-  navn_original <- unname(variabler)
+  navn_original <- unname(
+    variabler
+  )
 
   if (anyDuplicated(navn_egen)) {
+
     duplikater <- unique(
       navn_egen[duplicated(navn_egen)]
     )
 
     stop(
       "Følgende variabler i egen fil er oppgitt flere ganger: ",
-      paste(duplikater, collapse = ", "),
+      paste(
+        duplikater,
+        collapse = ", "
+      ),
       call. = FALSE
     )
   }
@@ -1913,7 +2280,10 @@ copy_metadata_variable <- function(
   if (length(mangler_i_egen) > 0L) {
     stop(
       "Følgende variabler finnes ikke i egen metadatafil: ",
-      paste(mangler_i_egen, collapse = ", "),
+      paste(
+        mangler_i_egen,
+        collapse = ", "
+      ),
       call. = FALSE
     )
   }
@@ -1921,7 +2291,10 @@ copy_metadata_variable <- function(
   if (length(mangler_i_original) > 0L) {
     stop(
       "Følgende variabler finnes ikke i original metadatafil: ",
-      paste(mangler_i_original, collapse = ", "),
+      paste(
+        mangler_i_original,
+        collapse = ", "
+      ),
       call. = FALSE
     )
   }
@@ -1960,17 +2333,19 @@ copy_metadata_variable <- function(
     "Kopierte metadata for ",
     length(navn_egen),
     " variabel",
-    if (length(navn_egen) == 1L) "." else "er."
+    if (length(navn_egen) == 1L) "." else "er.",
+    "\nOppdatert fil: ",
+    filsti_datadoc_egen
   )
 
   datadoc_egen
 }
 
 
-#' Kopier metadata mellom DataDoc-filer
+#' Kopier metadata mellom Datadoc-filer
 #'
-#' Kopierer variabelmetadata fra en original DataDoc-fil til en annen
-#' DataDoc-fil. Metadata kopieres automatisk for variabler som har samme
+#' Kopierer variabelmetadata fra en original Datadoc-fil til en annen
+#' Datadoc-fil. Metadata kopieres automatisk for variabler som har samme
 #' `short_name` i begge filer. Det kan i tillegg angis eksplisitte koblinger
 #' mellom variabler med ulike kortnavn.
 #'
@@ -1987,12 +2362,12 @@ copy_metadata_variable <- function(
 #'   variabler. Når verdien er `FALSE`, hoppes variabler over dersom feltet
 #'   `name` i mottakerfilen ikke er `NULL`. Standardverdien er `TRUE`.
 #'
-#' @return Den oppdaterte DataDoc-strukturen som en liste. Strukturen skrives
+#' @return Den oppdaterte Datadoc-strukturen som en liste. Strukturen skrives
 #'   samtidig tilbake til filen angitt i `filsti_datadoc_egen`.
 #'
 #' @details
 #' Funksjonen finner først alle variabler som har samme `short_name` i de to
-#' DataDoc-filene. Metadata for disse variablene kopieres automatisk.
+#' Datadoc-filene. Metadata for disse variablene kopieres automatisk.
 #'
 #' Argumentet `variabler` kan brukes til å koble variabler som har ulike
 #' kortnavn i de to filene. En kobling som er angitt eksplisitt i
@@ -2011,7 +2386,7 @@ copy_metadata_variable <- function(
 #'
 #' \itemize{
 #'   \item `overwrite` må være én enkelt logisk verdi;
-#'   \item `short_name` må være unik i begge DataDoc-filene;
+#'   \item `short_name` må være unik i begge Datadoc-filene;
 #'   \item `variabler` må være en navngitt tekstvektor dersom argumentet
 #'     ikke er `NULL`;
 #'   \item samme mottakervariabel kan ikke oppgis flere ganger; og
@@ -2026,14 +2401,14 @@ copy_metadata_variable <- function(
 #' \dontrun{
 #' # Kopier metadata for alle variabler med samme short_name
 #' copy_metadata(
-#'   filsti_datadoc_egen = "data/egen__DOC.json",
-#'   filsti_datadoc_original = "data/original__DOC.json"
+#'   filsti_datadoc_egen = "/buckets/data/egen__DOC.json",
+#'   filsti_datadoc_original = "/buckets/data/original__DOC.json"
 #' )
 #'
 #' # Legg også til en eksplisitt kobling mellom ulike kortnavn
 #' copy_metadata(
-#'   filsti_datadoc_egen = "data/egen__DOC.json",
-#'   filsti_datadoc_original = "data/original__DOC.json",
+#'   filsti_datadoc_egen = "/buckets/data/egen__DOC.json",
+#'   filsti_datadoc_original = "/buckets/data/original__DOC.json",
 #'   variabler = c(
 #'     kjoenn = "sex",
 #'     bostedskommune = "kommune"
@@ -2042,8 +2417,8 @@ copy_metadata_variable <- function(
 #'
 #' # Kopier bare til variabler som ikke allerede har metadata
 #' copy_metadata(
-#'   filsti_datadoc_egen = "data/egen__DOC.json",
-#'   filsti_datadoc_original = "data/original__DOC.json",
+#'   filsti_datadoc_egen = "/buckets/data/egen__DOC.json",
+#'   filsti_datadoc_original = "/buckets/data/original__DOC.json",
 #'   overwrite = FALSE
 #' )
 #' }
