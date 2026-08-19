@@ -4,25 +4,20 @@
 \alias{show_labels_df}
 \title{Vis verdietiketter i et datasett}
 \usage{
-show_labels_df(data, labels = TRUE, keep_codes = TRUE)
+show_labels_df(data, labels = TRUE)
 }
 \arguments{
 \item{data}{Et datasett som kan inneholde variabler med verdietiketter.}
 
 \item{labels}{En logisk verdi som angir om verdietikettene skal vises.
-Når verdien er \code{TRUE}, konverteres merkede variabler til etikettene
-deres. Når verdien er \code{FALSE}, returneres datasettet uendret.
-Standardverdien er \code{TRUE}.}
-
-\item{keep_codes}{En logisk verdi som angir om de opprinnelige kodene
-skal inkluderes sammen med verdietikettene. Argumentet sendes videre
-til \code{keep.labels} i \code{\link[sjlabelled:as_label]{sjlabelled::as_label()}}. Standardverdien er
-\code{TRUE}.}
+Når verdien er \code{TRUE}, konverteres merkede variabler til faktorer med
+verdietikettene som faktorverdier. Når verdien er \code{FALSE}, returneres
+datasettet uendret. Standardverdien er \code{TRUE}.}
 }
 \value{
 Datasettet som ble oppgitt i \code{data}. Dersom \code{labels = TRUE},
-er variabler med verdietiketter konvertert til faktorer med etikettene
-som verdier.
+er merkede variabler konvertert til faktorer med verdietikettene som
+faktorverdier.
 }
 \description{
 Erstatter verdiene i merkede variabler med tilhørende verdietiketter.
@@ -30,15 +25,14 @@ Variabler uten verdietiketter beholdes uendret.
 }
 \details{
 Funksjonen identifiserer merkede variabler ved hjelp av
-\code{\link[haven:is.labelled]{haven::is.labelled()}} og konverterer dem med
-\code{\link[sjlabelled:as_label]{sjlabelled::as_label()}}.
+\code{\link[haven:is.labelled]{haven::is.labelled()}} og konverterer dem med \code{\link[haven:as_factor]{haven::as_factor()}}.
 
-Når \code{keep_codes = TRUE}, beholdes de opprinnelige kodene i
-faktorverdiene sammen med etikettene. Når \code{keep_codes = FALSE}, vises
-bare etikettene.
+Ved konverteringen brukes \code{levels = "labels"}, slik at faktorverdiene
+består av verdietikettene og ikke de underliggende kodene. Dette fungerer
+både for numeriske og tekstbaserte merkede variabler, inkludert
+tekstkoder med ledende nuller, som \code{"01"} og \code{"02"}.
 
-\code{labels} og \code{keep_codes} må være én enkelt logisk verdi og kan ikke
-være \code{NA}.
+\code{labels} må være én enkelt logisk verdi og kan ikke være \code{NA}.
 }
 \examples{
 data <- data.frame(
@@ -53,11 +47,6 @@ data <- data.frame(
 
 show_labels_df(
   data = data
-)
-
-show_labels_df(
-  data = data,
-  keep_codes = FALSE
 )
 
 show_labels_df(

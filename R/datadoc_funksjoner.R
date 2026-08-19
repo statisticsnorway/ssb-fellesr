@@ -1332,29 +1332,24 @@ add_value_labels <- function(
 #'
 #' @param data Et datasett som kan inneholde variabler med verdietiketter.
 #' @param labels En logisk verdi som angir om verdietikettene skal vises.
-#'   Når verdien er `TRUE`, konverteres merkede variabler til etikettene
-#'   deres. Når verdien er `FALSE`, returneres datasettet uendret.
-#'   Standardverdien er `TRUE`.
-#' @param keep_codes En logisk verdi som angir om de opprinnelige kodene
-#'   skal inkluderes sammen med verdietikettene. Argumentet sendes videre
-#'   til `keep.labels` i [sjlabelled::as_label()]. Standardverdien er
-#'   `TRUE`.
+#'   Når verdien er `TRUE`, konverteres merkede variabler til faktorer med
+#'   verdietikettene som faktorverdier. Når verdien er `FALSE`, returneres
+#'   datasettet uendret. Standardverdien er `TRUE`.
 #'
 #' @return Datasettet som ble oppgitt i `data`. Dersom `labels = TRUE`,
-#'   er variabler med verdietiketter konvertert til faktorer med etikettene
-#'   som verdier.
+#'   er merkede variabler konvertert til faktorer med verdietikettene som
+#'   faktorverdier.
 #'
 #' @details
 #' Funksjonen identifiserer merkede variabler ved hjelp av
-#' [haven::is.labelled()] og konverterer dem med
-#' [sjlabelled::as_label()].
+#' [haven::is.labelled()] og konverterer dem med [haven::as_factor()].
 #'
-#' Når `keep_codes = TRUE`, beholdes de opprinnelige kodene i
-#' faktorverdiene sammen med etikettene. Når `keep_codes = FALSE`, vises
-#' bare etikettene.
+#' Ved konverteringen brukes `levels = "labels"`, slik at faktorverdiene
+#' består av verdietikettene og ikke de underliggende kodene. Dette fungerer
+#' både for numeriske og tekstbaserte merkede variabler, inkludert
+#' tekstkoder med ledende nuller, som `"01"` og `"02"`.
 #'
-#' `labels` og `keep_codes` må være én enkelt logisk verdi og kan ikke
-#' være `NA`.
+#' `labels` må være én enkelt logisk verdi og kan ikke være `NA`.
 #'
 #' @examples
 #' data <- data.frame(
@@ -1373,19 +1368,13 @@ add_value_labels <- function(
 #'
 #' show_labels_df(
 #'   data = data,
-#'   keep_codes = FALSE
-#' )
-#'
-#' show_labels_df(
-#'   data = data,
 #'   labels = FALSE
 #' )
 #'
 #' @export
 show_labels_df <- function(
     data,
-    labels = TRUE,
-    keep_codes = TRUE
+    labels = TRUE
 ) {
 
   if (
@@ -1399,25 +1388,14 @@ show_labels_df <- function(
     )
   }
 
-  if (
-    !is.logical(keep_codes) ||
-    length(keep_codes) != 1L ||
-    is.na(keep_codes)
-  ) {
-    stop(
-      "`keep_codes` må være enten TRUE eller FALSE.",
-      call. = FALSE
-    )
-  }
-
   if (labels) {
     data <- dplyr::mutate(
       data,
       dplyr::across(
         tidyselect::where(haven::is.labelled),
-        ~ sjlabelled::as_label(
+        ~ haven::as_factor(
           .x,
-          keep.labels = keep_codes
+          levels = "labels"
         )
       )
     )
@@ -1425,7 +1403,6 @@ show_labels_df <- function(
 
   data
 }
-
 
 
 #' Vis kolonneetiketter ved utskrift av et datasett
