@@ -14,6 +14,7 @@ i RStudio (Windows og Linux) og Jupyterlab i produksjonssonen.
 ## Parametre
 
 ``` r
+
 dynarev_uttrekk(
   delregnr,
   skjema = T,
@@ -69,6 +70,7 @@ Under følger en rekke eksempler på hvordan man bruker funksjonen
 Her får man lastet inn alle kolonnene fra valgt skjema.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE41",
                            skjema_cols = T)
@@ -80,6 +82,7 @@ Her får man lastet ned utvalgte kolonner fra valgt skjema. Her er
 kolonnene AARGANG, FORETAKETS_NAVN og FORETAKETS_ORGNR valgt.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE41",
                            skjema_cols = c("AARGANG", "FORETAKETS_NAVN", "FORETAKETS_ORGNR"))
@@ -90,6 +93,7 @@ dynarev <- dynarev_uttrekk(delregnr = 2421,
 Her får man lastet ned alle kolonnene med SFU-data fra valgt skjema.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE41",
                            skjema_cols = F,
@@ -102,6 +106,7 @@ Her får man lastet ned utvalgte kolonner med SFU-data fra valgt skjema.
 Her er kolonnene NAVN og ORGNR valgt.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE41",
                            skjema_cols = F,
@@ -115,6 +120,7 @@ valgt delregister. Dersom man kun ønsker utvalgte variabler fra SFU-data
 erstattes `sfu_cols = T` med `sfu_cols = c("variabel1", "variabel2")`.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = T,
                            skjema_cols = F,
@@ -130,6 +136,7 @@ to datasett. For å få hentet ut skjemadata skriver man
 skriver man `dynarev_sfu <- data.frame(dynarev[2])`.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE41",
                            skjema_cols = T,
@@ -148,6 +155,7 @@ skriver man `dynarev_skjema <- data.frame(dynarev[1])` og for å hente ut
 SFU-data skriver man `dynarev_sfu <- data.frame(dynarev[2])`.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE41",
                            skjema_cols = T,
@@ -167,6 +175,7 @@ altså to datasett. For å få hentet ut skjemadata skriver man
 skriver man `dynarev_sfu <- data.frame(dynarev[2])`.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE41",
                            skjema_cols = c("AARGANG", "FORETAKETS_NAVN", "FORETAKETS_ORGNR"),
@@ -183,6 +192,7 @@ kolonner) fra valgt delregister. SFU-dataene blir koblet på
 skjemadataene slik at man kun får én fil.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE41",
                            skjema_cols = T,
@@ -197,6 +207,7 @@ Her får man lastet ned både skjemadata (alle kolonner) og SFU-data
 SFU-dataene blir koblet på skjemadataene slik at man kun får én fil.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE41",
                            skjema_cols = T,
@@ -212,6 +223,7 @@ NAVN og ORGNR) fra valgt delregister. SFU-dataene blir koblet på
 skjemadataene slik at man kun får én fil.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                                     skjema = "HELSE41",
                                     skjema_cols = c("AARGANG", "FORETAKETS_NAVN", "FORETAKETS_ORGNR"),
@@ -226,6 +238,7 @@ med to datasett returneres; \[1\] skjemadata og \[2\] dublettdata
 (dersom det finnes dubletter, hvis ikke er denne blank).
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE39",
                            dublettsjekk = T)
@@ -241,6 +254,7 @@ variabler skrives disse i en vektor, f.eks.
 `dublettsjekk = c("variabel1", "variabel2")`.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = "HELSE0X",
                            dublettsjekk = c("FORETAKSNR", "ART_SEKTOR", "FUNKSJON_KAPITTEL"))
@@ -257,6 +271,7 @@ logge på først øverst i scriptet:
 `con <- dynarev_uttrekk(con_ask = "con")`
 
 ``` r
+
 con <- dynarev_uttrekk(con_ask = "con")
 
 dynarev_1 <- dynarev_uttrekk(delregnr = 2421,
@@ -282,6 +297,7 @@ skjemanavnene i en karaktervektor i argumentet `skjema`. Her er
 skjemaene HELSE38P, HELSE39 og HELSE44P valgt.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = c("HELSE38P", "HELSE39", "HELSE44P"),
                            skjema_cols = c("FORETAKETS_NAVN", "FORETAKETS_ORGNR", "HELSEREGION_EPOST", "HELSEREGION_NAVN"))
@@ -299,6 +315,7 @@ kolonner så det kan være lurt å spesifisere hvilke variabler man ønsker
 å hente ut.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421, 
                                     skjema = T, 
                                     skjema_cols = T, 
@@ -310,6 +327,7 @@ dynarev <- dynarev_uttrekk(delregnr = 2421,
 Her lastes det inn SFU-data fra flere skjema (fra samme delregister).
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = c("HELSE38P", "HELSE39", "HELSE44P"),
                            skjema_cols = F,
@@ -322,6 +340,7 @@ Her lastes det inn rådata fra de aktive enhetene i valgt skjema/valgte
 skjemaer.
 
 ``` r
+
 dynarev <- dynarev_uttrekk(delregnr = 2421,
                            skjema = T,
                            skjema_cols = T,

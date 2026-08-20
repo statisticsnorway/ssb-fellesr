@@ -41,7 +41,7 @@ is issued.
 
 ``` r
 set_project_root("renv.lock")
-#> Warning: Project root not found (target = 'renv.lock')
+#> Working directory set to project root: /home/runner/work/ssb-fellesr/ssb-fellesr
 set_project_root(".Rproj")
 #> Working directory set to project root: /home/runner/work/ssb-fellesr/ssb-fellesr
 ```

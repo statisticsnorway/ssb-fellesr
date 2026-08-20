@@ -8,6 +8,7 @@ for mer dokumentasjon av funksjonene.
 For å ta i bruk funksjonene i `fellesr` må du kalle biblioteket med:
 
 ``` r
+
 library(fellesr)
 ```
 
@@ -16,6 +17,7 @@ RStudio Server (produksjonssonen). Dersom du bruker et virtuelt miljø
 med `renv` kan pakken installeres slik:
 
 ``` r
+
 renv::init()
 renv::install("statisticsnorway/ssb-fellesr")
 ```
@@ -53,6 +55,7 @@ Dapla-teamet ditt. Base-R funksjonen
 å se innholdet i mapper eller undermapper under `"/buckets/"`.
 
 ``` r
+
 list.files("/buckets/produkt/R_smoke_test")
 
 ### Legg til filstørrelse og endringsdato
@@ -82,6 +85,7 @@ kan brukes til å liste opp filene som finnes i alle bøtter teamet ditt
 har tilgang til, f.eks. delt-bøtter fra andre team.
 
 ``` r
+
 fellesr::gcs.list.files("ssb-dapla-felles-data-produkt-prod/R_smoke_test/")
 ```
 
@@ -93,6 +97,7 @@ man bruke base-R funksjonen
 [`file.remove()`](https://rdrr.io/r/base/files.html).
 
 ``` r
+
 file.remove("/buckets/produkt/R_smoke_test/fil_som_skal_slettes.parquet")
 ```
 
@@ -107,6 +112,7 @@ mappe, kan denne lese inn ved å skrive navnet på mappen (uten endelsen
 .parquet).
 
 ``` r
+
 # Parquet
 read_SSB_parquet <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/R_smoke_test/1987.parquet")
 read_SSB_parquet <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/R_smoke_test/1987.parquet", col_select = c("Year", "Month"))
@@ -130,6 +136,7 @@ jobbe med kartdata på DAPLA, se [Kartdata i
 DAPLA-manualen](https://manual.dapla.ssb.no/kartdata.html#r).
 
 ``` r
+
 data <- fellesr::read_SSB("ssb-dapla-felles-data-produkt-prod/GIS/testdata/veger_oslo.parquet", sf = TRUE)
 ```
 
@@ -145,6 +152,7 @@ kun lese inn én fil som ligger i en mappe så dersom dataene ikke er
 inn alene.
 
 ``` r
+
 data <- fellesr::open_dataset("ssb-dapla-felles-data-produkt-prod/R_smoke_test/1987_1996_dataset") %>%
  dplyr::filter(Year == 1996 & TailNum == "N2823W") %>%
  dplyr::select(Year, Month, DayofMonth, TailNum) %>%
@@ -160,6 +168,7 @@ man til slutt leser inn filene med
 [`sfarrow::read_sf_dataset()`](https://wcjochem.github.io/sfarrow/reference/read_sf_dataset.html).
 
 ``` r
+
 data <- fellesr::open_dataset("ssb-prod-dapla-felles-data-delt/GIS/Kart/2023/ABAS_grunnkrets_flate_2023/") %>%
   dplyr::filter(KOMMUNENR == "0301") %>%
   sfarrow::read_sf_dataset()
@@ -171,6 +180,7 @@ Funksjonen `write_SSB` kan brukes til å skrive .parquet-, .feather- og
 .csv-filer til Google Cloud Storage.
 
 ``` r
+
 # PARQUET
 fellesr::write_SSB(data, "ssb-dapla-felles-data-produkt-prod/R_smoke_test/write_SSB_parquet_test.parquet")
 

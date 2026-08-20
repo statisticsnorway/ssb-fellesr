@@ -59,6 +59,7 @@ informasjon om hvilken server det kjøres på (nodename). Til slutt lagres
 data som en .csv. Vi kaller scriptet: `run_test.R`.
 
 ``` r
+
 # Les inn  data
 dt <- read.csv("~/sas_test/testdata.csv")
 
@@ -75,6 +76,7 @@ write.csv(dt, file ="~/sas_test/testdata_output.csv",
 For å ta imot parametre i R-skriptet trenger man denne kodesnutten:
 
 ``` r
+
 args <- commandArgs(trailingOnly = TRUE)
 aar <- as.numeric(args[1])  # Konverterer det første argumentet til numerisk verdi
 ```

@@ -8,6 +8,7 @@ statistikkbanken fra Jupyterlab i R. Funksjonen ligger i pakken
 `fellesr` versjon \>= 0.1.2.
 
 ``` r
+
 library(fellesr)
 ```
 
@@ -35,6 +36,7 @@ som er pålogget fra en miljøvariabel i Jupyterlab.
 Her er et eksempel:
 
 ``` r
+
 statbank_lasting(lastefil = roykalderkj1,
                  tabell_id = "05307",
                  laste_bruker = "LAST330",
@@ -45,6 +47,7 @@ Det er også mulig å oppgi filsti til mappen der lastefilen har blitt
 lagret i .parquet-format:
 
 ``` r
+
 statbank_lasting(lastefil = "roykalderkj1.parquet",
                  lastefilsti = "ssb-prod-spesh-personell-data-kilde",
                  tabell_id = "05307",
@@ -56,6 +59,7 @@ Flere filer kan lastes opp samtidig ved å spesifiere en filene i en
 liste. For eksempel:
 
 ``` r
+
 statbank_lasting(lastefil = list(speshelse08fylker1, speshelse08kommun1, speshelse08landet1),
                  tabell_id = "13772",
                  laste_bruker = "LAST330",

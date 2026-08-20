@@ -9,14 +9,15 @@ har vi laget to “wrapper” funksjoner (**`runApp_ssb`** og
 **`runExample`**) som kan brukes som gjøre shiny for SSB brukerne. Her
 er de to wrapper funksjonene for shiny:
 
-| Funksjon                                             | Beskrivelse                 |
-|------------------------------------------------------|-----------------------------|
-| [`runApp_ssb()`](../reference/runApp_ssb.md)         | Kjør en shiny app.          |
+| Funksjon | Beskrivelse |
+|----|----|
+| [`runApp_ssb()`](../reference/runApp_ssb.md) | Kjør en shiny app. |
 | [`runExample_ssb()`](../reference/runExample_ssb.md) | Kjør en eksempel shiny App. |
 
 For å kjøre et eksempel shiny app:
 
 ``` r
+
 library(shiny)
 library(fellesr)
 
@@ -32,6 +33,7 @@ men igjen er stien som det pekes til feil. Wrapper funksjonen
 **`esquisser_ssb`** peker til ritkig sted for appen. for example:
 
 ``` r
+
 library(esquisse)
 library(fellesr)
 data(iris)

@@ -6,6 +6,7 @@ fargepalett](https://www.ssb.no/klass/klassifikasjoner/614)). Denne kan
 lastes inn i R med funksjonen `klassR`:
 
 ``` r
+
 ssb_farger <- klassR::GetKlass(614, output_style = "wide") %>%
   dplyr::rename(farge_nummer = code3, 
                 HEX = name3, 

@@ -34,6 +34,7 @@ Mal for SSB pakker er inkluderte i SSBs `fellesr` pakke. **Sjekk at du
 har installerte fellesr** fra før ved å skrive
 
 ``` r
+
 library(fellesr)
 ```
 

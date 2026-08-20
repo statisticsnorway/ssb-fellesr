@@ -39,6 +39,7 @@ Det er fem nyttige R-pakker som gjøre pakke bygging prosessen lettere.
 Disse kan installeres ved:
 
 ``` r
+
 install.packages(c("devtools", "roxygen2", "testthat", "usethis", "knitr"))
 ```
 
@@ -46,6 +47,7 @@ Endelig kan du sjekke om systemet er klar for å bygge en pakke ved å
 kjøre:
 
 ``` r
+
 library(devtools)
 has_devel()
 ```
@@ -56,6 +58,7 @@ R-pakker har en standard struktur som må følges. For å bygge alle
 nødvendig filer kan du kjøre:
 
 ``` r
+
 library(usethis)
 create_package("~/path/to/minpakke")
 ```
@@ -112,6 +115,7 @@ forventet verdi. For eksempel kan vi bruke vectoren `x` nede for å teste
 at funksjonen `mean` returnerer den riktige verdien:
 
 ``` r
+
 x <- c(3, 4, 5)
 test_that("The function mean returns a correct value",{
   expect_equal(mean(x), 4)
@@ -130,6 +134,7 @@ skal det være en fil som heter `testthat.R`. Dette lagres i mappen
 vanligvis ligne på dette:
 
 ``` r
+
 library(testthat)
 library(minpakke)
 

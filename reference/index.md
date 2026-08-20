@@ -2,6 +2,26 @@
 
 ## All functions
 
+- [`add_labelled_columns()`](add_labelled_columns.md) : Legg til
+  kolonner med verdietiketter
+
+- [`add_labels()`](add_labels.md) : Legg til kolonneetiketter fra
+  Datadoc
+
+- [`add_value_labels()`](add_value_labels.md) : Legg til verdietiketter
+  fra KLASS
+
+- [`copy_metadata()`](copy_metadata.md) : Kopier metadata mellom
+  Datadoc-filer
+
+- [`copy_metadata_variable()`](copy_metadata_variable.md) : Kopier
+  variabelmetadata mellom DataDoc-filer
+
+- [`datadoc_path()`](datadoc_path.md) : Lag filsti til Datadoc-fil
+
+- [`datadoc_variabeloversikt()`](datadoc_variabeloversikt.md) : Lag
+  oversikt over variabler i en Datadoc-fil
+
 - [`dynarev_uttrekk()`](dynarev_uttrekk.md) : Uttrekk fra Dynarev til R
 
 - [`env_check()`](env_check.md) : Funksjon for aa sjekke hvilket miljoe
@@ -34,7 +54,16 @@
 - [`gcs_list_objects()`](gcs_list_objects.md) : Funksjon for aa sjekke
   hvilke filer som finnes i en Google Cloud Storage bucket
 
+- [`get_all_variable_definitions()`](get_all_variable_definitions.md) :
+  Hent variabeldefinisjoner
+
 - [`get_format()`](get_format.md) : Laster et SSB-format objekt fra JSON
+
+- [`get_variable_definition_by_id()`](get_variable_definition_by_id.md)
+  : Hent variabeldefinisjon etter ID
+
+- [`get_variable_definition_by_shortname()`](get_variable_definition_by_shortname.md)
+  : Hent variabeldefinisjon etter kortnavn
 
 - [`initialer_funk()`](initialer_funk.md) : Funksjon for aa hente
   initialene til paalogget bruker
@@ -43,6 +72,9 @@
   filsti
 
 - [`logg_kjoring()`](logg_kjoring.md) : Lag logg for versjonering
+
+- [`metadata_variable()`](metadata_variable.md) : Hent metadata for én
+  variabel fra Datadoc
 
 - [`open_dataset()`](open_dataset.md) : Funksjon for aa laste inn
   "multifile" datasett fra Google Cloud Storage bucket
@@ -78,6 +110,9 @@
 - [`read_xml()`](read_xml.md) : Funksjon for aa laste inn .xml-fil fra
   Google Cloud Storage bucket
 
+- [`remove_all_labels()`](remove_all_labels.md) : Fjern alle etiketter
+  fra et datasett
+
 - [`runApp_ssb()`](runApp_ssb.md) : Wrapper function for running shiny
   apps in Jupyter at SSB
 
@@ -91,6 +126,12 @@
 
 - [`set_project_root()`](set_project_root.md) : Set Working Directory to
   Project Root
+
+- [`show_column_labels()`](show_column_labels.md) : Vis kolonneetiketter
+  ved utskrift av et datasett
+
+- [`show_labels_df()`](show_labels_df.md) : Vis verdietiketter i et
+  datasett
 
 - [`sjekk_endring()`](sjekk_endring.md) : Sjekk for endringer i
   kolonner, datatyper eller verdier mellom siste og nyeste versjon av en
@@ -138,6 +179,24 @@
   Funksjon for aa hente uttaksbeskrivelsen til en statistikkbanktabell
 
 - [`theme_ssb()`](theme_ssb.md) : SSB theme for ggplot
+
+- [`values_without_labels()`](values_without_labels.md) : Finn
+  observerte verdier uten verdietikett
+
+- [`vardef_get_klass_id()`](vardef_get_klass_id.md) : Hent KLASS-ID fra
+  en variabeldefinisjon
+
+- [`vardef_url()`](vardef_url.md) : Hent URL til tjenesten for
+  variabeldefinisjoner
+
+- [`variables_with_classification_uri()`](variables_with_classification_uri.md)
+  : Finn variabler med eller uten kodeliste
+
+- [`vars_with_value_labels()`](vars_with_value_labels.md) : Finn
+  variabler med verdietiketter
+
+- [`vars_without_labels()`](vars_without_labels.md) : Finn variabler
+  uten kolonneetikett
 
 - [`versjoner_filer()`](versjoner_filer.md) : Versjonere filer
 

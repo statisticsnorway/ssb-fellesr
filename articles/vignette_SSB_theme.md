@@ -9,6 +9,7 @@ visualisering med ggplot. Vi starter med å lage en stolpediagram som et
 eksempel:
 
 ``` r
+
 library(ggplot2)
 
 ggplot(mtcars, aes(x=cyl, fill=as.factor(cyl))) + 
@@ -27,6 +28,7 @@ publiserer i notat og dokument-serie. Merk at fargene på stolpene ikke
 endres!
 
 ``` r
+
 library(fellesr)
 
 ggplot(mtcars, aes(x=cyl, fill=as.factor(cyl))) + 
@@ -55,6 +57,7 @@ Vi kan endre til SSB farger ved bruk av
 [`scale_fill_ssb()`](../reference/scale_fill_ssb.md)
 
 ``` r
+
 ggplot(mtcars, aes(x=as.factor(cyl), fill=as.factor(cyl) )) + 
   geom_bar( ) +
   scale_fill_ssb() +
@@ -68,6 +71,7 @@ mellom: ‘main’ (default), ‘greens’, ‘blues’, ‘primary’, ‘secon
 ‘shade1’, ‘shade2’,‘shade3’, ‘shade4’, eller ‘shade5’.
 
 ``` r
+
 ggplot(mtcars, aes(x=as.factor(cyl), fill=as.factor(cyl) )) + 
   geom_bar( ) +
   scale_fill_ssb('blues') +
@@ -83,6 +87,7 @@ For kontinuous numeriske data kan vi bruke
 farger. For example
 
 ``` r
+
 ggplot(mtcars, aes(x=hp, y=mpg, color=disp)) + 
   geom_point( ) +
   scale_colour_ssb('greens') +

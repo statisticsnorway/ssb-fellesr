@@ -25,6 +25,7 @@ R-funksjonene ifelse og dplyr::case_when er.
 ### Formater med intervaller
 
 ``` r
+
 # Eksempeldata
 alder <- sample(1L:100L, size = 10, replace = TRUE)
 
@@ -49,6 +50,7 @@ alder_kat <- ssb_age_frmt$map_range(alder)
 ### Formater fra kategori til kategori
 
 ``` r
+
 # Eksempeldata
 ansettelsesform <- sample(c("F", "M", "", "A"), 10, replace = TRUE)
 
@@ -70,6 +72,7 @@ ansettelsesform_ny <- ssb_ansform_frmt$map_cat(ansettelsesform)
 ### Les format fra JSON og initier
 
 ``` r
+
 ssb_age_frmt <- get_format("formats/alder.json", is_range_format = TRUE)
 
 # Eksempeldata

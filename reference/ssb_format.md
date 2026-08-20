@@ -30,7 +30,7 @@ intervallbaserte verdier i henhold til en forhåndsdefinert kodeliste.
 
 ### Public methods
 
-- [`ssb_format$new()`](#method-ssb_format-new)
+- [`ssb_format$new()`](#method-ssb_format-initialize)
 
 - [`ssb_format$map_range()`](#method-ssb_format-map_range)
 
@@ -40,7 +40,7 @@ intervallbaserte verdier i henhold til en forhåndsdefinert kodeliste.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `ssb_format$new()`
 
 Initialiserer SSB Format-klassen
 
@@ -61,7 +61,7 @@ Initialiserer SSB Format-klassen
 
 ------------------------------------------------------------------------
 
-### Method `map_range()`
+### `ssb_format$map_range()`
 
 Mapper numeriske verdier til kategoriske
 
@@ -81,14 +81,12 @@ En vektor med kategoriske verdier som er mappet.
 
 #### Examples
 
-    \dontrun{
     format <- ssb_format$new(frmt_list = list("10-20" = "A", "21-30" = "B", "other" = "C"), is_range_format = TRUE)
     format$map_range(c(15, 25, 35))
-    }
 
 ------------------------------------------------------------------------
 
-### Method `map_cat()`
+### `ssb_format$map_cat()`
 
 Mapper kategorier til kategorier
 
@@ -108,14 +106,12 @@ En vektor med de mappede verdiene.
 
 #### Examples
 
-    \dontrun{
     format <- ssb_format$new(frmt_list = list("A" = "Alpha", "B" = "Beta"), is_range_format = FALSE)
     format$map_cat(c("A", "B"))
-    }
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `ssb_format$clone()`
 
 The objects of this class are cloneable with this method.
 
@@ -132,8 +128,9 @@ The objects of this class are cloneable with this method.
 ## Examples
 
 ``` r
+
 ## ------------------------------------------------
-## Method `ssb_format$map_range`
+## Method `ssb_format$map_range()`
 ## ------------------------------------------------
 
 if (FALSE) { # \dontrun{
@@ -142,7 +139,7 @@ format$map_range(c(15, 25, 35))
 } # }
 
 ## ------------------------------------------------
-## Method `ssb_format$map_cat`
+## Method `ssb_format$map_cat()`
 ## ------------------------------------------------
 
 if (FALSE) { # \dontrun{
