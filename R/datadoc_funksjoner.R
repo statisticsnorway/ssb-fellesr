@@ -2643,7 +2643,241 @@ copy_metadata <- function(
 }
 
 
+#' Legg til kolonner med verdietiketter
+#'
+#' Oppretter nye kolonner med verdietiketter for merkede variabler,
+#' uten å endre de opprinnelige variablene.
+#'
+#' @param data Et datasett som inneholder én eller flere merkede variabler
+#'   med verdietiketter.
+#' @param variables En karaktervektor med navn på variablene det skal
+#'   opprettes nye etikettkolonner for. Alle variablene må finnes i `data`
+#'   og være merkede variabler som gjenkjennes av [haven::is.labelled()].
+#'   Dersom `NULL`, opprettes nye kolonner for alle merkede variabler i
+#'   `data`. Standardverdien er `NULL`.
+#' @param postfix En tekststreng som legges til på slutten av navnet til
+#'   de nye variablene. Standardverdien er `"_labelled"`.
+#'
+#' @return Datasettet som ble oppgitt i `data`, med én ny kolonne for hver
+#'   valgt merket variabel. De opprinnelige variablene beholdes uendret.
+#'   De nye variablene er faktorer der verdietikettene brukes som
+#'   faktorverdier.
+#'
+#' @details
+#' Funksjonen konverterer de valgte variablene med [haven::as_factor()] og
+#' `levels = "labels"`. Dette innebærer at de nye kolonnene inneholder
+#' verdietikettene, mens de opprinnelige kodene beholdes i de opprinnelige
+#' variablene.
+#'
+#' Dersom `variables = NULL`, identifiseres alle merkede variabler i
+#' datasettet ved hjelp av [haven::is.labelled()]. Dersom ingen merkede
+#' variabler finnes, returneres datasettet uendret og det gis en advarsel.
+#'
+#' Navnet på hver ny variabel består av det opprinnelige variabelnavnet
+#' etterfulgt av verdien i `postfix`. Dersom for eksempel variabelen heter
+#' `kjoenn` og `postfix = "_labelled"`, får den nye variabelen navnet
+#' `kjoenn_labelled`.
+#'
+#' Funksjonen gir en feil dersom:
+#'
+#' * `variables` ikke er `NULL` eller en karaktervektor med minst ett
+#'   variabelnavn.
+#' * én eller flere av variablene i `variables` ikke finnes i `data`.
+#' * én eller flere av variablene i `variables` ikke er merkede variabler.
+#' * én eller flere av de nye variablene allerede finnes i `data`.
+#' * `postfix` ikke er én enkelt tekststreng.
+#'
+#' Det gis en advarsel dersom konverteringen introduserer nye
+#' missing-verdier. Missing-verdier som allerede finnes i de opprinnelige
+#' variablene utløser ikke advarselen. Nye missing-verdier kan blant annet
+#' oppstå dersom enkelte verdier ikke har en tilhørende verdietikett.
+#'
+#' @examples
+#' data <- data.frame(
+#'   kjoenn = labelled::labelled(
+#'     c(1, 2, 1),
+#'     labels = c(
+#'       Mann = 1,
+#'       Kvinne = 2
+#'     )
+#'   ),
+#'   region = labelled::labelled(
+#'     c("01", "02", "01"),
+#'     labels = c(
+#'       Ost = "01",
+#'       Vest = "02"
+#'     )
+#'   ),
+#'   alder = c(30, 45, 52)
+#' )
+#'
+#' # Opprett etikettkolonner for alle merkede variabler
+#' add_labelled_columns(
+#'   data = data
+#' )
+#'
+#' # Opprett etikettkolonne for én bestemt variabel
+#' add_labelled_columns(
+#'   data = data,
+#'   variables = "kjoenn"
+#' )
+#'
+#' # Opprett etikettkolonner for flere bestemte variabler
+#' add_labelled_columns(
+#'   data = data,
+#'   variables = c(
+#'     "kjoenn",
+#'     "region"
+#'   )
+#' )
+#'
+#' # Bruk et annet postfiks
+#' add_labelled_columns(
+#'   data = data,
+#'   variables = "kjoenn",
+#'   postfix = "_navn"
+#' )
+#'
+#' @export
+add_labelled_columns <- function(
+    data,
+    variables = NULL,
+    postfix = "_labelled"
+) {
 
+  if (!is.null(variables) && (
+    !is.character(variables) ||
+    length(variables) == 0L ||
+    anyNA(variables)
+  )) {
+    stop(
+      "`variables` må være NULL eller en karaktervektor med minst ett variabelnavn.",
+      call. = FALSE
+    )
+  }
+
+  if (
+    !is.character(postfix) ||
+    length(postfix) != 1L ||
+    is.na(postfix)
+  ) {
+    stop(
+      "`postfix` må være én enkelt tekststreng.",
+      call. = FALSE
+    )
+  }
+
+  if (is.null(variables)) {
+    variables <- names(data)[
+      vapply(
+        data,
+        haven::is.labelled,
+        logical(1)
+      )
+    ]
+
+    if (length(variables) == 0L) {
+      warning(
+        "Ingen merkede variabler med verdietiketter ble funnet i `data`.",
+        call. = FALSE
+      )
+      return(data)
+    }
+  }
+
+  variables_missing <- setdiff(
+    variables,
+    names(data)
+  )
+
+  if (length(variables_missing) > 0L) {
+    stop(
+      "Følgende variabler finnes ikke i `data`: ",
+      paste(variables_missing, collapse = ", "),
+      ".",
+      call. = FALSE
+    )
+  }
+
+  variables_not_labelled <- variables[
+    !vapply(
+      data[variables],
+      haven::is.labelled,
+      logical(1)
+    )
+  ]
+
+  if (length(variables_not_labelled) > 0L) {
+    stop(
+      "Følgende variabler er ikke labelled: ",
+      paste(variables_not_labelled, collapse = ", "),
+      ".",
+      call. = FALSE
+    )
+  }
+
+  new_variables <- paste0(
+    variables,
+    postfix
+  )
+
+  variables_existing <- intersect(
+    new_variables,
+    names(data)
+  )
+
+  if (length(variables_existing) > 0L) {
+    stop(
+      "Følgende variabler finnes allerede i `data`: ",
+      paste(variables_existing, collapse = ", "),
+      ".",
+      call. = FALSE
+    )
+  }
+
+  original_data <- data
+
+  data <- dplyr::mutate(
+    data,
+    dplyr::across(
+      dplyr::all_of(variables),
+      ~ haven::as_factor(
+        .x,
+        levels = "labels"
+      ),
+      .names = paste0(
+        "{.col}",
+        postfix
+      )
+    )
+  )
+
+  variables_with_new_missing <- variables[
+    vapply(
+      seq_along(variables),
+      function(i) {
+        original <- original_data[[variables[i]]]
+        labelled <- data[[new_variables[i]]]
+
+        any(
+          !is.na(original) & is.na(labelled)
+        )
+      },
+      logical(1)
+    )
+  ]
+
+  if (length(variables_with_new_missing) > 0L) {
+    warning(
+      "Følgende variabler fikk nye missing-verdier ved konvertering til verdietiketter: ",
+      paste(variables_with_new_missing, collapse = ", "),
+      ". Dette kan skyldes at enkelte verdier mangler verdietikett.",
+      call. = FALSE
+    )
+  }
+
+  data
+}
 
 
 
