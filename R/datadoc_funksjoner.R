@@ -2,34 +2,103 @@
 # Datadoc-funksjoner
 
 
-#' Lag filsti til Datadoc-fil
+#' Konverter filsti mellom Parquet og Datadoc
 #'
-#' Oppretter filstien til en Datadoc-fil basert på filstien til en
-#' Parquet-fil. Filendelsen `.parquet` erstattes med `__DOC.json`.
+#' Konverterer en filsti mellom en Parquet-fil og den tilhørende
+#' Datadoc JSON-filen.
 #'
-#' @param filsti En tekststreng eller tegnvektor med filstien til én eller
-#'   flere Parquet-filer.
+#' Standardoppførselen er å konvertere fra `.parquet` til `__DOC.json`.
+#' Ved å sette `to = "parquet"` konverteres en Datadoc-fil tilbake til
+#' den tilhørende Parquet-filstien.
 #'
-#' @return En tekststreng eller tegnvektor med filstien til den tilhørende
-#'   DataDoc-filen.
+#' @param filsti En tekststreng eller tekstvektor med filstien til én eller
+#'   flere Parquet- eller Datadoc-filer.
+#' @param to En tekststreng som angir hvilket filformat filstien skal
+#'   konverteres til. Gyldige verdier er `"json"` og `"parquet"`.
+#'   Standardverdien er `"json"`.
+#' @param warn_if_missing En logisk verdi som angir om det skal gis en
+#'   advarsel dersom filen den konverterte filstien peker til, ikke finnes.
+#'   Standardverdien er `TRUE`.
+#'
+#' @return En tekststreng eller tekstvektor med den konverterte filstien.
 #'
 #' @examples
 #' datadoc_path("/buckets/data/personell_v1.parquet")
 #'
 #' datadoc_path(
-#'   c(
-#'     "/buckets/data/personell_v1.parquet",
-#'     "/buckets/data/regnskap_v1.parquet"
-#'   )
+#'   "/buckets/data/personell_v1__DOC.json",
+#'   to = "parquet"
 #' )
 #'
 #' @export
-datadoc_path <- function(filsti) {
-  sub(
-    pattern = "\\.parquet$",
-    replacement = "__DOC.json",
-    x = filsti
-  )
+datadoc_path <- function(
+    filsti,
+    to = c("json", "parquet"),
+    warn_if_missing = TRUE
+) {
+
+  to <- match.arg(to)
+
+  if (
+    !is.logical(warn_if_missing) ||
+    length(warn_if_missing) != 1L ||
+    is.na(warn_if_missing)
+  ) {
+    stop(
+      "`warn_if_missing` må være enten TRUE eller FALSE.",
+      call. = FALSE
+    )
+  }
+
+  if (to == "json") {
+
+    if (any(!grepl("\\.parquet$", filsti, ignore.case = TRUE))) {
+      stop(
+        "`filsti` må slutte på `.parquet` når `to = \"json\"`.",
+        call. = FALSE
+      )
+    }
+
+    output <- sub(
+      pattern = "\\.parquet$",
+      replacement = "__DOC.json",
+      x = filsti,
+      ignore.case = TRUE
+    )
+
+  } else {
+
+    if (any(!grepl("__DOC\\.json$", filsti, ignore.case = TRUE))) {
+      stop(
+        "`filsti` må slutte på `__DOC.json` når `to = \"parquet\"`.",
+        call. = FALSE
+      )
+    }
+
+    output <- sub(
+      pattern = "__DOC\\.json$",
+      replacement = ".parquet",
+      x = filsti,
+      ignore.case = TRUE
+    )
+  }
+
+  if (warn_if_missing) {
+
+    missing_files <- output[!file.exists(output)]
+
+    if (length(missing_files) > 0L) {
+      warning(
+        "Følgende fil",
+        if (length(missing_files) > 1L) "er" else "",
+        " finnes ikke:\n",
+        paste0("- ", missing_files, collapse = "\n"),
+        call. = FALSE
+      )
+    }
+  }
+
+  output
 }
 
 #' Hent URL til tjenesten for variabeldefinisjoner
@@ -1314,6 +1383,24 @@ add_value_labels <- function(
       kodeliste_klass$name
     )
 
+    # Sørg for at variabelen har samme type som kodene i kodelisten
+    if (!is.character(data[[variabel]])) {
+
+      warning(
+        "Variabelen `",
+        variabel,
+        "` har type `",
+        typeof(data[[variabel]]),
+        "`, mens kodene i KLASS er tekst. ",
+        "Variabelen konverteres til `character` før verdietikettene legges til.",
+        call. = FALSE
+      )
+
+      data[[variabel]] <- as.character(
+        data[[variabel]]
+      )
+    }
+
     data[[variabel]] <- labelled::set_value_labels(
       data[[variabel]],
       .labels = labs
@@ -1783,7 +1870,8 @@ values_without_labels <- function(data) {
       tibble::tibble(
         variable = var,
         value_without_label = missing_labels
-      )
+      ) |>
+        remove_all_labels()
     }
   )
 }
@@ -2647,15 +2735,6 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
   # Behold original sti for å hente versjon og periode
   filsti_data_egen <- filsti_datadoc_egen
 
-  # Gjør om parquet-sti til Datadoc-sti dersom nødvendig
-  datadoc_path <- function(path) {
-    if (grepl("\\.parquet$", path, ignore.case = TRUE)) {
-      sub("\\.parquet$", "__DOC.json", path, ignore.case = TRUE)
-    } else {
-      path
-    }
-  }
-
   # Hent versjonsnummer fra filnavn
   hent_versjon <- function(path) {
     filnavn <- basename(path)
@@ -2705,11 +2784,24 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
     )
   }
 
-  versjon <- hent_versjon(filsti_data_egen)
+  versjon <- hent_versjon(filsti_data_egen) # OBS: erstatt med fellesr::finn_versjon()
   periode <- hent_periode(filsti_data_egen)
 
-  filsti_datadoc_egen <- datadoc_path(filsti_datadoc_egen)
-  filsti_datadoc_original <- datadoc_path(filsti_datadoc_original)
+  filsti_datadoc_egen <- if (
+    tolower(tools::file_ext(filsti_datadoc_egen)) == "parquet"
+  ) {
+    datadoc_path(filsti_datadoc_egen, to = "parquet")
+  } else {
+    filsti_datadoc_egen
+  }
+
+  filsti_datadoc_original <- if (
+    tolower(tools::file_ext(filsti_datadoc_original)) == "parquet"
+  ) {
+    datadoc_path(filsti_datadoc_original, to = "parquet")
+  } else {
+    filsti_datadoc_original
+  }
 
   # Les Datadoc-filene
   egen <- jsonlite::read_json(
@@ -2799,8 +2891,12 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
 #' `short_name` i begge filer. Det kan i tillegg angis eksplisitte koblinger
 #' mellom variabler med ulike kortnavn.
 #'
-#' Gyldighetsperioden for variablene i mottakerfilen settes automatisk ut fra
-#' perioden i filnavnet. For eksempel gir `_p2025_v1` perioden
+#' Variabler kan ekskluderes fullstendig fra oppdateringen ved hjelp av
+#' `ekskluder_variabler`. For disse variablene kopieres verken metadata eller
+#' gyldighetsperiode.
+#'
+#' Gyldighetsperioden for øvrige variabler i mottakerfilen settes automatisk
+#' ut fra perioden i filnavnet. For eksempel gir `_p2025_v1` perioden
 #' `2025-01-01` til `2025-12-31`. Det kan angis egne gyldighetsperioder for
 #' enkeltvariabler ved hjelp av `dato_unntak`.
 #'
@@ -2813,16 +2909,22 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
 #'   koblinger mellom variabler. Navnet på hvert element angir `short_name`
 #'   i filen som skal oppdateres, mens verdien angir `short_name` i
 #'   originalfilen. Standardverdien er `NULL`.
+#' @param ekskluder_variabler `NULL` eller en tekstvektor med `short_name`
+#'   for variabler i mottakerfilen som ikke skal endres. For disse variablene
+#'   kopieres verken metadata eller gyldighetsperiode. En variabel kan ikke
+#'   samtidig være oppgitt i `dato_unntak`. Standardverdien er `NULL`.
 #' @param overwrite En logisk verdi som angir om eksisterende metadata skal
 #'   erstattes. Når verdien er `TRUE`, kopieres metadata for alle aktuelle
 #'   variabler. Når verdien er `FALSE`, hoppes variabler over dersom feltet
 #'   `name` i mottakerfilen ikke er `NULL`. Standardverdien er `TRUE`.
 #' @param dato_unntak `NULL` eller en data frame med egne gyldighetsperioder
-#'   for enkeltvariabler. Dataframen må inneholde kolonnene `short_name`,
-#'   `contains_data_from` og `contains_data_until`. Datoene skal være på
-#'   formatet `"YYYY-MM-DD"`. Variabler som ikke er oppgitt i
-#'   `dato_unntak`, får gyldighetsperiode basert på perioden i filnavnet.
-#'   Standardverdien er `NULL`.
+#'   for enkeltvariabler. Metadata kopieres på vanlig måte for disse
+#'   variablene, men feltene `contains_data_from` og `contains_data_until`
+#'   overskrives med periodene angitt i `dato_unntak`. Dataframen må inneholde
+#'   kolonnene `short_name`, `contains_data_from` og `contains_data_until`.
+#'   Datoene skal være på formatet `"YYYY-MM-DD"`. En variabel kan ikke
+#'   samtidig være oppgitt i `ekskluder_variabler`. Standardverdien er
+#'   `NULL`.
 #'
 #' @return Den oppdaterte Datadoc-strukturen som en liste. Strukturen skrives
 #'   samtidig tilbake til filen angitt i `filsti_datadoc_egen`.
@@ -2836,7 +2938,12 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
 #' `variabler`, får forrang dersom mottakervariabelen også inngår blant
 #' variablene med identiske kortnavn.
 #'
-#' For hver variabel kopieres hele metadataobjektet fra originalfilen.
+#' Variabler som er oppgitt i `ekskluder_variabler`, fjernes fra listen over
+#' variabler som skal få kopiert metadata. De hoppes også over når
+#' gyldighetsperioden oppdateres. Disse variablene beholdes derfor uendret i
+#' mottakerfilen.
+#'
+#' For hver øvrige variabel kopieres hele metadataobjektet fra originalfilen.
 #' Feltet `short_name` erstattes deretter med kortnavnet som brukes i filen
 #' som oppdateres.
 #'
@@ -2849,14 +2956,21 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
 #' metadata, får oppdatert feltene `contains_data_from` og
 #' `contains_data_until`.
 #'
+#' Variabler i `ekskluder_variabler` er unntatt fra denne oppdateringen og
+#' beholdes fullstendig uendret.
+#'
 #' Standardperioden hentes fra filnavnet til `filsti_datadoc_egen`.
 #' Et filnavn som inneholder `_p2025_v1` gir
 #' `contains_data_from = "2025-01-01"` og
 #' `contains_data_until = "2025-12-31"`.
 #'
 #' Dersom enkelte variabler har en annen gyldighetsperiode, kan disse oppgis
-#' i `dato_unntak`. Perioden som er angitt i `dato_unntak`, erstatter
-#' standardperioden for de aktuelle variablene.
+#' i `dato_unntak`. Metadata kopieres på vanlig måte, men perioden som er
+#' angitt i `dato_unntak`, erstatter standardperioden for de aktuelle
+#' variablene.
+#'
+#' Samme variabel kan ikke være oppgitt både i `ekskluder_variabler` og
+#' `dato_unntak`.
 #'
 #' Følgende kontroller utføres før filen endres:
 #'
@@ -2869,11 +2983,17 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
 #'     `variabler`;
 #'   \item alle eksplisitt oppgitte variabler må finnes i de respektive
 #'     Datadoc-filene;
+#'   \item `ekskluder_variabler` må være en tekstvektor dersom argumentet
+#'     ikke er `NULL`;
+#'   \item alle variabler i `ekskluder_variabler` må finnes i
+#'     mottakerfilen;
 #'   \item filnavnet til mottakerfilen må inneholde en periode på formen
 #'     `_pYYYY_vN`;
 #'   \item `dato_unntak` må inneholde de nødvendige kolonnene;
 #'   \item hver variabel kan bare forekomme én gang i `dato_unntak`;
-#'   \item alle variabler i `dato_unntak` må finnes i mottakerfilen; og
+#'   \item alle variabler i `dato_unntak` må finnes i mottakerfilen;
+#'   \item samme variabel kan ikke forekomme både i `ekskluder_variabler`
+#'     og `dato_unntak`; og
 #'   \item datoene i `dato_unntak` må være gyldige datoer på formatet
 #'     `"YYYY-MM-DD"`.
 #' }
@@ -2883,7 +3003,7 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
 #'
 #' @examples
 #' \dontrun{
-#' # Kopier metadata og sett perioden til 2025 for alle variabler
+#' # Kopier metadata og sett perioden til 2025 for alle aktuelle variabler
 #' copy_metadata(
 #'   filsti_datadoc_egen =
 #'     "/buckets/data/resultat_p2025_v1__DOC.json",
@@ -2900,7 +3020,7 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
 #'   overwrite = FALSE
 #' )
 #'
-#' # Legg til en eksplisitt kobling mellom ulike kortnavn
+#' # Legg til eksplisitte koblinger mellom ulike kortnavn
 #' copy_metadata(
 #'   filsti_datadoc_egen =
 #'     "/buckets/data/resultat_p2025_v1__DOC.json",
@@ -2909,6 +3029,18 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
 #'   variabler = c(
 #'     kjoenn = "sex",
 #'     bostedskommune = "kommune"
+#'   )
+#' )
+#'
+#' # Ikke gjør noen endringer i enkelte variabler
+#' copy_metadata(
+#'   filsti_datadoc_egen =
+#'     "/buckets/data/resultat_p2025_v1__DOC.json",
+#'   filsti_datadoc_original =
+#'     "/buckets/data/resultat_p2024_v1__DOC.json",
+#'   ekskluder_variabler = c(
+#'     "orgnr_frtk",
+#'     "navn_frtk"
 #'   )
 #' )
 #'
@@ -2933,7 +3065,6 @@ copy_metadata_dataset <- function(filsti_datadoc_egen,
 #'     "/buckets/data/resultat_p2025_v1__DOC.json",
 #'   filsti_datadoc_original =
 #'     "/buckets/data/resultat_p2024_v1__DOC.json",
-#'   overwrite = FALSE,
 #'   dato_unntak = dato_unntak
 #' )
 #' }
@@ -2947,6 +3078,7 @@ copy_metadata <- function(
     filsti_datadoc_egen,
     filsti_datadoc_original,
     variabler = NULL,
+    ekskluder_variabler = NULL,
     overwrite = TRUE,
     dato_unntak = NULL
 ) {
@@ -3056,6 +3188,71 @@ copy_metadata <- function(
       ),
       call. = FALSE
     )
+  }
+
+  # Kontroller ekskluder_variabler
+  if (is.null(ekskluder_variabler)) {
+
+    ekskluder_variabler <- character(0)
+
+  } else {
+
+    if (
+      !is.character(ekskluder_variabler) ||
+      length(ekskluder_variabler) == 0L ||
+      anyNA(ekskluder_variabler) ||
+      any(!nzchar(trimws(ekskluder_variabler)))
+    ) {
+      stop(
+        paste0(
+          "`ekskluder_variabler` må være en tekstvektor med ",
+          "`short_name`, for eksempel c(\"orgnr_frtk\", \"navn_frtk\")."
+        ),
+        call. = FALSE
+      )
+    }
+
+    ekskluder_variabler <- trimws(
+      ekskluder_variabler
+    )
+
+    if (anyDuplicated(ekskluder_variabler)) {
+
+      duplikater <- unique(
+        ekskluder_variabler[
+          duplicated(ekskluder_variabler)
+        ]
+      )
+
+      stop(
+        "Følgende variabler forekommer flere ganger i ",
+        "`ekskluder_variabler`: ",
+        paste(
+          duplikater,
+          collapse = ", "
+        ),
+        ".",
+        call. = FALSE
+      )
+    }
+
+    mangler_i_egen <- setdiff(
+      ekskluder_variabler,
+      short_name_egen
+    )
+
+    if (length(mangler_i_egen) > 0L) {
+      stop(
+        "Følgende variabler fra `ekskluder_variabler` finnes ikke i ",
+        "`filsti_datadoc_egen`: ",
+        paste(
+          mangler_i_egen,
+          collapse = ", "
+        ),
+        ".",
+        call. = FALSE
+      )
+    }
   }
 
   # Kontroller dato_unntak
@@ -3227,6 +3424,32 @@ copy_metadata <- function(
     }
   }
 
+  # Kontroller at samme variabel ikke finnes både i
+  # ekskluder_variabler og dato_unntak
+  if (
+    length(ekskluder_variabler) > 0L &&
+    !is.null(dato_unntak)
+  ) {
+
+    overlapp <- intersect(
+      ekskluder_variabler,
+      dato_unntak$short_name
+    )
+
+    if (length(overlapp) > 0L) {
+      stop(
+        "Følgende variabler er oppgitt både i `ekskluder_variabler` ",
+        "og `dato_unntak`: ",
+        paste(
+          overlapp,
+          collapse = ", "
+        ),
+        ". En variabel kan ikke være oppgitt i begge argumentene.",
+        call. = FALSE
+      )
+    }
+  }
+
   # Alle variabler med samme navn i begge filer
   variabler_felles <- intersect(
     short_name_egen,
@@ -3337,6 +3560,11 @@ copy_metadata <- function(
     )
   ]
 
+  # Ekskluderte variabler skal ikke kopieres
+  variabler_samlet <- variabler_samlet[
+    !names(variabler_samlet) %in% ekskluder_variabler
+  ]
+
   variabler_kopiert <- character(0)
   variabler_hoppet_over <- character(0)
 
@@ -3395,15 +3623,21 @@ copy_metadata <- function(
     )
   }
 
-  # Oppdater gyldighetsperiode for alle variabler
+  # Oppdater gyldighetsperiode for alle variabler,
+  # bortsett fra ekskluderte variabler
   for (i in seq_along(datadoc_egen$datadoc$variables)) {
 
     navn <- datadoc_egen$datadoc$variables[[i]]$short_name
 
+    # Ekskluderte variabler skal ikke endres
+    if (navn %in% ekskluder_variabler) {
+      next
+    }
+
     fra <- contains_data_from
     til <- contains_data_until
 
-    # Bruk egen periode dersom variabelen er oppgitt som unntak
+    # dato_unntak overskriver standardperioden
     if (
       !is.null(dato_unntak) &&
       navn %in% dato_unntak$short_name
@@ -3455,11 +3689,33 @@ copy_metadata <- function(
     )
   }
 
+  if (length(ekskluder_variabler) > 0L) {
+    message(
+      "Lot ",
+      length(ekskluder_variabler),
+      " ekskludert",
+      if (length(ekskluder_variabler) == 1L) " variabel" else "e variabler",
+      " være uendret: ",
+      paste(
+        ekskluder_variabler,
+        collapse = ", "
+      ),
+      "."
+    )
+  }
+
+  antall_dato_oppdatert <- length(
+    setdiff(
+      short_name_egen,
+      ekskluder_variabler
+    )
+  )
+
   message(
     "Oppdaterte gyldighetsperiode for ",
-    length(short_name_egen),
+    antall_dato_oppdatert,
     " variabel",
-    if (length(short_name_egen) == 1L) "" else "er",
+    if (antall_dato_oppdatert == 1L) "" else "er",
     " til ",
     contains_data_from,
     "–",
@@ -3477,7 +3733,6 @@ copy_metadata <- function(
 
   datadoc_egen
 }
-
 
 #' Erstatt filsti i Datadoc-metadata
 #'
@@ -3530,3 +3785,672 @@ replace_file_path <- function(filsti_datadoc,
   invisible(datadoc)
 }
 
+#' Beregn dekning av verdietiketter
+#'
+#' Beregner hvor stor andel av de observerte verdiene i hver variabel som har
+#' en tilhørende verdietikett.
+#'
+#' Funksjonen beregner både dekning blant alle observerte verdier og blant
+#' unike observerte verdier.
+#'
+#' @param data Et datasett som skal undersøkes for verdietiketter.
+#' @param labelled_only En logisk verdi som angir om bare variabler som har
+#'   minst én verdietikett skal inkluderes. Når verdien er `FALSE`, inkluderes
+#'   alle variabler i datasettet. Standardverdien er `FALSE`.
+#'
+#' @return En tibble med én rad per variabel og følgende kolonner:
+#'
+#' \describe{
+#'   \item{`variable`}{Navnet på variabelen.}
+#'   \item{`has_value_labels`}{Logisk verdi som angir om variabelen har minst
+#'     én registrert verdietikett.}
+#'   \item{`n_values`}{Antall observerte, ikke-manglende verdier i variabelen.}
+#'   \item{`n_values_with_label`}{Antall observerte verdier som har en
+#'     tilhørende verdietikett.}
+#'   \item{`pct_values_with_label`}{Andel observerte verdier som har en
+#'     tilhørende verdietikett, angitt i prosent og avrundet til to desimaler.}
+#'   \item{`n_unique_values`}{Antall unike observerte, ikke-manglende verdier.}
+#'   \item{`n_unique_values_with_label`}{Antall unike observerte verdier som
+#'     har en tilhørende verdietikett.}
+#'   \item{`pct_unique_values_with_label`}{Andel unike observerte verdier som
+#'     har en tilhørende verdietikett, angitt i prosent og avrundet til to
+#'     desimaler.}
+#' }
+#'
+#' @details
+#' Verdietikettene hentes med [labelled::val_labels()]. Manglende verdier
+#' tas ikke med i beregningene.
+#'
+#' En observert verdi regnes som merket dersom verdien finnes blant verdiene
+#' som er registrert i variabelens verdietiketter.
+#'
+#' `pct_values_with_label` beregnes på grunnlag av alle observerte verdier.
+#' Dersom samme verdi forekommer flere ganger, teller hver forekomst separat.
+#'
+#' `pct_unique_values_with_label` beregnes derimot på grunnlag av de unike
+#' observerte verdiene. Hver forskjellig verdi teller derfor bare én gang,
+#' uavhengig av hvor ofte den forekommer i datasettet.
+#'
+#' Dersom en variabel ikke inneholder noen observerte verdier, settes den
+#' aktuelle prosentandelen til `NA`.
+#'
+#' Når `labelled_only = TRUE`, inkluderes bare variabler som returneres av
+#' [vars_with_value_labels()].
+#'
+#' @examples
+#' data <- tibble::tibble(
+#'   kjoenn = labelled::labelled(
+#'     c(1, 2, 1, 3, NA),
+#'     labels = c(
+#'       Mann = 1,
+#'       Kvinne = 2
+#'     )
+#'   ),
+#'   alder = c(35, 42, 28, 51, 37)
+#' )
+#'
+#' value_label_coverage(data)
+#'
+#' value_label_coverage(
+#'   data,
+#'   labelled_only = TRUE
+#' )
+#'
+#' @seealso
+#' [vars_with_value_labels()] for å finne variabler med verdietiketter,
+#' [values_without_labels()] for å finne observerte verdier uten
+#' verdietikett og [labelled::val_labels()] for å hente verdietikettene
+#' til en variabel.
+#'
+#' @export
+value_label_coverage <- function(
+    data,
+    labelled_only = FALSE
+) {
+
+  if (
+    !is.logical(labelled_only) ||
+    length(labelled_only) != 1L ||
+    is.na(labelled_only)
+  ) {
+    stop(
+      "`labelled_only` må være enten TRUE eller FALSE.",
+      call. = FALSE
+    )
+  }
+
+  variables_with_labels <- vars_with_value_labels(data)
+
+  variables <- names(data)
+
+  if (labelled_only) {
+    variables <- variables[
+      variables %in% variables_with_labels
+    ]
+  }
+
+  purrr::map_dfr(
+    variables,
+    function(variable) {
+
+      x <- data[[variable]]
+
+      observed_values <- x[
+        !is.na(x)
+      ]
+
+      labelled_values <- unname(
+        labelled::val_labels(x)
+      )
+
+      values_have_label <-
+        observed_values %in% labelled_values
+
+      unique_values <- unique(
+        observed_values
+      )
+
+      unique_values_have_label <-
+        unique_values %in% labelled_values
+
+      n_values <- length(
+        observed_values
+      )
+
+      n_unique_values <- length(
+        unique_values
+      )
+
+      tibble::tibble(
+        variable = variable,
+        has_value_labels =
+          variable %in% variables_with_labels,
+
+        n_values = n_values,
+        n_values_with_label =
+          sum(values_have_label),
+
+        pct_values_with_label =
+          if (n_values > 0L) {
+            round(
+              sum(values_have_label) /
+                n_values * 100,
+              digits = 2
+            )
+          } else {
+            NA_real_
+          },
+
+        n_unique_values =
+          n_unique_values,
+
+        n_unique_values_with_label =
+          sum(unique_values_have_label),
+
+        pct_unique_values_with_label =
+          if (n_unique_values > 0L) {
+            round(
+              sum(unique_values_have_label) /
+                n_unique_values * 100,
+              digits = 2
+            )
+          } else {
+            NA_real_
+          }
+      )
+    }
+  )
+}
+
+#' Kontroller forventet dekning av verdietiketter
+#'
+#' Lager en oversikt over hvilke variabler i et datasett som forventes å ha
+#' verdietiketter, hvilke som faktisk har verdietiketter, og hvilke variabler
+#' som mangler forventede verdietiketter.
+#'
+#' Forventningen kan baseres på variabeltype og på en eksplisitt angitt
+#' tekstvektor med variabelnavn. Dersom en DataDoc-fil oppgis, hentes i tillegg
+#' ID-er for variabeldefinisjoner og KLASS-klassifikasjoner.
+#'
+#' @param data Et datasett som skal undersøkes for verdietiketter.
+#' @param filsti `NULL` eller en tekststreng med filstien til en DataDoc
+#'   JSON-fil. Dersom en filsti oppgis, hentes `vardef_id` og `klass_id`
+#'   fra variabelmetadataene i DataDoc-filen. Standardverdien er `NULL`.
+#' @param variables `NULL` eller en tekstvektor med navn på variabler som
+#'   forventes å ha verdietiketter. Variabler som oppgis her, markeres som
+#'   forventet å ha verdietiketter uavhengig av datatype. Standardverdien
+#'   er `NULL`.
+#' @param character_variables En logisk verdi som angir om alle
+#'   tekstvariabler skal forventes å ha verdietiketter. Når verdien er
+#'   `TRUE`, markeres alle variabler der [is.character()] er `TRUE`.
+#'   Standardverdien er `TRUE`.
+#' @param missing_only En logisk verdi som angir om resultatet bare skal
+#'   inneholde variabler som forventes å ha verdietiketter, men som mangler
+#'   slike etiketter. Når verdien er `FALSE`, returneres alle variabler.
+#'   Standardverdien er `FALSE`.
+#'
+#' @return En tibble med én rad per variabel og følgende kolonner:
+#'
+#' \describe{
+#'   \item{`variable`}{Navnet på variabelen.}
+#'   \item{`type`}{Den første klassen til variabelen, hentet fra
+#'     [class()].}
+#'   \item{`should_have_value_labels`}{Logisk verdi som angir om variabelen
+#'     forventes å ha verdietiketter.}
+#'   \item{`has_value_labels`}{Logisk verdi som angir om variabelen faktisk
+#'     har minst én registrert verdietikett.}
+#'   \item{`missing_expected_value_labels`}{Logisk verdi som er `TRUE`
+#'     dersom variabelen forventes å ha verdietiketter, men ikke har noen
+#'     registrerte verdietiketter.}
+#'   \item{`vardef_id`}{ID-en til variabeldefinisjonen hentet fra
+#'     `definition_uri` i DataDoc-filen. Kolonnen inkluderes bare når
+#'     `filsti` er oppgitt.}
+#'   \item{`klass_id`}{KLASS-ID-en hentet fra `classification_uri` i
+#'     DataDoc-filen. Kolonnen inkluderes bare når `filsti` er oppgitt.}
+#' }
+#'
+#' @details
+#' En variabel regnes som å ha verdietiketter dersom
+#' [labelled::val_labels()] returnerer minst én etikett.
+#'
+#' Når `character_variables = TRUE`, forventes alle tekstvariabler å ha
+#' verdietiketter. Variabler som oppgis eksplisitt i `variables`, forventes
+#' også å ha verdietiketter, uavhengig av datatype.
+#'
+#' Dersom både `character_variables = FALSE` og `variables = NULL`, forventes
+#' ingen variabler å ha verdietiketter.
+#'
+#' Når `filsti` er oppgitt, leses DataDoc-filen med
+#' [jsonlite::fromJSON()]. Funksjonen bruker `short_name` til å koble
+#' metadataene i DataDoc-filen til variablene i `data`.
+#'
+#' ID-en i `definition_uri` og `classification_uri` hentes fra teksten etter
+#' siste skråstrek (`/`) eller kolon (`:`). En eventuell avsluttende skråstrek
+#' fjernes før ID-en hentes.
+#'
+#' Dersom et av URI-feltene mangler i DataDoc-filen, settes den tilhørende
+#' ID-en til `NA`.
+#'
+#' Når `missing_only = TRUE`, filtreres resultatet slik at bare variabler der
+#' `missing_expected_value_labels` er `TRUE`, returneres.
+#'
+#' @examples
+#' data <- tibble::tibble(
+#'   kjoenn = labelled::labelled(
+#'     c("1", "2", "1"),
+#'     labels = c(
+#'       Mann = "1",
+#'       Kvinne = "2"
+#'     )
+#'   ),
+#'   bosted = c("01", "02", "03"),
+#'   alder = c(35, 42, 28)
+#' )
+#'
+#' value_label_expectations(data)
+#'
+#' value_label_expectations(
+#'   data,
+#'   variables = "alder"
+#' )
+#'
+#' value_label_expectations(
+#'   data,
+#'   missing_only = TRUE
+#' )
+#'
+#' \dontrun{
+#' value_label_expectations(
+#'   data,
+#'   filsti = "data/personell__DOC.json"
+#' )
+#' }
+#'
+#' @seealso
+#' [vars_with_value_labels()] for å finne variabler som har verdietiketter,
+#' [values_without_labels()] for å finne observerte verdier uten
+#' verdietikett og [value_label_coverage()] for å beregne dekningen av
+#' verdietiketter.
+#'
+#' @export
+value_label_expectations <- function(
+    data,
+    filsti = NULL,
+    variables = NULL,
+    character_variables = TRUE,
+    missing_only = FALSE
+) {
+
+  if (
+    !is.logical(character_variables) ||
+    length(character_variables) != 1L ||
+    is.na(character_variables)
+  ) {
+    stop(
+      "`character_variables` må være enten TRUE eller FALSE.",
+      call. = FALSE
+    )
+  }
+
+  if (
+    !is.logical(missing_only) ||
+    length(missing_only) != 1L ||
+    is.na(missing_only)
+  ) {
+    stop(
+      "`missing_only` må være enten TRUE eller FALSE.",
+      call. = FALSE
+    )
+  }
+
+  should_have_labels <- rep(
+    FALSE,
+    ncol(data)
+  )
+
+  names(should_have_labels) <- names(data)
+
+  if (character_variables) {
+    should_have_labels <- should_have_labels |
+      vapply(
+        data,
+        is.character,
+        logical(1)
+      )
+  }
+
+  if (!is.null(variables)) {
+    should_have_labels[
+      names(should_have_labels) %in% variables
+    ] <- TRUE
+  }
+
+  result <- tibble::tibble(
+    variable = names(data),
+    type = vapply(
+      data,
+      function(x) class(x)[1],
+      character(1)
+    ),
+    should_have_value_labels = should_have_labels,
+    has_value_labels = vapply(
+      data,
+      function(x) {
+        length(labelled::val_labels(x)) > 0L
+      },
+      logical(1)
+    )
+  ) |>
+    dplyr::mutate(
+      missing_expected_value_labels =
+        should_have_value_labels & !has_value_labels
+    )
+
+  # Hent ID-er direkte fra DataDoc ---------------------------------
+
+  if (!is.null(filsti)) {
+
+    datadoc <- jsonlite::fromJSON(
+      filsti
+    )
+
+    datadoc_variables <- datadoc$datadoc$variables
+
+    if (is.null(datadoc_variables)) {
+      stop(
+        "Fant ikke `datadoc$variables` i DataDoc-filen.",
+        call. = FALSE
+      )
+    }
+
+    if (!"short_name" %in% names(datadoc_variables)) {
+      stop(
+        "Fant ikke `short_name` i DataDoc-filen.",
+        call. = FALSE
+      )
+    }
+
+    # Hjelpefunksjon: hent første ikke-tomme verdi
+    first_nonempty <- function(x) {
+
+      if (is.null(x) || length(x) == 0L) {
+        return(NA_character_)
+      }
+
+      x <- as.character(x)
+      x <- trimws(x)
+
+      x <- x[
+        !is.na(x) &
+          nzchar(x)
+      ]
+
+      if (length(x) == 0L) {
+        return(NA_character_)
+      }
+
+      x[[1L]]
+    }
+
+    # Hjelpefunksjon: hent ID fra URI
+    extract_id <- function(x) {
+
+      x <- first_nonempty(x)
+
+      if (is.na(x)) {
+        return(NA_character_)
+      }
+
+      # Fjern eventuell avsluttende skråstrek
+      x <- sub(
+        pattern = "/+$",
+        replacement = "",
+        x = x
+      )
+
+      # Hent delen etter siste "/" eller ":"
+      sub(
+        pattern = "^.*[:/]",
+        replacement = "",
+        x = x
+      )
+    }
+
+    n_variables <- NROW(
+      datadoc_variables
+    )
+
+    # Vardef-ID
+    if ("definition_uri" %in% names(datadoc_variables)) {
+
+      vardef_id <- vapply(
+        seq_len(n_variables),
+        function(i) {
+          extract_id(
+            datadoc_variables$definition_uri[[i]]
+          )
+        },
+        character(1)
+      )
+
+    } else {
+
+      vardef_id <- rep(
+        NA_character_,
+        n_variables
+      )
+    }
+
+    # KLASS-ID
+    if ("classification_uri" %in% names(datadoc_variables)) {
+
+      klass_id <- vapply(
+        seq_len(n_variables),
+        function(i) {
+          extract_id(
+            datadoc_variables$classification_uri[[i]]
+          )
+        },
+        character(1)
+      )
+
+    } else {
+
+      klass_id <- rep(
+        NA_character_,
+        n_variables
+      )
+    }
+
+    metadata <- tibble::tibble(
+      variable = datadoc_variables$short_name,
+      vardef_id = vardef_id,
+      klass_id = klass_id
+    )
+
+    result <- result |>
+      dplyr::left_join(
+        metadata,
+        by = "variable"
+      )
+  }
+
+  if (missing_only) {
+    result <- result |>
+      dplyr::filter(
+        missing_expected_value_labels
+      )
+  }
+
+  result
+}
+
+
+
+#' Sett versjonsbeskrivelse i en DataDoc-fil
+#'
+#' Legger til eller oppdaterer versjonsbeskrivelsen for et datasett i en
+#' DataDoc-fil. Versjonsbeskrivelsen lagres med tilhørende språkkode.
+#'
+#' @param filsti_datadoc Tekststreng. Filsti til DataDoc-filen som skal
+#'   oppdateres.
+#' @param version_description Tekststreng. Versjonsbeskrivelsen som skal
+#'   lagres.
+#' @param language_code Tekststreng. Språkkode for versjonsbeskrivelsen.
+#'   Standard er `"nb"`.
+#' @param overwrite Logisk verdi. Angir om en eksisterende
+#'   versjonsbeskrivelse skal overskrives. Standard er `FALSE`.
+#'
+#' @details
+#' Funksjonen leser DataDoc-filen, oppdaterer
+#' `datadoc.dataset.version_description` og skriver den oppdaterte
+#' dokumentasjonen tilbake til samme fil.
+#'
+#' Versjonsbeskrivelsen lagres som en liste med `languageCode` og
+#' `languageText`.
+#'
+#' Dersom `version_description` allerede er utfylt og `overwrite = FALSE`,
+#' blir filen ikke endret, og funksjonen gir en advarsel. Sett
+#' `overwrite = TRUE` for å erstatte en eksisterende versjonsbeskrivelse.
+#'
+#' @return
+#' Returnerer det oppdaterte DataDoc-objektet usynlig. Dersom en eksisterende
+#' versjonsbeskrivelse ikke overskrives, returneres det uendrede
+#' DataDoc-objektet usynlig.
+#'
+#' @examples
+#' \dontrun{
+#' set_version_description(
+#'   filsti_datadoc = "data/datasett__DOC.json",
+#'   version_description = "Oppdaterte tall for 2026."
+#' )
+#'
+#' set_version_description(
+#'   filsti_datadoc = "data/datasett__DOC.json",
+#'   version_description = "Reviderte tall for 2026.",
+#'   overwrite = TRUE
+#' )
+#'
+#' set_version_description(
+#'   filsti_datadoc = "data/dataset__DOC.json",
+#'   version_description = "Updated figures for 2026.",
+#'   language_code = "en"
+#' )
+#' }
+#'
+#' @export
+set_version_description <- function(filsti_datadoc,
+                                    version_description,
+                                    language_code = "nb",
+                                    overwrite = FALSE) {
+
+  datadoc <- jsonlite::read_json(
+    filsti_datadoc,
+    simplifyVector = FALSE
+  )
+
+  existing_description <- datadoc$datadoc$dataset$version_description
+
+  if (!is.null(existing_description) && !overwrite) {
+    warning(
+      "version_description er allerede utfylt. ",
+      "Bruk overwrite = TRUE for å overskrive eksisterende verdi."
+    )
+
+    return(invisible(datadoc))
+  }
+
+  datadoc$datadoc$dataset$version_description <- list(
+    list(
+      languageCode = language_code,
+      languageText = version_description
+    )
+  )
+
+  jsonlite::write_json(
+    datadoc,
+    filsti_datadoc,
+    pretty = TRUE,
+    auto_unbox = TRUE,
+    null = "null"
+  )
+
+  invisible(datadoc)
+}
+
+
+#' Sammenlign variabelmetadata mellom to DataDoc-filer
+#'
+#' Sammenligner utvalgt variabelmetadata mellom to DataDoc-filer og viser
+#' hvilke variabler som har ulik KLASS-referanse eller ulik tidsperiode for
+#' dataene.
+#'
+#' @param filsti_1 Tekststreng. Filsti til den første DataDoc-filen eller
+#'   Parquet-filen.
+#' @param filsti_2 Tekststreng. Filsti til den andre DataDoc-filen eller
+#'   Parquet-filen.
+#' @param only_differences Logisk verdi. Dersom `TRUE`, returneres kun
+#'   variabler med ulik metadata. Dersom `FALSE`, returneres alle variabler
+#'   som finnes i begge DataDoc-filene. Standard er `TRUE`.
+#'
+#' @details
+#' Dersom en filsti peker til en Parquet-fil, brukes `datadoc_path()` til å
+#' finne tilhørende DataDoc-fil.
+#'
+#' Funksjonen sammenligner følgende metadata for variabler som finnes i
+#' begge DataDoc-filene:
+#'
+#' * KLASS-id hentet fra `classification_uri`
+#' * `contains_data_from`
+#' * `contains_data_until`
+#'
+#' Variabler som kun finnes i én av DataDoc-filene, tas ikke med i
+#' sammenligningen.
+#'
+#' Forskjeller i `contains_data_from` eller `contains_data_until` oppsummeres
+#' i kolonnen `ulik_tidsperiode`. Kolonnen `ulik_metadata` er `TRUE` dersom
+#' enten KLASS-id eller tidsperiode er forskjellig mellom filene.
+#'
+#' Manglende verdier behandles som en forskjell dersom metadata er utfylt
+#' i den ene DataDoc-filen, men mangler i den andre.
+#'
+#' @return
+#' En tibble med én rad per variabel som finnes i begge DataDoc-filene.
+#' Resultatet inneholder følgende kolonner:
+#'
+#' * `variable`: Variabelens kortnavn.
+#' * `klass_id_1`: KLASS-id i den første DataDoc-filen.
+#' * `klass_id_2`: KLASS-id i den andre DataDoc-filen.
+#' * `ulik_klass_id`: Om KLASS-id er forskjellig.
+#' * `contains_data_from_1`: Startdato for data i den første DataDoc-filen.
+#' * `contains_data_from_2`: Startdato for data i den andre DataDoc-filen.
+#' * `contains_data_until_1`: Sluttdato for data i den første DataDoc-filen.
+#' * `contains_data_until_2`: Sluttdato for data i den andre DataDoc-filen.
+#' * `ulik_tidsperiode`: Om start- eller sluttdato er forskjellig.
+#' * `ulik_metadata`: Om KLASS-id eller tidsperiode er forskjellig.
+#'
+#' Dersom `only_differences = TRUE`, inneholder resultatet kun rader der
+#' `ulik_metadata` er `TRUE`.
+#'
+#' @examples
+#' \dontrun{
+#' compare_variable_metadata(
+#'   filsti_1 = "data/datasett_2025__DOC.json",
+#'   filsti_2 = "data/datasett_2026__DOC.json"
+#' )
+#'
+#' compare_variable_metadata(
+#'   filsti_1 = "data/datasett_2025.parquet",
+#'   filsti_2 = "data/datasett_2026.parquet",
+#'   only_differences = FALSE
+#' )
+#' }
+#'
+#' @export
+compare_variable_metadata <- function(
+    filsti_1,
+    filsti_2,
+    only_differences = TRUE
+) {
+  # ...
+}
