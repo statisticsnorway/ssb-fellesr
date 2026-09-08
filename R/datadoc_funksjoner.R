@@ -4452,5 +4452,145 @@ compare_variable_metadata <- function(
     filsti_2,
     only_differences = TRUE
 ) {
-  # ...
+
+  # Gjør om parquet-sti til datadoc-sti ved behov
+  filsti_1 <- if (
+    tolower(tools::file_ext(filsti_1)) == "parquet"
+  ) {
+    datadoc_path(filsti_1, to = "parquet")
+  } else {
+    filsti_1
+  }
+
+  filsti_2 <- if (
+    tolower(tools::file_ext(filsti_2)) == "parquet"
+  ) {
+    datadoc_path(filsti_2, to = "parquet")
+  } else {
+    filsti_2
+  }
+
+  # Les datadoc
+  datadoc_1 <- jsonlite::read_json(
+    filsti_1,
+    simplifyVector = FALSE
+  )
+
+  datadoc_2 <- jsonlite::read_json(
+    filsti_2,
+    simplifyVector = FALSE
+  )
+
+  # Hjelpefunksjon for å hente KLASS-id fra classification_uri
+  get_klass_id <- function(classification_uri) {
+
+    if (
+      is.null(classification_uri) ||
+      length(classification_uri) == 0 ||
+      is.na(classification_uri)
+    ) {
+      return(NA_character_)
+    }
+
+    id <- stringr::str_match(
+      classification_uri,
+      "(?:klassifikasjoner|classifications)/(\\d+)"
+    )[, 2]
+
+    if (is.na(id)) {
+      id <- stringr::str_extract(
+        classification_uri,
+        "\\d+(?=/?$)"
+      )
+    }
+
+    id
+  }
+
+  # Hjelpefunksjon for å hente relevant variabelmetadata
+  get_variable_metadata <- function(datadoc) {
+
+    purrr::map_dfr(
+      datadoc$datadoc$variables,
+      function(x) {
+
+        tibble::tibble(
+          variable = x$short_name,
+          classification_uri = if (is.null(x$classification_uri)) {
+            NA_character_
+          } else {
+            x$classification_uri
+          },
+          klass_id = get_klass_id(x$classification_uri),
+          contains_data_from = if (is.null(x$contains_data_from)) {
+            NA_character_
+          } else {
+            x$contains_data_from
+          },
+          contains_data_until = if (is.null(x$contains_data_until)) {
+            NA_character_
+          } else {
+            x$contains_data_until
+          }
+        )
+      }
+    )
+  }
+
+  metadata_1 <- get_variable_metadata(datadoc_1)
+  metadata_2 <- get_variable_metadata(datadoc_2)
+
+  # Behold kun variabler som finnes i begge
+  result <- metadata_1 |>
+    dplyr::inner_join(
+      metadata_2,
+      by = "variable",
+      suffix = c("_1", "_2")
+    ) |>
+    dplyr::mutate(
+      ulik_klass_id = dplyr::coalesce(
+        klass_id_1 != klass_id_2,
+        xor(
+          is.na(klass_id_1),
+          is.na(klass_id_2)
+        )
+      ),
+      ulik_fra = dplyr::coalesce(
+        contains_data_from_1 != contains_data_from_2,
+        xor(
+          is.na(contains_data_from_1),
+          is.na(contains_data_from_2)
+        )
+      ),
+      ulik_til = dplyr::coalesce(
+        contains_data_until_1 != contains_data_until_2,
+        xor(
+          is.na(contains_data_until_1),
+          is.na(contains_data_until_2)
+        )
+      ),
+      ulik_tidsperiode = ulik_fra | ulik_til,
+      ulik_metadata = ulik_klass_id | ulik_tidsperiode
+    ) |>
+    dplyr::select(
+      variable,
+      klass_id_1,
+      klass_id_2,
+      ulik_klass_id,
+      contains_data_from_1,
+      contains_data_from_2,
+      contains_data_until_1,
+      contains_data_until_2,
+      ulik_tidsperiode,
+      ulik_metadata
+    )
+
+  if (only_differences) {
+    result <- result |>
+      dplyr::filter(ulik_metadata)
+  }
+
+  result
 }
+
+
