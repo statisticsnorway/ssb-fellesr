@@ -4,72 +4,73 @@
 \alias{add_value_labels}
 \title{Legg til verdietiketter fra KLASS}
 \usage{
-add_value_labels(data, filsti, language = "nb")
+add_value_labels(data, filsti, language = "nb", quiet = TRUE)
 }
 \arguments{
-\item{data}{Et datasett som skal få lagt til verdietiketter.}
+\item{data}{Et datasett, for eksempel en \code{data.frame} eller tibble,
+som skal få lagt til verdietiketter.}
 
-\item{filsti}{En tekststreng med filstien til Parquet-filen som datasettet
-er lest fra. Filstien brukes til å finne den tilhørende DataDoc-filen.}
+\item{filsti}{En tekststreng med filsti til DataDoc-filen eller den
+tilhørende datafilen.}
 
-\item{language}{En tekststreng med språkkoden som skal brukes ved uthenting
-av språkavhengig metadata. Standardverdien er \code{"nb"}.}
+\item{language}{En tekststreng som angir språk som skal brukes ved
+henting av metadata. Standard er \code{"nb"}.}
+
+\item{quiet}{Logisk verdi. Dersom \code{TRUE}, undertrykkes alle advarsler
+som oppstår under kjøringen. Standard er \code{FALSE}.}
 }
 \value{
-Datasettet som ble oppgitt i \code{data}, med verdietiketter lagt til
-på variabler med en gyldig kodeliste i KLASS. Variabler som ikke kan
-behandles, returneres uendret.
+Datasettet \code{data} med verdietiketter lagt til for variabler
+der en gyldig klassifikasjon ble funnet. Variabler kan bli
+konvertert til \code{character} dersom de opprinnelig har en annen
+datatype enn kodene fra KLASS.
 }
 \description{
 Legger til verdietiketter på variabler i et datasett basert på
-kodelister fra SSBs klassifikasjonssystem KLASS.
+klassifikasjoner registrert i DataDoc eller Vardef.
 }
 \details{
-Funksjonen finner variabler med en tilknyttet kodeliste gjennom
-Datadoc-metadata eller en tilknyttet variabeldefinisjon. Kodelistene
-hentes fra KLASS, og navnene i kodelisten legges til som verdietiketter
-ved hjelp av \code{\link[labelled:set_value_labels]{labelled::set_value_labels()}}.
+For hver variabel hentes KLASS-ID fra DataDoc dersom denne finnes.
+Dersom KLASS-ID ikke er registrert i DataDoc, brukes eventuell
+klassifikasjon fra Vardef. KLASS-ID fra DataDoc har dermed forrang.
+
+Kodelisten hentes fra KLASS ved hjelp av
+\code{\link[klassR:get_klass]{klassR::get_klass()}}. Dersom \code{contains_data_until} er registrert
+i DataDoc, brukes denne datoen ved henting av kodelisten.
+
+Variabler som ikke finnes i \code{data}, som mangler en gyldig KLASS-ID,
+eller der kodelisten ikke kan hentes, hoppes over med en advarsel.
+
+Kodene fra KLASS behandles som tekst. Dersom en variabel i \code{data}
+ikke er av typen \code{character}, konverteres den til \code{character} før
+verdietikettene legges til. Dette gir som standard en advarsel.
+
+Ved å sette \code{quiet = TRUE} undertrykkes alle advarsler som oppstår
+under kjøringen av funksjonen. Feil (\code{error}) undertrykkes ikke.
 
 Funksjonen bruker \code{\link[=variables_with_classification_uri]{variables_with_classification_uri()}} til å finne
-variabler med en tilknyttet kodeliste.
+variabler med tilknyttede klassifikasjoner.
 
-Dersom en KLASS-ID finnes både direkte i Datadoc-filen og i den
-tilknyttede variabeldefinisjonen, brukes ID-en fra Datadoc-filen.
-ID-en fra variabeldefinisjonen brukes dersom Datadoc-filen ikke
-inneholder en KLASS-ID.
+Dersom både DataDoc og Vardef inneholder en klassifikasjon for samme
+variabel, brukes klassifikasjonen fra DataDoc.
 
-Kodelisten hentes med \code{\link[klassR:get_klass]{klassR::get_klass()}}. Verdien i
-\code{contains_data_until} brukes som dato for oppslaget i KLASS.
-
-En variabel hoppes over med en advarsel dersom:
-
-\itemize{
-\item variabelen ikke finnes i \code{data};
-\item det ikke finnes en KLASS-ID;
-\item KLASS-ID-en inneholder andre tegn enn sifre; eller
-\item kodelisten ikke kan hentes fra KLASS.
-}
-
-Verdiene i kodelistens kolonne \code{code} brukes som variabelverdier, mens
-verdiene i kolonnen \code{name} brukes som verdietiketter.
+Verdietikettene legges til med \code{\link[labelled:set_value_labels]{labelled::set_value_labels()}}, der
+navnene fra KLASS brukes som etiketter og kodene som underliggende
+verdier.
 }
 \examples{
 \dontrun{
 data_med_labels <- add_value_labels(
-  data = personell,
-  filsti = "/buckets/data/personell_v1.parquet"
+  data = data,
+  filsti = "data__DOC.json"
 )
 
+# Undertrykk advarsler
 data_med_labels <- add_value_labels(
-  data = personell,
-  filsti = "/buckets/data/personell_v1.parquet",
-  language = "en"
+  data = data,
+  filsti = "data__DOC.json",
+  quiet = TRUE
 )
 }
 
-}
-\seealso{
-\code{\link[=variables_with_classification_uri]{variables_with_classification_uri()}} for å finne variabler med
-kodelister og \code{\link[labelled:set_value_labels]{labelled::set_value_labels()}} for å legge til
-verdietiketter.
 }

@@ -1211,205 +1211,228 @@ variables_with_classification_uri <- function(
 }
 
 
-
 #' Legg til verdietiketter fra KLASS
 #'
 #' Legger til verdietiketter på variabler i et datasett basert på
-#' kodelister fra SSBs klassifikasjonssystem KLASS.
+#' klassifikasjoner registrert i DataDoc eller Vardef.
 #'
-#' Funksjonen finner variabler med en tilknyttet kodeliste gjennom
-#' Datadoc-metadata eller en tilknyttet variabeldefinisjon. Kodelistene
-#' hentes fra KLASS, og navnene i kodelisten legges til som verdietiketter
-#' ved hjelp av [labelled::set_value_labels()].
+#' For hver variabel hentes KLASS-ID fra DataDoc dersom denne finnes.
+#' Dersom KLASS-ID ikke er registrert i DataDoc, brukes eventuell
+#' klassifikasjon fra Vardef. KLASS-ID fra DataDoc har dermed forrang.
 #'
-#' @param data Et datasett som skal få lagt til verdietiketter.
-#' @param filsti En tekststreng med filstien til Parquet-filen som datasettet
-#'   er lest fra. Filstien brukes til å finne den tilhørende DataDoc-filen.
-#' @param language En tekststreng med språkkoden som skal brukes ved uthenting
-#'   av språkavhengig metadata. Standardverdien er `"nb"`.
+#' Kodelisten hentes fra KLASS ved hjelp av
+#' [klassR::get_klass()]. Dersom `contains_data_until` er registrert
+#' i DataDoc, brukes denne datoen ved henting av kodelisten.
 #'
-#' @return Datasettet som ble oppgitt i `data`, med verdietiketter lagt til
-#'   på variabler med en gyldig kodeliste i KLASS. Variabler som ikke kan
-#'   behandles, returneres uendret.
+#' Variabler som ikke finnes i `data`, som mangler en gyldig KLASS-ID,
+#' eller der kodelisten ikke kan hentes, hoppes over med en advarsel.
+#'
+#' Kodene fra KLASS behandles som tekst. Dersom en variabel i `data`
+#' ikke er av typen `character`, konverteres den til `character` før
+#' verdietikettene legges til. Dette gir som standard en advarsel.
+#'
+#' Ved å sette `quiet = TRUE` undertrykkes alle advarsler som oppstår
+#' under kjøringen av funksjonen. Feil (`error`) undertrykkes ikke.
+#'
+#' @param data Et datasett, for eksempel en `data.frame` eller tibble,
+#'   som skal få lagt til verdietiketter.
+#' @param filsti En tekststreng med filsti til DataDoc-filen eller den
+#'   tilhørende datafilen.
+#' @param language En tekststreng som angir språk som skal brukes ved
+#'   henting av metadata. Standard er `"nb"`.
+#' @param quiet Logisk verdi. Dersom `TRUE`, undertrykkes alle advarsler
+#'   som oppstår under kjøringen. Standard er `FALSE`.
+#'
+#' @return Datasettet `data` med verdietiketter lagt til for variabler
+#'   der en gyldig klassifikasjon ble funnet. Variabler kan bli
+#'   konvertert til `character` dersom de opprinnelig har en annen
+#'   datatype enn kodene fra KLASS.
 #'
 #' @details
 #' Funksjonen bruker [variables_with_classification_uri()] til å finne
-#' variabler med en tilknyttet kodeliste.
+#' variabler med tilknyttede klassifikasjoner.
 #'
-#' Dersom en KLASS-ID finnes både direkte i Datadoc-filen og i den
-#' tilknyttede variabeldefinisjonen, brukes ID-en fra Datadoc-filen.
-#' ID-en fra variabeldefinisjonen brukes dersom Datadoc-filen ikke
-#' inneholder en KLASS-ID.
+#' Dersom både DataDoc og Vardef inneholder en klassifikasjon for samme
+#' variabel, brukes klassifikasjonen fra DataDoc.
 #'
-#' Kodelisten hentes med [klassR::get_klass()]. Verdien i
-#' `contains_data_until` brukes som dato for oppslaget i KLASS.
-#'
-#' En variabel hoppes over med en advarsel dersom:
-#'
-#' \itemize{
-#'   \item variabelen ikke finnes i `data`;
-#'   \item det ikke finnes en KLASS-ID;
-#'   \item KLASS-ID-en inneholder andre tegn enn sifre; eller
-#'   \item kodelisten ikke kan hentes fra KLASS.
-#' }
-#'
-#' Verdiene i kodelistens kolonne `code` brukes som variabelverdier, mens
-#' verdiene i kolonnen `name` brukes som verdietiketter.
+#' Verdietikettene legges til med [labelled::set_value_labels()], der
+#' navnene fra KLASS brukes som etiketter og kodene som underliggende
+#' verdier.
 #'
 #' @examples
 #' \dontrun{
 #' data_med_labels <- add_value_labels(
-#'   data = personell,
-#'   filsti = "/buckets/data/personell_v1.parquet"
+#'   data = data,
+#'   filsti = "data__DOC.json"
 #' )
 #'
+#' # Undertrykk advarsler
 #' data_med_labels <- add_value_labels(
-#'   data = personell,
-#'   filsti = "/buckets/data/personell_v1.parquet",
-#'   language = "en"
+#'   data = data,
+#'   filsti = "data__DOC.json",
+#'   quiet = TRUE
 #' )
 #' }
-#'
-#' @seealso
-#' [variables_with_classification_uri()] for å finne variabler med
-#' kodelister og [labelled::set_value_labels()] for å legge til
-#' verdietiketter.
 #'
 #' @export
 add_value_labels <- function(
     data,
     filsti,
-    language = "nb"
+    language = "nb",
+    quiet = TRUE
 ) {
 
-  variabler_med_kodelister <- variables_with_classification_uri(
-    filsti = filsti,
-    language = language
-  ) |>
-    dplyr::mutate(
-      # KLASS-ID-en fra DataDoc får forrang dersom begge finnes.
-      classification_uri_effective = dplyr::coalesce(
-        dplyr::na_if(
-          trimws(as.character(classification_uri)),
-          ""
-        ),
-        dplyr::na_if(
-          trimws(as.character(vardef_classification_uri)),
-          ""
-        )
-      )
-    )
-
-  for (i in seq_len(nrow(variabler_med_kodelister))) {
-
-    variabel <- variabler_med_kodelister$short_name[[i]]
-
-    classification_uri <-
-      variabler_med_kodelister$classification_uri_effective[[i]]
-
-    contains_data_until <-
-      variabler_med_kodelister$contains_data_until[[i]]
-
-    # Hopp over dersom variabelen ikke finnes i datasettet
-    if (!variabel %in% names(data)) {
-      warning(
-        "Variabelen `", variabel,
-        "` finnes ikke i datasettet og ble hoppet over.",
-        call. = FALSE
-      )
-
-      next
-    }
-
-    # Hopp over dersom ingen KLASS-ID ble funnet
-    if (
-      is.na(classification_uri) ||
-      !nzchar(trimws(classification_uri))
-    ) {
-      warning(
-        "Fant ingen KLASS-ID for variabelen `",
-        variabel,
-        "`. Variabelen ble hoppet over.",
-        call. = FALSE
-      )
-
-      next
-    }
-
-    # Kontroller at bare selve KLASS-ID-en brukes videre
-    if (!grepl("^[0-9]+$", classification_uri)) {
-      warning(
-        "Ugyldig KLASS-ID for variabelen `",
-        variabel,
-        "`: ",
-        classification_uri,
-        ". Forventet kun sifre. Variabelen ble hoppet over.",
-        call. = FALSE
-      )
-
-      next
-    }
-
-    kodeliste_klass <- tryCatch(
-      klassR::get_klass(
-        classification_uri,
-        date = contains_data_until
-      ) |>
-        dplyr::mutate(
-          code = trimws(as.character(code)),
-          name = trimws(as.character(name))
-        ),
-      error = function(e) {
-        warning(
-          "Kunne ikke hente kodeliste for `",
-          variabel,
-          "` med KLASS-ID ",
-          classification_uri,
-          ". Variabelen ble hoppet over. Feilmelding: ",
-          conditionMessage(e),
-          call. = FALSE
-        )
-
-        NULL
-      }
-    )
-
-    if (is.null(kodeliste_klass)) {
-      next
-    }
-
-    labs <- stats::setNames(
-      kodeliste_klass$code,
-      kodeliste_klass$name
-    )
-
-    # Sørg for at variabelen har samme type som kodene i kodelisten
-    if (!is.character(data[[variabel]])) {
-
-      warning(
-        "Variabelen `",
-        variabel,
-        "` har type `",
-        typeof(data[[variabel]]),
-        "`, mens kodene i KLASS er tekst. ",
-        "Variabelen konverteres til `character` før verdietikettene legges til.",
-        call. = FALSE
-      )
-
-      data[[variabel]] <- as.character(
-        data[[variabel]]
-      )
-    }
-
-    data[[variabel]] <- labelled::set_value_labels(
-      data[[variabel]],
-      .labels = labs
+  if (
+    !is.logical(quiet) ||
+    length(quiet) != 1 ||
+    is.na(quiet)
+  ) {
+    stop(
+      "`quiet` må være enten TRUE eller FALSE.",
+      call. = FALSE
     )
   }
 
-  data
-}
+  add_labels <- function() {
 
+    variabler_med_kodelister <- variables_with_classification_uri(
+      filsti = filsti,
+      language = language
+    ) |>
+      dplyr::mutate(
+        # KLASS-ID-en fra DataDoc får forrang dersom begge finnes.
+        classification_uri_effective = dplyr::coalesce(
+          dplyr::na_if(
+            trimws(as.character(classification_uri)),
+            ""
+          ),
+          dplyr::na_if(
+            trimws(as.character(vardef_classification_uri)),
+            ""
+          )
+        )
+      )
+
+    for (i in seq_len(nrow(variabler_med_kodelister))) {
+
+      variabel <- variabler_med_kodelister$short_name[[i]]
+
+      classification_uri <-
+        variabler_med_kodelister$classification_uri_effective[[i]]
+
+      contains_data_until <-
+        variabler_med_kodelister$contains_data_until[[i]]
+
+      # Hopp over dersom variabelen ikke finnes i datasettet
+      if (!variabel %in% names(data)) {
+        warning(
+          "Variabelen `", variabel,
+          "` finnes ikke i datasettet og ble hoppet over.",
+          call. = FALSE
+        )
+
+        next
+      }
+
+      # Hopp over dersom ingen KLASS-ID ble funnet
+      if (
+        is.na(classification_uri) ||
+        !nzchar(trimws(classification_uri))
+      ) {
+        warning(
+          "Fant ingen KLASS-ID for variabelen `",
+          variabel,
+          "`. Variabelen ble hoppet over.",
+          call. = FALSE
+        )
+
+        next
+      }
+
+      # Kontroller at bare selve KLASS-ID-en brukes videre
+      if (!grepl("^[0-9]+$", classification_uri)) {
+        warning(
+          "Ugyldig KLASS-ID for variabelen `",
+          variabel,
+          "`: ",
+          classification_uri,
+          ". Forventet kun sifre. Variabelen ble hoppet over.",
+          call. = FALSE
+        )
+
+        next
+      }
+
+      kodeliste_klass <- tryCatch(
+        klassR::get_klass(
+          classification_uri,
+          date = contains_data_until
+        ) |>
+          dplyr::mutate(
+            code = trimws(as.character(code)),
+            name = trimws(as.character(name))
+          ),
+        error = function(e) {
+          warning(
+            "Kunne ikke hente kodeliste for `",
+            variabel,
+            "` med KLASS-ID ",
+            classification_uri,
+            ". Variabelen ble hoppet over. Feilmelding: ",
+            conditionMessage(e),
+            call. = FALSE
+          )
+
+          NULL
+        }
+      )
+
+      if (is.null(kodeliste_klass)) {
+        next
+      }
+
+      labs <- stats::setNames(
+        kodeliste_klass$code,
+        kodeliste_klass$name
+      )
+
+      # Sørg for at variabelen har samme type som kodene i kodelisten
+      if (!is.character(data[[variabel]])) {
+
+        warning(
+          "Variabelen `",
+          variabel,
+          "` har type `",
+          typeof(data[[variabel]]),
+          "`, mens kodene i KLASS er tekst. ",
+          "Variabelen konverteres til `character` før verdietikettene legges til.",
+          call. = FALSE
+        )
+
+        data[[variabel]] <- as.character(
+          data[[variabel]]
+        )
+      }
+
+      data[[variabel]] <- labelled::set_value_labels(
+        data[[variabel]],
+        .labels = labs
+      )
+    }
+
+    data
+  }
+
+  if (quiet) {
+    suppressMessages(
+      suppressWarnings(
+        add_labels()
+      )
+    )
+  } else {
+    add_labels()
+  }
+}
 
 
 #' Vis verdietiketter i et datasett
@@ -4594,3 +4617,169 @@ compare_variable_metadata <- function(
 }
 
 
+#' Finn variabler som mangler obligatorisk metadata
+#'
+#' Lager en oversikt over hvilke variabler i en Datadoc-fil som mangler
+#' ett eller flere obligatoriske metadatafelt.
+#'
+#' @param filsti En tekststreng med filstien til en Datadoc-fil eller den
+#'   tilhørende Parquet-filen.
+#' @param only_incomplete En logisk verdi som angir om bare variabler som
+#'   mangler ett eller flere obligatoriske metadatafelt skal returneres.
+#'   Når verdien er `TRUE`, returneres bare ufullstendig dokumenterte
+#'   variabler. Når verdien er `FALSE`, returneres alle variabler.
+#'   Standardverdien er `TRUE`.
+#'
+#' @return En `data.frame` med én rad per variabel og følgende kolonner:
+#'
+#' \describe{
+#'   \item{`variable`}{Variabelens kortnavn (`short_name`).}
+#'   \item{`n_missing`}{Antall obligatoriske metadatafelt som mangler.}
+#'   \item{`missing_required_fields`}{En kommaseparert tekststreng med navnene
+#'     på de obligatoriske metadatafeltene som mangler. Verdien er `NA`
+#'     dersom ingen obligatoriske felt mangler.}
+#'   \item{`complete`}{En logisk verdi som angir om alle obligatoriske
+#'     metadatafelt er utfylt.}
+#' }
+#'
+#' @details
+#' Funksjonen kontrollerer følgende obligatoriske, brukerutfylte
+#' metadatafelt for hver variabel:
+#'
+#' \itemize{
+#'   \item `name`
+#'   \item `is_personal_data`
+#'   \item `unit_type`
+#'   \item `variable_role`
+#'   \item `data_source`
+#'   \item `temporality_type`
+#' }
+#'
+#' Et metadatafelt regnes som manglende dersom verdien er `NULL`, har
+#' lengde null, er `NA`, eller består av tom tekst eller bare mellomrom.
+#'
+#' Logiske verdier behandles som gyldige verdier. Dette innebærer blant
+#' annet at `FALSE` i `is_personal_data` ikke regnes som manglende metadata.
+#'
+#' Dersom `only_incomplete = TRUE`, filtreres variabler som har alle de
+#' obligatoriske metadatafeltene utfylt bort fra resultatet.
+#'
+#' @examples
+#' \dontrun{
+#' # Vis bare variabler som mangler obligatorisk metadata
+#' summarise_missing_required_metadata(
+#'   filsti = "data/personell__DOC.json"
+#' )
+#'
+#' # Vis alle variabler
+#' summarise_missing_required_metadata(
+#'   filsti = "data/personell__DOC.json",
+#'   only_incomplete = FALSE
+#' )
+#' }
+#'
+#' @seealso
+#' [datadoc_path()] for å konvertere mellom filstier til Parquet- og
+#' Datadoc-filer.
+#'
+#' @export
+summarise_missing_required_metadata <- function(
+    filsti,
+    only_incomplete = TRUE
+) {
+
+  # Gjør om parquet-sti til datadoc-sti ved behov
+  filsti <- if (
+    tolower(tools::file_ext(filsti)) == "parquet"
+  ) {
+    datadoc_path(filsti, to = "parquet")
+  } else {
+    filsti
+  }
+
+  # Les Datadoc
+  datadoc <- jsonlite::read_json(
+    filsti,
+    simplifyVector = FALSE
+  )
+
+  variables <- datadoc$datadoc$variables
+
+  # Obligatoriske, brukerutfylte metadatafelt
+  required_fields <- c(
+    "name",
+    "is_personal_data",
+    "unit_type",
+    "variable_role",
+    "data_source",
+    "temporality_type"
+  )
+
+  # Hjelpefunksjon for å avgjøre om et felt mangler
+  is_missing_metadata <- function(x) {
+
+    if (is.null(x) || length(x) == 0) {
+      return(TRUE)
+    }
+
+    if (length(x) == 1 && is.na(x)) {
+      return(TRUE)
+    }
+
+    if (
+      is.character(x) &&
+      all(is.na(x) | trimws(x) == "")
+    ) {
+      return(TRUE)
+    }
+
+    FALSE
+  }
+
+  # Lag oversikt per variabel
+  result <- lapply(
+    variables,
+    function(variable) {
+
+      missing_fields <- required_fields[
+        vapply(
+          required_fields,
+          function(field) {
+            is_missing_metadata(variable[[field]])
+          },
+          logical(1)
+        )
+      ]
+
+      data.frame(
+        variable = if (
+          !is.null(variable$short_name) &&
+          length(variable$short_name) > 0
+        ) {
+          variable$short_name
+        } else {
+          NA_character_
+        },
+        n_missing = length(missing_fields),
+        missing_required_fields = if (length(missing_fields) == 0) {
+          NA_character_
+        } else {
+          paste(missing_fields, collapse = ", ")
+        },
+        complete = length(missing_fields) == 0,
+        stringsAsFactors = FALSE
+      )
+    }
+  )
+
+  result <- dplyr::bind_rows(result)
+
+  if (only_incomplete) {
+    result <- dplyr::filter(
+      result,
+      !complete
+    )
+  }
+
+  result
+}

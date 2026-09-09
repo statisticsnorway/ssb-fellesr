@@ -8,14 +8,17 @@ copy_metadata(
   filsti_datadoc_egen,
   filsti_datadoc_original,
   variabler = NULL,
-  overwrite = TRUE
+  ekskluder_variabler = NULL,
+  overwrite = TRUE,
+  dato_unntak = NULL
 )
 }
 \arguments{
-\item{filsti_datadoc_egen}{En tekststreng med filstien til DataDoc-filen
-som skal oppdateres.}
+\item{filsti_datadoc_egen}{En tekststreng med filstien til Datadoc-filen
+som skal oppdateres. Filnavnet må inneholde periode og versjon på formen
+\verb{_pYYYY_vN}, for eksempel \verb{_p2025_v1__DOC.json}.}
 
-\item{filsti_datadoc_original}{En tekststreng med filstien til DataDoc-filen
+\item{filsti_datadoc_original}{En tekststreng med filstien til Datadoc-filen
 som metadata skal kopieres fra.}
 
 \item{variabler}{\code{NULL} eller en navngitt tekstvektor med eksplisitte
@@ -23,10 +26,24 @@ koblinger mellom variabler. Navnet på hvert element angir \code{short_name}
 i filen som skal oppdateres, mens verdien angir \code{short_name} i
 originalfilen. Standardverdien er \code{NULL}.}
 
+\item{ekskluder_variabler}{\code{NULL} eller en tekstvektor med \code{short_name}
+for variabler i mottakerfilen som ikke skal endres. For disse variablene
+kopieres verken metadata eller gyldighetsperiode. En variabel kan ikke
+samtidig være oppgitt i \code{dato_unntak}. Standardverdien er \code{NULL}.}
+
 \item{overwrite}{En logisk verdi som angir om eksisterende metadata skal
 erstattes. Når verdien er \code{TRUE}, kopieres metadata for alle aktuelle
 variabler. Når verdien er \code{FALSE}, hoppes variabler over dersom feltet
 \code{name} i mottakerfilen ikke er \code{NULL}. Standardverdien er \code{TRUE}.}
+
+\item{dato_unntak}{\code{NULL} eller en data frame med egne gyldighetsperioder
+for enkeltvariabler. Metadata kopieres på vanlig måte for disse
+variablene, men feltene \code{contains_data_from} og \code{contains_data_until}
+overskrives med periodene angitt i \code{dato_unntak}. Dataframen må inneholde
+kolonnene \code{short_name}, \code{contains_data_from} og \code{contains_data_until}.
+Datoene skal være på formatet \code{"YYYY-MM-DD"}. En variabel kan ikke
+samtidig være oppgitt i \code{ekskluder_variabler}. Standardverdien er
+\code{NULL}.}
 }
 \value{
 Den oppdaterte Datadoc-strukturen som en liste. Strukturen skrives
@@ -39,6 +56,15 @@ Datadoc-fil. Metadata kopieres automatisk for variabler som har samme
 mellom variabler med ulike kortnavn.
 }
 \details{
+Variabler kan ekskluderes fullstendig fra oppdateringen ved hjelp av
+\code{ekskluder_variabler}. For disse variablene kopieres verken metadata eller
+gyldighetsperiode.
+
+Gyldighetsperioden for øvrige variabler i mottakerfilen settes automatisk
+ut fra perioden i filnavnet. For eksempel gir \verb{_p2025_v1} perioden
+\code{2025-01-01} til \code{2025-12-31}. Det kan angis egne gyldighetsperioder for
+enkeltvariabler ved hjelp av \code{dato_unntak}.
+
 Funksjonen finner først alle variabler som har samme \code{short_name} i de to
 Datadoc-filene. Metadata for disse variablene kopieres automatisk.
 
@@ -47,13 +73,39 @@ kortnavn i de to filene. En kobling som er angitt eksplisitt i
 \code{variabler}, får forrang dersom mottakervariabelen også inngår blant
 variablene med identiske kortnavn.
 
-For hver variabel kopieres hele metadataobjektet fra originalfilen.
+Variabler som er oppgitt i \code{ekskluder_variabler}, fjernes fra listen over
+variabler som skal få kopiert metadata. De hoppes også over når
+gyldighetsperioden oppdateres. Disse variablene beholdes derfor uendret i
+mottakerfilen.
+
+For hver øvrige variabel kopieres hele metadataobjektet fra originalfilen.
 Feltet \code{short_name} erstattes deretter med kortnavnet som brukes i filen
 som oppdateres.
 
 Når \code{overwrite = FALSE}, regnes en variabel som å ha eksisterende metadata
 dersom feltet \code{name} ikke er \code{NULL}. Andre metadatafelt tas ikke med i
 denne vurderingen.
+
+Gyldighetsperioden oppdateres uavhengig av \code{overwrite}. Dette innebærer at
+også variabler som ikke får kopiert metadata fordi de allerede har
+metadata, får oppdatert feltene \code{contains_data_from} og
+\code{contains_data_until}.
+
+Variabler i \code{ekskluder_variabler} er unntatt fra denne oppdateringen og
+beholdes fullstendig uendret.
+
+Standardperioden hentes fra filnavnet til \code{filsti_datadoc_egen}.
+Et filnavn som inneholder \verb{_p2025_v1} gir
+\code{contains_data_from = "2025-01-01"} og
+\code{contains_data_until = "2025-12-31"}.
+
+Dersom enkelte variabler har en annen gyldighetsperiode, kan disse oppgis
+i \code{dato_unntak}. Metadata kopieres på vanlig måte, men perioden som er
+angitt i \code{dato_unntak}, erstatter standardperioden for de aktuelle
+variablene.
+
+Samme variabel kan ikke være oppgitt både i \code{ekskluder_variabler} og
+\code{dato_unntak}.
 
 Følgende kontroller utføres før filen endres:
 
@@ -62,9 +114,23 @@ Følgende kontroller utføres før filen endres:
 \item \code{short_name} må være unik i begge Datadoc-filene;
 \item \code{variabler} må være en navngitt tekstvektor dersom argumentet
 ikke er \code{NULL};
-\item samme mottakervariabel kan ikke oppgis flere ganger; og
+\item samme mottakervariabel kan ikke oppgis flere ganger i
+\code{variabler};
 \item alle eksplisitt oppgitte variabler må finnes i de respektive
-DataDoc-filene.
+Datadoc-filene;
+\item \code{ekskluder_variabler} må være en tekstvektor dersom argumentet
+ikke er \code{NULL};
+\item alle variabler i \code{ekskluder_variabler} må finnes i
+mottakerfilen;
+\item filnavnet til mottakerfilen må inneholde en periode på formen
+\verb{_pYYYY_vN};
+\item \code{dato_unntak} må inneholde de nødvendige kolonnene;
+\item hver variabel kan bare forekomme én gang i \code{dato_unntak};
+\item alle variabler i \code{dato_unntak} må finnes i mottakerfilen;
+\item samme variabel kan ikke forekomme både i \code{ekskluder_variabler}
+og \code{dato_unntak}; og
+\item datoene i \code{dato_unntak} må være gyldige datoer på formatet
+\code{"YYYY-MM-DD"}.
 }
 
 Den oppdaterte strukturen skrives til \code{filsti_datadoc_egen} med
@@ -72,27 +138,69 @@ Den oppdaterte strukturen skrives til \code{filsti_datadoc_egen} med
 }
 \examples{
 \dontrun{
-# Kopier metadata for alle variabler med samme short_name
+# Kopier metadata og sett perioden til 2025 for alle aktuelle variabler
 copy_metadata(
-  filsti_datadoc_egen = "/buckets/data/egen__DOC.json",
-  filsti_datadoc_original = "/buckets/data/original__DOC.json"
+  filsti_datadoc_egen =
+    "/buckets/data/resultat_p2025_v1__DOC.json",
+  filsti_datadoc_original =
+    "/buckets/data/resultat_p2024_v1__DOC.json"
 )
 
-# Legg også til en eksplisitt kobling mellom ulike kortnavn
+# Kopier bare til variabler som ikke allerede har metadata
 copy_metadata(
-  filsti_datadoc_egen = "/buckets/data/egen__DOC.json",
-  filsti_datadoc_original = "/buckets/data/original__DOC.json",
+  filsti_datadoc_egen =
+    "/buckets/data/resultat_p2025_v1__DOC.json",
+  filsti_datadoc_original =
+    "/buckets/data/resultat_p2024_v1__DOC.json",
+  overwrite = FALSE
+)
+
+# Legg til eksplisitte koblinger mellom ulike kortnavn
+copy_metadata(
+  filsti_datadoc_egen =
+    "/buckets/data/resultat_p2025_v1__DOC.json",
+  filsti_datadoc_original =
+    "/buckets/data/resultat_p2024_v1__DOC.json",
   variabler = c(
     kjoenn = "sex",
     bostedskommune = "kommune"
   )
 )
 
-# Kopier bare til variabler som ikke allerede har metadata
+# Ikke gjør noen endringer i enkelte variabler
 copy_metadata(
-  filsti_datadoc_egen = "/buckets/data/egen__DOC.json",
-  filsti_datadoc_original = "/buckets/data/original__DOC.json",
-  overwrite = FALSE
+  filsti_datadoc_egen =
+    "/buckets/data/resultat_p2025_v1__DOC.json",
+  filsti_datadoc_original =
+    "/buckets/data/resultat_p2024_v1__DOC.json",
+  ekskluder_variabler = c(
+    "orgnr_frtk",
+    "navn_frtk"
+  )
+)
+
+# Angi egne gyldighetsperioder for enkelte variabler
+dato_unntak <- data.frame(
+  short_name = c(
+    "orgnr_frtk",
+    "navn_frtk"
+  ),
+  contains_data_from = c(
+    "2024-01-01",
+    "2020-01-01"
+  ),
+  contains_data_until = c(
+    "2025-12-31",
+    "2025-12-31"
+  )
+)
+
+copy_metadata(
+  filsti_datadoc_egen =
+    "/buckets/data/resultat_p2025_v1__DOC.json",
+  filsti_datadoc_original =
+    "/buckets/data/resultat_p2024_v1__DOC.json",
+  dato_unntak = dato_unntak
 )
 }
 
