@@ -118,13 +118,20 @@ under er det bare å ta kontakt.
 - [`add_value_labels()`](add_value_labels.md) : Legg til verdietiketter
   fra KLASS
 
+- [`compare_variable_metadata()`](compare_variable_metadata.md) :
+  Sammenlign variabelmetadata mellom to DataDoc-filer
+
 - [`copy_metadata()`](copy_metadata.md) : Kopier metadata mellom
   Datadoc-filer
+
+- [`copy_metadata_dataset()`](copy_metadata_dataset.md) : Kopier
+  metadata på datasett-nivå mellom Datadoc-filer
 
 - [`copy_metadata_variable()`](copy_metadata_variable.md) : Kopier
   variabelmetadata mellom DataDoc-filer
 
-- [`datadoc_path()`](datadoc_path.md) : Lag filsti til Datadoc-fil
+- [`datadoc_path()`](datadoc_path.md) : Konverter filsti mellom Parquet
+  og Datadoc
 
 - [`datadoc_variabeloversikt()`](datadoc_variabeloversikt.md) : Lag
   oversikt over variabler i en Datadoc-fil
@@ -220,6 +227,9 @@ under er det bare å ta kontakt.
 - [`remove_all_labels()`](remove_all_labels.md) : Fjern alle etiketter
   fra et datasett
 
+- [`replace_file_path()`](replace_file_path.md) : Erstatt filsti i
+  Datadoc-metadata
+
 - [`runApp_ssb()`](runApp_ssb.md) : Wrapper function for running shiny
   apps in Jupyter at SSB
 
@@ -233,6 +243,9 @@ under er det bare å ta kontakt.
 
 - [`set_project_root()`](set_project_root.md) : Set Working Directory to
   Project Root
+
+- [`set_version_description()`](set_version_description.md) : Sett
+  versjonsbeskrivelse i en DataDoc-fil
 
 - [`show_column_labels()`](show_column_labels.md) : Vis kolonneetiketter
   ved utskrift av et datasett
@@ -285,7 +298,16 @@ under er det bare å ta kontakt.
 - [`statbank_uttaksbeskrivelse()`](statbank_uttaksbeskrivelse.md) :
   Funksjon for aa hente uttaksbeskrivelsen til en statistikkbanktabell
 
+- [`summarise_missing_required_metadata()`](summarise_missing_required_metadata.md)
+  : Finn variabler som mangler obligatorisk metadata
+
 - [`theme_ssb()`](theme_ssb.md) : SSB theme for ggplot
+
+- [`value_label_coverage()`](value_label_coverage.md) : Beregn dekning
+  av verdietiketter
+
+- [`value_label_expectations()`](value_label_expectations.md) :
+  Kontroller forventet dekning av verdietiketter
 
 - [`values_without_labels()`](values_without_labels.md) : Finn
   observerte verdier uten verdietikett

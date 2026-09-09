@@ -2,19 +2,17 @@
 
 ## Authors
 
-- **Susie Jentoft**. Author, maintainer.
-
-- **Sindre Haugen**. Author.
+- **Sindre Haugen**. Author, maintainer.
 
 ## Citation
 
-Jentoft S, Haugen S (2026). *fellesr: General R functions for SSB*. R
-package version 0.4.3, <https://statisticsnorway.github.io/fellesr/>.
+Haugen S (2026). *fellesr: General R functions for SSB*. R package
+version 0.4.4, <https://statisticsnorway.github.io/fellesr/>.
 
     @Manual{,
       title = {fellesr: General R functions for SSB},
-      author = {Susie Jentoft and Sindre Haugen},
+      author = {Sindre Haugen},
       year = {2026},
-      note = {R package version 0.4.3},
+      note = {R package version 0.4.4},
       url = {https://statisticsnorway.github.io/fellesr/},
     }

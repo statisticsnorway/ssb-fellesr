@@ -1,38 +1,56 @@
-# Lag filsti til Datadoc-fil
+# Konverter filsti mellom Parquet og Datadoc
 
-Oppretter filstien til en Datadoc-fil basert på filstien til en
-Parquet-fil. Filendelsen `.parquet` erstattes med `__DOC.json`.
+Konverterer en filsti mellom en Parquet-fil og den tilhørende Datadoc
+JSON-filen.
 
 ## Usage
 
 ``` r
-datadoc_path(filsti)
+datadoc_path(filsti, to = c("json", "parquet"), warn_if_missing = TRUE)
 ```
 
 ## Arguments
 
 - filsti:
 
-  En tekststreng eller tegnvektor med filstien til én eller flere
-  Parquet-filer.
+  En tekststreng eller tekstvektor med filstien til én eller flere
+  Parquet- eller Datadoc-filer.
+
+- to:
+
+  En tekststreng som angir hvilket filformat filstien skal konverteres
+  til. Gyldige verdier er `"json"` og `"parquet"`. Standardverdien er
+  `"json"`.
+
+- warn_if_missing:
+
+  En logisk verdi som angir om det skal gis en advarsel dersom filen den
+  konverterte filstien peker til, ikke finnes. Standardverdien er
+  `TRUE`.
 
 ## Value
 
-En tekststreng eller tegnvektor med filstien til den tilhørende
-DataDoc-filen.
+En tekststreng eller tekstvektor med den konverterte filstien.
+
+## Details
+
+Standardoppførselen er å konvertere fra `.parquet` til `__DOC.json`. Ved
+å sette `to = "parquet"` konverteres en Datadoc-fil tilbake til den
+tilhørende Parquet-filstien.
 
 ## Examples
 
 ``` r
 datadoc_path("/buckets/data/personell_v1.parquet")
+#> Warning: Følgende fil finnes ikke:
+#> - /buckets/data/personell_v1__DOC.json
 #> [1] "/buckets/data/personell_v1__DOC.json"
 
 datadoc_path(
-  c(
-    "/buckets/data/personell_v1.parquet",
-    "/buckets/data/regnskap_v1.parquet"
-  )
+  "/buckets/data/personell_v1__DOC.json",
+  to = "parquet"
 )
-#> [1] "/buckets/data/personell_v1__DOC.json"
-#> [2] "/buckets/data/regnskap_v1__DOC.json" 
+#> Warning: Følgende fil finnes ikke:
+#> - /buckets/data/personell_v1.parquet
+#> [1] "/buckets/data/personell_v1.parquet"
 ```

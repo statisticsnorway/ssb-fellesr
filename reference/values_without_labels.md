@@ -67,8 +67,6 @@ data <- data.frame(
 )
 
 values_without_labels(data)
-#> # A tibble: 1 × 2
 #>   variable value_without_label
-#>   <chr>                  <dbl>
-#> 1 kjoenn                     3
+#> 1   kjoenn                   3
 ```

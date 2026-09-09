@@ -19,7 +19,9 @@
 <url><loc>/reference/add_labels.html</loc></url>
 <url><loc>/reference/add_value_labels.html</loc></url>
 <url><loc>/reference/arrow_to_sf.html</loc></url>
+<url><loc>/reference/compare_variable_metadata.html</loc></url>
 <url><loc>/reference/copy_metadata.html</loc></url>
+<url><loc>/reference/copy_metadata_dataset.html</loc></url>
 <url><loc>/reference/copy_metadata_variable.html</loc></url>
 <url><loc>/reference/create_metadata.html</loc></url>
 <url><loc>/reference/datadoc_path.html</loc></url>
@@ -58,11 +60,13 @@
 <url><loc>/reference/read_sf_dataset.html</loc></url>
 <url><loc>/reference/read_xml.html</loc></url>
 <url><loc>/reference/remove_all_labels.html</loc></url>
+<url><loc>/reference/replace_file_path.html</loc></url>
 <url><loc>/reference/runApp_ssb.html</loc></url>
 <url><loc>/reference/runExample_ssb.html</loc></url>
 <url><loc>/reference/scale_colour_ssb.html</loc></url>
 <url><loc>/reference/scale_fill_ssb.html</loc></url>
 <url><loc>/reference/set_project_root.html</loc></url>
+<url><loc>/reference/set_version_description.html</loc></url>
 <url><loc>/reference/show_column_labels.html</loc></url>
 <url><loc>/reference/show_labels_df.html</loc></url>
 <url><loc>/reference/sjekk_endring.html</loc></url>
@@ -79,8 +83,11 @@
 <url><loc>/reference/st_write_parquet.html</loc></url>
 <url><loc>/reference/statbank_lasting.html</loc></url>
 <url><loc>/reference/statbank_uttaksbeskrivelse.html</loc></url>
+<url><loc>/reference/summarise_missing_required_metadata.html</loc></url>
 <url><loc>/reference/theme_ssb.html</loc></url>
 <url><loc>/reference/validate_metadata.html</loc></url>
+<url><loc>/reference/value_label_coverage.html</loc></url>
+<url><loc>/reference/value_label_expectations.html</loc></url>
 <url><loc>/reference/values_without_labels.html</loc></url>
 <url><loc>/reference/vardef_get_klass_id.html</loc></url>
 <url><loc>/reference/vardef_url.html</loc></url>
