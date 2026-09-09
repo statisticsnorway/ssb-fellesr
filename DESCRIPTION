@@ -1,15 +1,11 @@
 Package: fellesr
 Type: Package
 Title: General R functions for SSB
-Version: 0.4.3
+Version: 0.4.4
 Authors@R: 
-  c(person(given = "Susie",
-           family = "Jentoft",
-           role = c("aut", "cre"),
-           email = "susie.jentoft@ssb.no"),
-    person(given = "Sindre",
+  c(person(given = "Sindre",
            family = "Haugen",
-           role = "aut",
+           role = c("aut", "cre"),
            email = "sindre.haugen@ssb.no"))
 Description: This package is for general R functions which may be useful for general use at SSB.
 Imports: 

@@ -2,30 +2,40 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{datadoc_path}
 \alias{datadoc_path}
-\title{Lag filsti til Datadoc-fil}
+\title{Konverter filsti mellom Parquet og Datadoc}
 \usage{
-datadoc_path(filsti)
+datadoc_path(filsti, to = c("json", "parquet"), warn_if_missing = TRUE)
 }
 \arguments{
-\item{filsti}{En tekststreng eller tegnvektor med filstien til én eller
-flere Parquet-filer.}
+\item{filsti}{En tekststreng eller tekstvektor med filstien til én eller
+flere Parquet- eller Datadoc-filer.}
+
+\item{to}{En tekststreng som angir hvilket filformat filstien skal
+konverteres til. Gyldige verdier er \code{"json"} og \code{"parquet"}.
+Standardverdien er \code{"json"}.}
+
+\item{warn_if_missing}{En logisk verdi som angir om det skal gis en
+advarsel dersom filen den konverterte filstien peker til, ikke finnes.
+Standardverdien er \code{TRUE}.}
 }
 \value{
-En tekststreng eller tegnvektor med filstien til den tilhørende
-DataDoc-filen.
+En tekststreng eller tekstvektor med den konverterte filstien.
 }
 \description{
-Oppretter filstien til en Datadoc-fil basert på filstien til en
-Parquet-fil. Filendelsen \code{.parquet} erstattes med \verb{__DOC.json}.
+Konverterer en filsti mellom en Parquet-fil og den tilhørende
+Datadoc JSON-filen.
+}
+\details{
+Standardoppførselen er å konvertere fra \code{.parquet} til \verb{__DOC.json}.
+Ved å sette \code{to = "parquet"} konverteres en Datadoc-fil tilbake til
+den tilhørende Parquet-filstien.
 }
 \examples{
 datadoc_path("/buckets/data/personell_v1.parquet")
 
 datadoc_path(
-  c(
-    "/buckets/data/personell_v1.parquet",
-    "/buckets/data/regnskap_v1.parquet"
-  )
+  "/buckets/data/personell_v1__DOC.json",
+  to = "parquet"
 )
 
 }
