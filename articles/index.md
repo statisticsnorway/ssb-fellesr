@@ -24,4 +24,7 @@
 
 - [SSB ggplot theme](vignette_SSB_theme.md):
 
+- [Hvordan ta i bruk oppstartsskript for RStudio i Dapla
+  Lab](vignette_startup_rstudio_dapla_lab.md):
+
 - [Lasting til statistikkbanken](vignette_statbank_lasting.md):
