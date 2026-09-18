@@ -28,7 +28,7 @@ prosjektet.
 Gå til **Avansert → Oppstartsskript** og legg til følgende under
 **Bash-skript**:
 
-``` text
+``` bash
 ssb-fellesr/scripts/startup-rstudio.sh
 ```
 
