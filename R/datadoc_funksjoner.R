@@ -4783,3 +4783,282 @@ summarise_missing_required_metadata <- function(
 
   result
 }
+
+
+#' Opprett et tomt Datadoc-dokument
+#'
+#' Oppretter et nytt Datadoc-metadatadokument for en Parquet-fil.
+#' Dokumentet opprettes på tilsvarende måte som når en udokumentert
+#' Parquet-fil åpnes og lagres i Datadoc Editor uten at metadata fylles
+#' ut manuelt.
+#'
+#' @param filsti En tegnstreng med full filsti til en Parquet-fil.
+#'   Filen må ligge under en produktsti på formen
+#'   `"/buckets/produkt/<statistikk>/..."`, der `<statistikk>` er
+#'   statistikkens kortnavn.
+#'
+#' @details
+#' Funksjonen bruker Python-pakken `dapla-toolbelt-metadata` via
+#' `reticulate` til å opprette Datadoc-dokumentet. Metadata som kan
+#' utledes automatisk fra Parquet-filen og filstien, som variabelnavn,
+#' datatyper, filnavn og datatilstand, fylles ut automatisk.
+#'
+#' Statistikkens kortnavn hentes fra filstien. For eksempel gir
+#' `"/buckets/produkt/speshelse/..."` kortnavnet `"speshelse"`.
+#' Statistikkområdet (`subject_field`) hentes fra SSBs emnestruktur
+#' basert på statistikkens primære plassering.
+#'
+#' Feltene `metadata_created_by` og `metadata_last_updated_by` settes
+#' fra miljøvariabelen `GIT_USER_MAIL`. Dette brukes som en tilpasning
+#' for RStudio-miljøer der `dapla-toolbelt-metadata` ikke har tilgang
+#' til brukerens `OIDC_TOKEN`.
+#'
+#' Metadatadokumentet lagres i samme mappe som Parquet-filen og får
+#' samme filnavn med suffikset `"__DOC.json"`. For eksempel vil
+#' `"data_p2025_v1.parquet"` gi `"data_p2025_v1__DOC.json"`.
+#'
+#' Funksjonen stopper dersom inputfilen ikke er en Parquet-fil,
+#' dersom statistikkens kortnavn ikke kan utledes fra filstien, eller
+#' dersom Datadoc-filen allerede finnes.
+#'
+#' Det gis en advarsel dersom statistikkområdet ikke kan bestemmes,
+#' eller dersom miljøvariabelen `GIT_USER_MAIL` ikke er tilgjengelig.
+#'
+#' @return Usynlig (`invisible`) tegnstreng med filstien til det
+#'   opprettede Datadoc-dokumentet.
+#'
+#' @examples
+#' \dontrun{
+#' create_empty_datadoc(
+#'   "/buckets/produkt/speshelse/klargjorte-data/data_p2025_v1.parquet"
+#' )
+#' }
+#'
+#' @export
+create_empty_datadoc <- function(filsti) {
+  
+  # ------------------------------------------------------------------
+  # 1. Kontroller fil
+  # ------------------------------------------------------------------
+  
+  if (tolower(tools::file_ext(filsti)) != "parquet") {
+    stop(
+      "Filen må være en parquet-fil: ",
+      filsti
+    )
+  }
+  
+  
+  # ------------------------------------------------------------------
+  # 2. Finn sti til Datadoc-fil
+  # ------------------------------------------------------------------
+  
+  datadoc_filsti <- sub(
+    "\\.parquet$",
+    "__DOC.json",
+    filsti,
+    ignore.case = TRUE
+  )
+  
+  if (file.exists(datadoc_filsti)) {
+    stop(
+      "Datadoc-filen finnes allerede: ",
+      datadoc_filsti
+    )
+  }
+  
+  
+  # ------------------------------------------------------------------
+  # 3. Finn statistikk-kortnavn fra filstien
+  # ------------------------------------------------------------------
+  
+  statistikk <- stringr::str_match(
+    filsti,
+    "/buckets/produkt/([^/]+)/"
+  )[, 2]
+  
+  if (is.na(statistikk)) {
+    stop(
+      paste0(
+        "Kunne ikke finne statistikk-kortnavn fra filstien.\n",
+        "Forventet en sti på formen:\n",
+        "/buckets/produkt/<statistikk>/..."
+      )
+    )
+  }
+  
+  
+  # ------------------------------------------------------------------
+  # 4. Finn statistikkområde / subject_field
+  # ------------------------------------------------------------------
+  
+  subject_url <- paste0(
+    "https://www.ssb.no/xp/_/service/mimir/",
+    "subjectStructurStatistics"
+  )
+  
+  subject_field <- tryCatch(
+    {
+      emnestruktur <- xml2::read_xml(
+        subject_url
+      )
+      
+      delemner <- xml2::xml_find_all(
+        emnestruktur,
+        ".//delemne"
+      )
+      
+      treff <- vapply(
+        delemner,
+        function(delemne) {
+          
+          statistikker <- xml2::xml_find_all(
+            delemne,
+            ".//Statistikk"
+          )
+          
+          if (length(statistikker) == 0) {
+            return(FALSE)
+          }
+          
+          kortnavn <- xml2::xml_attr(
+            statistikker,
+            "kortnavn"
+          )
+          
+          primaer <- xml2::xml_attr(
+            statistikker,
+            "isPrimaerPlassering"
+          )
+          
+          any(
+            kortnavn == statistikk &
+              primaer == "true",
+            na.rm = TRUE
+          )
+        },
+        logical(1)
+      )
+      
+      if (!any(treff)) {
+        NA_character_
+      } else {
+        xml2::xml_attr(
+          delemner[treff][[1]],
+          "emnekode"
+        )
+      }
+    },
+    error = function(e) {
+      warning(
+        "Kunne ikke hente statistikkområde for '",
+        statistikk,
+        "': ",
+        conditionMessage(e)
+      )
+      
+      NA_character_
+    }
+  )
+  
+  
+  # ------------------------------------------------------------------
+  # 5. Python-avhengighet
+  # ------------------------------------------------------------------
+  
+  reticulate::py_require(
+    "dapla-toolbelt-metadata"
+  )
+  
+  dapla_datasets <- reticulate::import(
+    "dapla_metadata.datasets"
+  )
+  
+  
+  # ------------------------------------------------------------------
+  # 6. Opprett Datadoc-objekt fra parquet-filen
+  # ------------------------------------------------------------------
+  
+  metadata <- dapla_datasets$Datadoc(
+    dataset_path = filsti
+  )
+  
+  
+  # ------------------------------------------------------------------
+  # 7. Sett statistikkområde eksplisitt
+  # ------------------------------------------------------------------
+  
+  if (!is.na(subject_field) && nzchar(subject_field)) {
+    metadata$dataset$subject_field <- subject_field
+  } else {
+    warning(
+      "Fant ikke statistikkområde for statistikken '",
+      statistikk,
+      "'."
+    )
+  }
+  
+  
+  # ------------------------------------------------------------------
+  # 8. Skriv Datadoc-dokument
+  # ------------------------------------------------------------------
+  
+  metadata$write_metadata_document()
+  
+  
+  # ------------------------------------------------------------------
+  # 9. Sett Opprettet av / Oppdatert av
+  # ------------------------------------------------------------------
+  
+  bruker <- Sys.getenv(
+    "GIT_USER_MAIL",
+    unset = NA_character_
+  )
+  
+  if (!is.na(bruker) && nzchar(bruker)) {
+    
+    datadoc <- jsonlite::read_json(
+      datadoc_filsti,
+      simplifyVector = FALSE
+    )
+    
+    datadoc$datadoc$dataset$metadata_created_by <- bruker
+    datadoc$datadoc$dataset$metadata_last_updated_by <- bruker
+    
+    jsonlite::write_json(
+      datadoc,
+      path = datadoc_filsti,
+      pretty = TRUE,
+      auto_unbox = TRUE,
+      null = "null"
+    )
+    
+  } else {
+    warning(
+      "Miljøvariabelen GIT_USER_MAIL er ikke satt. ",
+      "Feltene 'Opprettet av' og 'Oppdatert av' ble derfor ikke fylt ut."
+    )
+  }
+  
+  
+  # ------------------------------------------------------------------
+  # 10. Ferdig
+  # ------------------------------------------------------------------
+  
+  message(
+    "Datadoc-fil opprettet: ",
+    datadoc_filsti
+  )
+  
+  if (!is.na(subject_field) && nzchar(subject_field)) {
+    message(
+      "Statistikkområde: ",
+      subject_field,
+      " (",
+      statistikk,
+      ")"
+    )
+  }
+  
+  invisible(datadoc_filsti)
+}

@@ -28,6 +28,7 @@ renv::init()
 # usethis::use_package("stringr", type = "imports")
 # usethis::use_package("sfarrow", type = "imports")
 # usethis::use_package("arsenal", type = "imports")
+usethis::use_package("reticulate", type = "imports")
 
 # usethis::use_package("tidyselect", type = "imports")
 

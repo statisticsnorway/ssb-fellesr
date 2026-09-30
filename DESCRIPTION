@@ -39,7 +39,8 @@ Imports:
     purrr,
     sjlabelled,
     tibble,
-    tidyselect
+    tidyselect,
+    reticulate
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
