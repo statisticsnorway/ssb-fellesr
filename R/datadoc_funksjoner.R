@@ -5160,6 +5160,10 @@ set_variable_names_from_labels <- function(
 #' @param language_code En tekststreng med språkkoden for tekstfeltene,
 #'   for eksempel `"nb"`, `"nn"` eller `"en"`. Standard er `"nb"`.
 #'
+#' @param quiet Logisk verdi. Standard er `FALSE`. Med `TRUE` skjules
+#'   meldinger, advarsler og konsollutskrifter fra R og Python under
+#'   kjøringen. Feil som stopper kjøringen, vises fortsatt.
+#'
 #' @details
 #' Funksjonen bruker Python-pakken `dapla-toolbelt-metadata` via
 #' `reticulate` til å opprette Datadoc-dokumentet. Metadata som kan
@@ -5215,7 +5219,8 @@ set_variable_names_from_labels <- function(
 #'   name = "Røyk, alkohol og andre rusmidler 2026",
 #'   description = "Klargjorte data fra undersøkelsen i 2026.",
 #'   version_description = "Første klargjorte versjon.",
-#'   language_code = "nb"
+#'   language_code = "nb",
+#'   quiet = TRUE
 #' )
 #' }
 #'
@@ -5226,300 +5231,348 @@ create_empty_datadoc <- function(
     name = NULL,
     description = NULL,
     version_description = NULL,
-    language_code = "nb") {
+    language_code = "nb",
+    quiet = FALSE) {
   
-  kontroller_tekst <- function(x, argument, tillat_null = TRUE) {
-    if (is.null(x) && tillat_null) {
-      return(invisible(NULL))
-    }
-    if (!is.character(x) || length(x) != 1L ||
-        is.na(x) || !nzchar(trimws(x))) {
-      stop(
-        "Argumentet '", argument,
-        "' må være én ikke-tom tekststreng uten NA",
-        if (tillat_null) " eller NULL." else ".",
-        call. = FALSE
-      )
-    }
-    invisible(NULL)
+  if (!is.logical(quiet) || length(quiet) != 1L || is.na(quiet)) {
+    stop("Argumentet 'quiet' må være TRUE eller FALSE.", call. = FALSE)
   }
   
-  kontroller_tekst(filsti, "filsti", tillat_null = FALSE)
-  kontroller_tekst(language_code, "language_code", tillat_null = FALSE)
-  language_code <- trimws(language_code)
-  
-  tekstfelter <- list(
-    population_description = population_description,
-    name = name,
-    description = description,
-    version_description = version_description
-  )
-  for (felt in names(tekstfelter)) {
-    kontroller_tekst(tekstfelter[[felt]], felt)
-  }
-  
-  # ------------------------------------------------------------------
-  # 1. Kontroller fil
-  # ------------------------------------------------------------------
-  
-  if (tolower(tools::file_ext(filsti)) != "parquet") {
-    stop(
-      "Filen må være en parquet-fil: ",
-      filsti
-    )
-  }
-  
-  
-  # ------------------------------------------------------------------
-  # 2. Finn sti til Datadoc-fil
-  # ------------------------------------------------------------------
-  
-  datadoc_filsti <- sub(
-    "\\.parquet$",
-    "__DOC.json",
-    filsti,
-    ignore.case = TRUE
-  )
-  
-  if (file.exists(datadoc_filsti)) {
-    stop(
-      "Datadoc-filen finnes allerede: ",
-      datadoc_filsti
-    )
-  }
-  
-  
-  # ------------------------------------------------------------------
-  # 3. Finn statistikk-kortnavn fra filstien
-  # ------------------------------------------------------------------
-  
-  statistikk <- stringr::str_match(
-    filsti,
-    "/buckets/produkt/([^/]+)/"
-  )[, 2]
-  
-  if (is.na(statistikk)) {
-    stop(
-      paste0(
-        "Kunne ikke finne statistikk-kortnavn fra filstien.\n",
-        "Forventet en sti på formen:\n",
-        "/buckets/produkt/<statistikk>/..."
-      )
-    )
-  }
-  
-  
-  # ------------------------------------------------------------------
-  # 4. Finn statistikkområde / subject_field
-  # ------------------------------------------------------------------
-  
-  subject_url <- paste0(
-    "https://www.ssb.no/xp/_/service/mimir/",
-    "subjectStructurStatistics"
-  )
-  
-  subject_field <- tryCatch(
-    {
-      emnestruktur <- xml2::read_xml(
-        subject_url
-      )
-      
-      delemner <- xml2::xml_find_all(
-        emnestruktur,
-        ".//delemne"
-      )
-      
-      treff <- vapply(
-        delemner,
-        function(delemne) {
-          
-          statistikker <- xml2::xml_find_all(
-            delemne,
-            ".//Statistikk"
-          )
-          
-          if (length(statistikker) == 0) {
-            return(FALSE)
-          }
-          
-          kortnavn <- xml2::xml_attr(
-            statistikker,
-            "kortnavn"
-          )
-          
-          primaer <- xml2::xml_attr(
-            statistikker,
-            "isPrimaerPlassering"
-          )
-          
-          any(
-            kortnavn == statistikk &
-              primaer == "true",
-            na.rm = TRUE
-          )
-        },
-        logical(1)
-      )
-      
-      if (!any(treff)) {
-        NA_character_
-      } else {
-        xml2::xml_attr(
-          delemner[treff][[1]],
-          "emnekode"
+  kjor <- function() {
+    
+    kontroller_tekst <- function(x, argument, tillat_null = TRUE) {
+      if (is.null(x) && tillat_null) {
+        return(invisible(NULL))
+      }
+      if (!is.character(x) || length(x) != 1L ||
+          is.na(x) || !nzchar(trimws(x))) {
+        stop(
+          "Argumentet '", argument,
+          "' må være én ikke-tom tekststreng uten NA",
+          if (tillat_null) " eller NULL." else ".",
+          call. = FALSE
         )
       }
-    },
-    error = function(e) {
-      warning(
-        "Kunne ikke hente statistikkområde for '",
-        statistikk,
-        "': ",
-        conditionMessage(e)
+      invisible(NULL)
+    }
+    
+    kontroller_tekst(filsti, "filsti", tillat_null = FALSE)
+    kontroller_tekst(language_code, "language_code", tillat_null = FALSE)
+    language_code <- trimws(language_code)
+    
+    tekstfelter <- list(
+      population_description = population_description,
+      name = name,
+      description = description,
+      version_description = version_description
+    )
+    for (felt in names(tekstfelter)) {
+      kontroller_tekst(tekstfelter[[felt]], felt)
+    }
+    
+    # ------------------------------------------------------------------
+    # 1. Kontroller fil
+    # ------------------------------------------------------------------
+    
+    if (tolower(tools::file_ext(filsti)) != "parquet") {
+      stop(
+        "Filen må være en parquet-fil: ",
+        filsti
+      )
+    }
+    
+    
+    # ------------------------------------------------------------------
+    # 2. Finn sti til Datadoc-fil
+    # ------------------------------------------------------------------
+    
+    datadoc_filsti <- sub(
+      "\\.parquet$",
+      "__DOC.json",
+      filsti,
+      ignore.case = TRUE
+    )
+    
+    if (file.exists(datadoc_filsti)) {
+      stop(
+        "Datadoc-filen finnes allerede: ",
+        datadoc_filsti
+      )
+    }
+    
+    
+    # ------------------------------------------------------------------
+    # 3. Finn statistikk-kortnavn fra filstien
+    # ------------------------------------------------------------------
+    
+    statistikk <- stringr::str_match(
+      filsti,
+      "/buckets/produkt/([^/]+)/"
+    )[, 2]
+    
+    if (is.na(statistikk)) {
+      stop(
+        paste0(
+          "Kunne ikke finne statistikk-kortnavn fra filstien.\n",
+          "Forventet en sti på formen:\n",
+          "/buckets/produkt/<statistikk>/..."
+        )
+      )
+    }
+    
+    
+    # ------------------------------------------------------------------
+    # 4. Finn statistikkområde / subject_field
+    # ------------------------------------------------------------------
+    
+    subject_url <- paste0(
+      "https://www.ssb.no/xp/_/service/mimir/",
+      "subjectStructurStatistics"
+    )
+    
+    subject_field <- tryCatch(
+      {
+        emnestruktur <- xml2::read_xml(
+          subject_url
+        )
+        
+        delemner <- xml2::xml_find_all(
+          emnestruktur,
+          ".//delemne"
+        )
+        
+        treff <- vapply(
+          delemner,
+          function(delemne) {
+            
+            statistikker <- xml2::xml_find_all(
+              delemne,
+              ".//Statistikk"
+            )
+            
+            if (length(statistikker) == 0) {
+              return(FALSE)
+            }
+            
+            kortnavn <- xml2::xml_attr(
+              statistikker,
+              "kortnavn"
+            )
+            
+            primaer <- xml2::xml_attr(
+              statistikker,
+              "isPrimaerPlassering"
+            )
+            
+            any(
+              kortnavn == statistikk &
+                primaer == "true",
+              na.rm = TRUE
+            )
+          },
+          logical(1)
+        )
+        
+        if (!any(treff)) {
+          NA_character_
+        } else {
+          xml2::xml_attr(
+            delemner[treff][[1]],
+            "emnekode"
+          )
+        }
+      },
+      error = function(e) {
+        warning(
+          "Kunne ikke hente statistikkområde for '",
+          statistikk,
+          "': ",
+          conditionMessage(e)
+        )
+        
+        NA_character_
+      }
+    )
+    
+    
+    # ------------------------------------------------------------------
+    # 5. Python-avhengighet
+    # ------------------------------------------------------------------
+    
+    reticulate::py_require(
+      "dapla-toolbelt-metadata"
+    )
+    
+    opprett_metadata <- function() {
+      if (quiet) {
+        # Stans også loggere som allerede har en egen konsollhandler.
+        logging <- reticulate::import("logging")
+        tidligere_loggnivaa <- logging$root$manager$disable
+        on.exit(logging$disable(tidligere_loggnivaa), add = TRUE)
+        logging$disable(.Machine$integer.max)
+      }
+      
+      dapla_datasets <- reticulate::import(
+        "dapla_metadata.datasets"
       )
       
-      NA_character_
+      
+      # ------------------------------------------------------------------
+      # 6. Opprett Datadoc-objekt fra parquet-filen
+      # ------------------------------------------------------------------
+      
+      metadata <- dapla_datasets$Datadoc(
+        dataset_path = filsti
+      )
+      
+      
+      # ------------------------------------------------------------------
+      # 7. Sett statistikkområde eksplisitt
+      # ------------------------------------------------------------------
+      
+      if (!is.na(subject_field) && nzchar(subject_field)) {
+        metadata$dataset$subject_field <- subject_field
+      } else {
+        warning(
+          "Fant ikke statistikkområde for statistikken '",
+          statistikk,
+          "'."
+        )
+      }
+      
+      
+      # ------------------------------------------------------------------
+      # 8. Skriv Datadoc-dokument
+      # ------------------------------------------------------------------
+      
+      metadata$write_metadata_document()
+      invisible(NULL)
     }
-  )
-  
-  
-  # ------------------------------------------------------------------
-  # 5. Python-avhengighet
-  # ------------------------------------------------------------------
-  
-  reticulate::py_require(
-    "dapla-toolbelt-metadata"
-  )
-  
-  dapla_datasets <- reticulate::import(
-    "dapla_metadata.datasets"
-  )
-  
-  
-  # ------------------------------------------------------------------
-  # 6. Opprett Datadoc-objekt fra parquet-filen
-  # ------------------------------------------------------------------
-  
-  metadata <- dapla_datasets$Datadoc(
-    dataset_path = filsti
-  )
-  
-  
-  # ------------------------------------------------------------------
-  # 7. Sett statistikkområde eksplisitt
-  # ------------------------------------------------------------------
-  
-  if (!is.na(subject_field) && nzchar(subject_field)) {
-    metadata$dataset$subject_field <- subject_field
-  } else {
-    warning(
-      "Fant ikke statistikkområde for statistikken '",
-      statistikk,
-      "'."
-    )
-  }
-  
-  
-  # ------------------------------------------------------------------
-  # 8. Skriv Datadoc-dokument
-  # ------------------------------------------------------------------
-  
-  metadata$write_metadata_document()
-  
-  
-  # ------------------------------------------------------------------
-  # 9. Fyll ut tekstfelter og Opprettet av / Oppdatert av
-  # ------------------------------------------------------------------
-  
-  datadoc <- jsonlite::read_json(
-    datadoc_filsti,
-    simplifyVector = FALSE
-  )
-  
-  if (!is.list(datadoc$datadoc$dataset)) {
-    stop("Datadoc-filen mangler forventet struktur: datadoc.dataset.")
-  }
-  
-  sett_spraktekst <- function(eksisterende, tekst) {
-    if (is.null(tekst)) {
-      return(eksisterende)
+    
+    if (quiet) {
+      invisible(reticulate::py_capture_output(
+        opprett_metadata(),
+        type = c("stdout", "stderr")
+      ))
+    } else {
+      opprett_metadata()
     }
-    if (is.null(eksisterende)) {
-      eksisterende <- list()
+    
+    # ------------------------------------------------------------------
+    # 9. Fyll ut tekstfelter og Opprettet av / Oppdatert av
+    # ------------------------------------------------------------------
+    
+    datadoc <- jsonlite::read_json(
+      datadoc_filsti,
+      simplifyVector = FALSE
+    )
+    
+    if (!is.list(datadoc$datadoc$dataset)) {
+      stop("Datadoc-filen mangler forventet struktur: datadoc.dataset.")
     }
-    treff <- vapply(
-      eksisterende,
-      function(post) identical(post$languageCode, language_code),
-      logical(1)
-    )
-    c(
-      eksisterende[!treff],
-      list(list(languageCode = language_code, languageText = tekst))
-    )
-  }
-  
-  for (felt in names(tekstfelter)) {
-    if (!is.null(tekstfelter[[felt]])) {
-      datadoc$datadoc$dataset[[felt]] <- sett_spraktekst(
-        datadoc$datadoc$dataset[[felt]],
-        tekstfelter[[felt]]
+    
+    sett_spraktekst <- function(eksisterende, tekst) {
+      if (is.null(tekst)) {
+        return(eksisterende)
+      }
+      if (is.null(eksisterende)) {
+        eksisterende <- list()
+      }
+      treff <- vapply(
+        eksisterende,
+        function(post) identical(post$languageCode, language_code),
+        logical(1)
+      )
+      c(
+        eksisterende[!treff],
+        list(list(languageCode = language_code, languageText = tekst))
       )
     }
-  }
-  
-  if (!is.null(population_description)) {
-    for (i in seq_along(datadoc$datadoc$variables)) {
-      datadoc$datadoc$variables[[i]]$population_description <- sett_spraktekst(
-        datadoc$datadoc$variables[[i]]$population_description,
-        population_description
+    
+    for (felt in names(tekstfelter)) {
+      if (!is.null(tekstfelter[[felt]])) {
+        datadoc$datadoc$dataset[[felt]] <- sett_spraktekst(
+          datadoc$datadoc$dataset[[felt]],
+          tekstfelter[[felt]]
+        )
+      }
+    }
+    
+    if (!is.null(population_description)) {
+      for (i in seq_along(datadoc$datadoc$variables)) {
+        datadoc$datadoc$variables[[i]]$population_description <- sett_spraktekst(
+          datadoc$datadoc$variables[[i]]$population_description,
+          population_description
+        )
+      }
+    }
+    
+    bruker <- Sys.getenv(
+      "GIT_USER_MAIL",
+      unset = NA_character_
+    )
+    
+    if (!is.na(bruker) && nzchar(bruker)) {
+      
+      datadoc$datadoc$dataset$metadata_created_by <- bruker
+      datadoc$datadoc$dataset$metadata_last_updated_by <- bruker
+      
+    } else {
+      warning(
+        "Miljøvariabelen GIT_USER_MAIL er ikke satt. ",
+        "Feltene 'Opprettet av' og 'Oppdatert av' ble derfor ikke fylt ut."
       )
     }
-  }
-  
-  bruker <- Sys.getenv(
-    "GIT_USER_MAIL",
-    unset = NA_character_
-  )
-  
-  if (!is.na(bruker) && nzchar(bruker)) {
     
-    datadoc$datadoc$dataset$metadata_created_by <- bruker
-    datadoc$datadoc$dataset$metadata_last_updated_by <- bruker
-    
-  } else {
-    warning(
-      "Miljøvariabelen GIT_USER_MAIL er ikke satt. ",
-      "Feltene 'Opprettet av' og 'Oppdatert av' ble derfor ikke fylt ut."
+    jsonlite::write_json(
+      datadoc,
+      path = datadoc_filsti,
+      pretty = TRUE,
+      auto_unbox = TRUE,
+      null = "null",
+      digits = NA
     )
-  }
-  
-  jsonlite::write_json(
-    datadoc,
-    path = datadoc_filsti,
-    pretty = TRUE,
-    auto_unbox = TRUE,
-    null = "null",
-    digits = NA
-  )
-  
-  # ------------------------------------------------------------------
-  # 10. Ferdig
-  # ------------------------------------------------------------------
-  
-  message(
-    "Datadoc-fil opprettet: ",
-    datadoc_filsti
-  )
-  
-  if (!is.na(subject_field) && nzchar(subject_field)) {
+    
+    # ------------------------------------------------------------------
+    # 10. Ferdig
+    # ------------------------------------------------------------------
+    
     message(
-      "Statistikkområde: ",
-      subject_field,
-      " (",
-      statistikk,
-      ")"
+      "Datadoc-fil opprettet: ",
+      datadoc_filsti
     )
+    
+    if (!is.na(subject_field) && nzchar(subject_field)) {
+      message(
+        "Statistikkområde: ",
+        subject_field,
+        " (",
+        statistikk,
+        ")"
+      )
+    }
+    
+    invisible(datadoc_filsti)
   }
   
-  invisible(datadoc_filsti)
+  if (!quiet) {
+    return(invisible(kjor()))
+  }
+  
+  # Gjenopprett konsollen også dersom kjøringen stopper med en feil.
+  stille <- file(if (.Platform$OS.type == "windows") "NUL" else "/dev/null",
+                 open = "wt")
+  tidligere_output <- sink.number(type = "output")
+  tidligere_message <- sink.number(type = "message")
+  on.exit({
+    sink(tidligere_message, type = "message")
+    while (sink.number(type = "output") > tidligere_output) {
+      sink(type = "output")
+    }
+    close(stille)
+  }, add = TRUE)
+  sink(stille, type = "output")
+  sink(stille, type = "message")
+  
+  invisible(suppressMessages(suppressWarnings(kjor())))
 }
