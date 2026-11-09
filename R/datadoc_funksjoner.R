@@ -4785,17 +4785,380 @@ summarise_missing_required_metadata <- function(
 }
 
 
+#' Legg til verdietiketter fra en lokal kodeliste
+#'
+#' Kobler kolonnenavn i data til `variabel` i kodelisten. For hver variabel
+#' brukes `kode` som underliggende verdi og `betydning` som verdietikett.
+#' Taggene `<rt>` og `</rt>` fjernes fra etiketten.
+#'
+#' @param data En data.frame eller tibble som skal få etiketter.
+#' @param kodelister En data.frame eller tibble med kodelistene, eller en
+#'   tekststreng med filstien til en Parquet-fil i samme format.
+#' @param quiet Logisk verdi. Hvis FALSE, gis en advarsel når en variabel
+#'   konverteres til tekst. Standard er TRUE.
+#' @details Som i add_value_labels() behandles koder som tekst. Ledende
+#'   nuller bevares når kodene er lagret som tekst. Eksisterende verdietiketter
+#'   erstattes for variabler med en gyldig kodeliste. Variabler uten treff og
+#'   rader uten kode eller etikett hoppes over. To ulike etiketter for samme
+#'   variabel og kode gir en feil. Eksisterende kolonneetiketter bevares.
+#' @return Datasettet med verdietiketter på de aktuelle variablene.
+#' @examples
+#' data <- data.frame(nrinnled = c("1", "2"))
+#' kodelister <- data.frame(
+#'   variabel = c("nrinnled", "nrinnled"),
+#'   kode = c("1", "2"),
+#'   betydning = c("intervju", "<rt>Frafall</rt>")
+#' )
+#' resultat <- add_value_labels_from_file(data, kodelister)
+#' labelled::val_labels(resultat$nrinnled)
+#' @export
+add_value_labels_from_file <- function(data, kodelister, quiet = TRUE) {
+  if (!is.logical(quiet) || length(quiet) != 1L || is.na(quiet)) {
+    stop("`quiet` må være TRUE eller FALSE.", call. = FALSE)
+  }
+  
+  oppslag <- .les_etikettoppslag(data, kodelister, c("kode", "betydning"))
+  oppslag$kode <- trimws(as.character(oppslag$kode))
+  oppslag$betydning <- trimws(gsub(
+    "</?rt>", "", as.character(oppslag$betydning), ignore.case = TRUE
+  ))
+  gyldig <- !is.na(oppslag$kode) & nzchar(oppslag$kode) &
+    !is.na(oppslag$betydning) & nzchar(oppslag$betydning)
+  oppslag <- unique(oppslag[gyldig, , drop = FALSE])
+  
+  for (variabel in unique(oppslag$variabel)) {
+    rader <- oppslag[oppslag$variabel == variabel, , drop = FALSE]
+    duplikat <- anyDuplicated(rader$kode)
+    if (duplikat > 0L) {
+      stop("Flere betydninger for kode `", rader$kode[[duplikat]],
+           "` i variabelen `", variabel, "`.", call. = FALSE)
+    }
+    
+    x <- data[[variabel]]
+    if (!is.character(x)) {
+      if (!quiet) {
+        warning("Konverterer `", variabel, "` til tekst.", call. = FALSE)
+      }
+      kolonneetikett <- labelled::var_label(x)
+      if (inherits(x, "haven_labelled")) {
+        x <- unclass(x)
+      }
+      x <- as.character(x)
+      labelled::var_label(x) <- kolonneetikett
+    }
+    
+    data[[variabel]] <- labelled::set_value_labels(
+      x, .labels = stats::setNames(rader$kode, rader$betydning)
+    )
+  }
+  data
+}
+
+#' Legg til kolonneetiketter fra en lokal kodeliste
+#'
+#' Bruker `variable_text` som kolonneetikett for hver kolonne som har treff
+#' i `variabel`. Funksjonen kan også brukes for variabler uten svarkoder.
+#'
+#' @inheritParams add_value_labels_from_file
+#' @details Bare kolonnene `variabel` og `variable_text` kreves. Tomme
+#'   tekster hoppes over. Samme tekst kan forekomme på flere rader.
+#'   Ulike, ikke-tomme tekster for samme variabel gir en feil.
+#'   Ved treff erstattes en eventuell eksisterende kolonneetikett.
+#' @return Datasettet med kolonneetiketter. Verdier, datatyper og
+#'   verdietiketter beholdes.
+#' @examples
+#' data <- data.frame(nrinnled = c("1", "2"))
+#' kodelister <- data.frame(variabel = "nrinnled", variable_text = "Status på IO")
+#' resultat <- add_column_labels_from_file(data, kodelister)
+#' labelled::var_label(resultat$nrinnled)
+#' @export
+add_column_labels_from_file <- function(data, kodelister) {
+  oppslag <- .les_etikettoppslag(data, kodelister, "variable_text")
+  oppslag$variable_text <- trimws(as.character(oppslag$variable_text))
+  gyldig <- !is.na(oppslag$variable_text) & nzchar(oppslag$variable_text)
+  oppslag <- unique(oppslag[gyldig, , drop = FALSE])
+  
+  duplikat <- anyDuplicated(oppslag$variabel)
+  if (duplikat > 0L) {
+    stop("Flere kolonneetiketter for variabelen `",
+         oppslag$variabel[[duplikat]], "`.", call. = FALSE)
+  }
+  
+  for (i in seq_len(nrow(oppslag))) {
+    variabel <- oppslag$variabel[[i]]
+    labelled::var_label(data[[variabel]]) <- oppslag$variable_text[[i]]
+  }
+  data
+}
+
+# Felles innlesing og utvalg av kolonner som finnes i datasettet.
+.les_etikettoppslag <- function(data, kodelister, felt) {
+  if (!is.data.frame(data)) {
+    stop("`data` må være en data.frame eller tibble.", call. = FALSE)
+  }
+  
+  if (is.character(kodelister) && length(kodelister) == 1L &&
+      !is.na(kodelister)) {
+    if (tolower(tools::file_ext(kodelister)) != "parquet") {
+      stop("Oppgi en Parquet-fil eller les kodelisten inn som en tabell.",
+           call. = FALSE)
+    }
+    kodelister <- arrow::read_parquet(kodelister)
+  }
+  
+  if (!is.data.frame(kodelister)) {
+    stop("`kodelister` må være en tabell eller en filsti.", call. = FALSE)
+  }
+  kolonner <- c("variabel", felt)
+  mangler <- setdiff(kolonner, names(kodelister))
+  if (length(mangler)) {
+    stop("Kodelisten mangler ", paste(mangler, collapse = ", "), ".",
+         call. = FALSE)
+  }
+  
+  oppslag <- as.data.frame(kodelister)[kolonner]
+  oppslag$variabel <- trimws(as.character(oppslag$variabel))
+  oppslag[oppslag$variabel %in% names(data), , drop = FALSE]
+}
+
+#' Oppdater variabelnavn og intervjumetadata i DataDoc
+#'
+#' Henter variabelnavn fra en metadatatabell eller fra kolonneetiketter i
+#' et datasett. Koblingen skjer på eksakt likhet med `short_name`.
+#' Standardverdier for intervjuspørsmål fyller tomme felt for matchende
+#' variabler. Utvalget kan avgrenses med `intervjuvariabler`.
+#'
+#' @param filsti_datadoc Filsti til DataDoc-filen (.json) eller til den
+#'   tilhørende Parquet-filen. JSON-filen må allerede finnes.
+#' @param metadata En metadatatabell med `variabel` og `variable_text`,
+#'   filstien til en slik tabell i Parquet-format, eller et data.frame med
+#'   kolonneetiketter i attributtet `label`. Gjentatte, identiske tekster
+#'   for samme variabel er tillatt. Tomme etiketter brukes ikke som navn.
+#' @param variabler Tekstvektor med kortnavn som skal oppdateres.
+#'   NULL velger alle kortnavn som finnes i både kilden og DataDoc.
+#' @param overwrite Logisk verdi. FALSE fyller bare manglende navn på
+#'   valgt språk. TRUE tillater også å erstatte navnet på dette språket.
+#'   Andre språk og utfylte fagfelt beholdes ved begge innstillinger.
+#' @param intervjuvariabler Kortnavn på direkte intervjuspørsmål som skal få
+#'   standardverdier. Standard er `variabler`. NULL velger alle variablene
+#'   som matcher innenfor utvalget. Bruk `character()` for bare navn.
+#'   Alle intervjuvariabler må inngå i utvalget og finnes i begge kilder.
+#' @param unit_type Enhetstype som tekstkode. Standard er "20" (person).
+#' @param temporality_type Standard er "STATUS" for status på
+#'   intervjutidspunktet. Andre muligheter er "ACCUMULATED", "FIXED" og "EVENT".
+#' @param data_source Tekstkode fra KLASS 712. Standard er "67".
+#'   Koden brukes direkte. NULL hopper over feltet. Verdien "SSB"
+#'   støttes også og slår opp SSB i KLASS for datasettets sluttdato.
+#' @param variable_role Standard er "MEASURE" for selve intervjusvaret.
+#' @param population_description Eventuell dokumentert populasjonstekst
+#'   for alle valgte intervjuspørsmål, på `language_code`. Standard NULL
+#'   hopper over feltet. Funksjonen utleder ikke hvem som fikk spørsmålet.
+#'   Manglende populasjon vil fortsatt kunne utløse valideringsadvarsler.
+#' @param language_code Språk for navn og eventuell populasjonstekst.
+#'   Standard er "nb". Tillatte verdier er "nb", "nn" og "en".
+#' @details Bruk NULL for et fagfelt som skal hoppes over. Send spørsmål
+#'   med forskjellige referanseperioder i separate kall. Funksjonen
+#'   oppdaterer variabelmetadata i JSON-filen. Øvrige deler av dokumentet
+#'   beholdes, også eventuell tidligere beregnet fullføringsprosent.
+#' @return Det oppdaterte DataDoc-dokumentet, usynlig. Antall endrede
+#'   variabler meldes i konsollen. Ved null endringer skrives ikke filen.
+#' @examples
+#' \dontrun{
+#' # Fyll navn og tomme fagfelt for alle matchende variabler.
+#' set_variable_names_from_labels(filsti_datadoc, kodelister)
+#' # Fyll bare navn.
+#' set_variable_names_from_labels(
+#'   filsti_datadoc, kodelister, intervjuvariabler = character()
+#' )
+#' set_variable_names_from_labels(
+#'   filsti_datadoc, royk_med_labels,
+#'   variabler = c("tob1", "tob2")
+#' )
+#' }
+#' @md
+#' @export
+set_variable_names_from_labels <- function(
+    filsti_datadoc, metadata, variabler = NULL, overwrite = FALSE,
+    intervjuvariabler = variabler, unit_type = "20", temporality_type = "STATUS",
+    data_source = "67", variable_role = "MEASURE",
+    population_description = NULL, language_code = "nb") {
+  
+  tekst <- function(x) {
+    is.character(x) && length(x) == 1L && !is.na(x) && nzchar(trimws(x))
+  }
+  if (!tekst(filsti_datadoc)) stop("Oppgi én filsti til DataDoc.")
+  if (!is.logical(overwrite) || length(overwrite) != 1L || is.na(overwrite)) {
+    stop("`overwrite` må være TRUE eller FALSE.")
+  }
+  if (!tekst(language_code) || !language_code %in% c("nb", "nn", "en")) {
+    stop("`language_code` må være nb, nn eller en.")
+  }
+  for (utvalg in list(variabler, intervjuvariabler)) {
+    if (!is.null(utvalg) && (!is.character(utvalg) || anyNA(utvalg) ||
+                             any(!nzchar(trimws(utvalg))))) {
+      stop("Variabelutvalg må bestå av ikke-tomme kortnavn.")
+    }
+  }
+  standard <- list(unit_type = unit_type, temporality_type = temporality_type,
+                   variable_role = variable_role, data_source = data_source)
+  for (verdi in c(standard, list(population_description))) {
+    if (!is.null(verdi) && !tekst(verdi)) stop("Bruk én tekstverdi eller NULL per fagfelt.")
+  }
+  if (!is.null(temporality_type) &&
+      !temporality_type %in% c("STATUS", "FIXED", "EVENT", "ACCUMULATED")) {
+    stop("Ukjent temporalitetstype: ", temporality_type)
+  }
+  if (!is.null(variable_role) &&
+      !variable_role %in% c("MEASURE", "IDENTIFIER", "ATTRIBUTE", "START_TIME", "STOP_TIME")) {
+    stop("Ukjent variabelrolle: ", variable_role)
+  }
+  
+  if (tolower(tools::file_ext(filsti_datadoc)) == "parquet") {
+    filsti_datadoc <- sub("\\.parquet$", "__DOC.json", filsti_datadoc, ignore.case = TRUE)
+  }
+  if (tolower(tools::file_ext(filsti_datadoc)) != "json" || !file.exists(filsti_datadoc)) {
+    stop("Finner ingen DataDoc-fil på oppgitt sti: ", filsti_datadoc)
+  }
+  signatur <- unname(tools::md5sum(filsti_datadoc))
+  doc <- jsonlite::read_json(filsti_datadoc, simplifyVector = FALSE)
+  poster <- doc$datadoc$variables
+  if (!is.list(poster) || is.null(poster)) stop("DataDoc mangler listen datadoc.variables.")
+  kortnavn <- vapply(poster, function(x) x[["short_name"]], character(1))
+  if (anyNA(kortnavn) || any(!nzchar(kortnavn)) || anyDuplicated(kortnavn)) {
+    stop("DataDoc må ha ett unikt kortnavn per variabel.")
+  }
+  
+  if (tekst(metadata)) {
+    if (tolower(tools::file_ext(metadata)) != "parquet") stop("Metadatafilen må være Parquet.")
+    metadata <- arrow::read_parquet(metadata, col_select = c("variabel", "variable_text"))
+  }
+  if (!is.data.frame(metadata)) stop("Oppgi en metadatatabell, en Parquet-fil eller et datasett.")
+  if (all(c("variabel", "variable_text") %in% names(metadata))) {
+    kilde <- data.frame(kortnavn = trimws(as.character(metadata$variabel)),
+                        navn = trimws(as.character(metadata$variable_text)))
+  } else {
+    etiketter <- vapply(metadata, function(x) {
+      verdi <- attr(x, "label", exact = TRUE)
+      if (tekst(verdi)) trimws(verdi) else NA_character_
+    }, character(1))
+    kilde <- data.frame(kortnavn = names(metadata), navn = unname(etiketter))
+  }
+  
+  felles <- intersect(kortnavn, kilde$kortnavn)
+  if (!is.null(variabler)) {
+    mangler <- setdiff(variabler, felles)
+    if (length(mangler)) stop("Valgte variabler mangler i DataDoc eller kilden: ",
+                              paste(mangler, collapse = ", "))
+    felles <- intersect(felles, variabler)
+  }
+  # NULL følger det ferdige utvalget, også når variabler er utelatt.
+  if (is.null(intervjuvariabler)) {
+    intervjuvariabler <- felles
+  }
+  if (length(setdiff(intervjuvariabler, felles))) {
+    stop("Intervjuvariablene må finnes både i kilden og i DataDoc og være med i utvalget.")
+  }
+  kilde <- unique(kilde[kilde$kortnavn %in% felles & !is.na(kilde$navn) &
+                          nzchar(kilde$navn), , drop = FALSE])
+  duplikat <- anyDuplicated(kilde$kortnavn)
+  if (duplikat) stop("Motstridende kolonneetiketter for ", kilde$kortnavn[[duplikat]], ".")
+  navn <- stats::setNames(kilde$navn, kilde$kortnavn)
+  
+  # DataDoc representerer flerspråklig tekst som en liste med språkposter.
+  sett_spraktekst <- function(felt, verdi, erstatt = FALSE) {
+    if (is.null(verdi)) return(felt)
+    if (is.null(felt)) felt <- list()
+    if (!is.list(felt)) stop("Uventet format på flerspråklig DataDoc-felt.")
+    koder <- vapply(felt, function(x) x[["languageCode"]], character(1))
+    i <- which(koder == language_code)
+    if (length(i) > 1L) stop("Flere språkposter for ", language_code, ".")
+    if (!length(i)) {
+      felt[[length(felt) + 1L]] <- list(languageCode = language_code, languageText = verdi)
+    } else if (erstatt || !tekst(felt[[i]][["languageText"]])) {
+      felt[[i]][["languageText"]] <- verdi
+    }
+    felt
+  }
+  
+  antall <- 0L
+  for (i in which(kortnavn %in% felles)) {
+    var <- poster[[i]]
+    id <- kortnavn[[i]]
+    if (id %in% names(navn)) {
+      var$name <- sett_spraktekst(var$name, navn[[id]], overwrite)
+    }
+    if (id %in% intervjuvariabler) {
+      for (felt in names(standard)) {
+        verdi <- standard[[felt]]
+        eksisterende <- var[[felt]]
+        tomt <- is.null(eksisterende) || length(eksisterende) == 0L ||
+          (is.character(eksisterende) && length(eksisterende) == 1L &&
+             (is.na(eksisterende) || !nzchar(trimws(eksisterende))))
+        if (is.null(verdi) || !tomt) next
+        if (felt == "data_source" && verdi == "SSB") {
+          dato <- doc$datadoc$dataset$contains_data_until
+          if (!tekst(dato)) dato <- as.character(Sys.Date())
+          kilder <- klassR::get_klass(712, date = dato, language = "nb")
+          kilde_navn <- tolower(trimws(kilder$name))
+          ssb <- unique(as.character(kilder$code[kilde_navn %in%
+                                                   c("statistisk sentralbyrå", "statistisk sentralbyrå (ssb)", "ssb")]))
+          if (length(ssb) != 1L || !tekst(ssb)) {
+            stop("Fant ikke én entydig kode for SSB i KLASS 712. ",
+                 "Oppgi virksomhetens avtalte kode i data_source, eller NULL for å hoppe over.")
+          }
+          verdi <- ssb[[1L]]
+          standard$data_source <- verdi
+        }
+        var[[felt]] <- verdi
+      }
+      if (!is.null(population_description)) {
+        var$population_description <- sett_spraktekst(var$population_description,
+                                                      population_description)
+      }
+    }
+    if (!identical(var, poster[[i]])) {
+      poster[[i]] <- var
+      antall <- antall + 1L
+    }
+  }
+  
+  if (antall > 0L) {
+    doc$datadoc$variables <- poster
+    ny_fil <- tempfile(".datadoc-", tmpdir = dirname(filsti_datadoc), fileext = ".tmp")
+    on.exit(unlink(ny_fil), add = TRUE)
+    jsonlite::write_json(doc, ny_fil, pretty = TRUE, auto_unbox = TRUE,
+                         null = "null", digits = NA)
+    if (!identical(signatur, unname(tools::md5sum(filsti_datadoc)))) {
+      stop("DataDoc-filen ble endret etter innlesing. Kjør på nytt med oppdatert fil.")
+    }
+    if (!file.rename(ny_fil, filsti_datadoc)) stop("Kunne ikke erstatte DataDoc-filen.")
+  }
+  message("Oppdaterte ", antall, " av ", length(felles), " matchende variabler.")
+  invisible(doc)
+}
+
 #' Opprett et tomt Datadoc-dokument
 #'
 #' Oppretter et nytt Datadoc-metadatadokument for en Parquet-fil.
 #' Dokumentet opprettes på tilsvarende måte som når en udokumentert
 #' Parquet-fil åpnes og lagres i Datadoc Editor uten at metadata fylles
-#' ut manuelt.
+#' ut manuelt. Valgfrie argumenter fyller ut tekstfelter ved opprettelsen.
 #'
-#' @param filsti En tegnstreng med full filsti til en Parquet-fil.
+#' @param filsti En tekststreng med full filsti til en Parquet-fil.
 #'   Filen må ligge under en produktsti på formen
 #'   `"/buckets/produkt/<statistikk>/..."`, der `<statistikk>` er
 #'   statistikkens kortnavn.
+#' @param population_description En tekststreng som beskriver populasjonen.
+#'   Samme tekst legges i `population_description` på datasettnivå og for
+#'   alle variabler. Standard er `NULL`, som lar feltene være uendret.
+#' @param name En tekststreng med datasettets navn. Gjelder bare
+#'   datasettnivå. Standard er `NULL`.
+#' @param description En tekststreng med beskrivelse av datasettet.
+#'   Gjelder bare datasettnivå. Standard er `NULL`.
+#' @param version_description En tekststreng med beskrivelse av denne
+#'   versjonen av datasettet. Gjelder bare datasettnivå. Standard er `NULL`.
+#' @param language_code En tekststreng med språkkoden for tekstfeltene,
+#'   for eksempel `"nb"`, `"nn"` eller `"en"`. Standard er `"nb"`.
 #'
 #' @details
 #' Funksjonen bruker Python-pakken `dapla-toolbelt-metadata` via
@@ -4809,9 +5172,7 @@ summarise_missing_required_metadata <- function(
 #' basert på statistikkens primære plassering.
 #'
 #' Feltene `metadata_created_by` og `metadata_last_updated_by` settes
-#' fra miljøvariabelen `GIT_USER_MAIL`. Dette brukes som en tilpasning
-#' for RStudio-miljøer der `dapla-toolbelt-metadata` ikke har tilgang
-#' til brukerens `OIDC_TOKEN`.
+#' fra miljøvariabelen `GIT_USER_MAIL`.
 #'
 #' Metadatadokumentet lagres i samme mappe som Parquet-filen og får
 #' samme filnavn med suffikset `"__DOC.json"`. For eksempel vil
@@ -4824,7 +5185,22 @@ summarise_missing_required_metadata <- function(
 #' Det gis en advarsel dersom statistikkområdet ikke kan bestemmes,
 #' eller dersom miljøvariabelen `GIT_USER_MAIL` ikke er tilgjengelig.
 #'
-#' @return Usynlig (`invisible`) tegnstreng med filstien til det
+#' Tekstfeltene lagres som språkposter med `languageCode` og
+#' `languageText`. En eksisterende tekst på valgt språk erstattes når
+#' argumentet er angitt; eventuelle andre språk beholdes. `NULL` betyr
+#' at feltet beholdes slik Python-pakken opprettet det. Angitte tekster
+#' må være én ikke-tom tekststreng og kan ikke være `NA`.
+#'
+#' Populasjonsteksten kopieres til alle variabler, også administrative
+#' og avledede variabler. Den beskriver en felles populasjon; eventuell
+#' spørsmålsruting eller andre avgrensninger må dokumenteres separat.
+#'
+#' Tekstfeltene fylles ut etter at Python-pakken har skrevet dokumentet.
+#' Pakken kan derfor varsle om manglende obligatoriske metadata før
+#' disse feltene fylles ut. Andre obligatoriske felter kan fortsatt
+#' mangle etter opprettelsen.
+#'
+#' @return Usynlig (`invisible`) tekststreng med filstien til det
 #'   opprettede Datadoc-dokumentet.
 #'
 #' @examples
@@ -4832,10 +5208,55 @@ summarise_missing_required_metadata <- function(
 #' create_empty_datadoc(
 #'   "/buckets/produkt/speshelse/klargjorte-data/data_p2025_v1.parquet"
 #' )
+#'
+#' create_empty_datadoc(
+#'   filsti = "/buckets/produkt/royk/klargjorte-data/royk_p2026.parquet",
+#'   population_description = "Beskriv undersøkelsens populasjon her.",
+#'   name = "Røyk, alkohol og andre rusmidler 2026",
+#'   description = "Klargjorte data fra undersøkelsen i 2026.",
+#'   version_description = "Første klargjorte versjon.",
+#'   language_code = "nb"
+#' )
 #' }
 #'
 #' @export
-create_empty_datadoc <- function(filsti) {
+create_empty_datadoc <- function(
+    filsti,
+    population_description = NULL,
+    name = NULL,
+    description = NULL,
+    version_description = NULL,
+    language_code = "nb") {
+  
+  kontroller_tekst <- function(x, argument, tillat_null = TRUE) {
+    if (is.null(x) && tillat_null) {
+      return(invisible(NULL))
+    }
+    if (!is.character(x) || length(x) != 1L ||
+        is.na(x) || !nzchar(trimws(x))) {
+      stop(
+        "Argumentet '", argument,
+        "' må være én ikke-tom tekststreng uten NA",
+        if (tillat_null) " eller NULL." else ".",
+        call. = FALSE
+      )
+    }
+    invisible(NULL)
+  }
+  
+  kontroller_tekst(filsti, "filsti", tillat_null = FALSE)
+  kontroller_tekst(language_code, "language_code", tillat_null = FALSE)
+  language_code <- trimws(language_code)
+  
+  tekstfelter <- list(
+    population_description = population_description,
+    name = name,
+    description = description,
+    version_description = version_description
+  )
+  for (felt in names(tekstfelter)) {
+    kontroller_tekst(tekstfelter[[felt]], felt)
+  }
   
   # ------------------------------------------------------------------
   # 1. Kontroller fil
@@ -5007,8 +5428,53 @@ create_empty_datadoc <- function(filsti) {
   
   
   # ------------------------------------------------------------------
-  # 9. Sett Opprettet av / Oppdatert av
+  # 9. Fyll ut tekstfelter og Opprettet av / Oppdatert av
   # ------------------------------------------------------------------
+  
+  datadoc <- jsonlite::read_json(
+    datadoc_filsti,
+    simplifyVector = FALSE
+  )
+  
+  if (!is.list(datadoc$datadoc$dataset)) {
+    stop("Datadoc-filen mangler forventet struktur: datadoc.dataset.")
+  }
+  
+  sett_spraktekst <- function(eksisterende, tekst) {
+    if (is.null(tekst)) {
+      return(eksisterende)
+    }
+    if (is.null(eksisterende)) {
+      eksisterende <- list()
+    }
+    treff <- vapply(
+      eksisterende,
+      function(post) identical(post$languageCode, language_code),
+      logical(1)
+    )
+    c(
+      eksisterende[!treff],
+      list(list(languageCode = language_code, languageText = tekst))
+    )
+  }
+  
+  for (felt in names(tekstfelter)) {
+    if (!is.null(tekstfelter[[felt]])) {
+      datadoc$datadoc$dataset[[felt]] <- sett_spraktekst(
+        datadoc$datadoc$dataset[[felt]],
+        tekstfelter[[felt]]
+      )
+    }
+  }
+  
+  if (!is.null(population_description)) {
+    for (i in seq_along(datadoc$datadoc$variables)) {
+      datadoc$datadoc$variables[[i]]$population_description <- sett_spraktekst(
+        datadoc$datadoc$variables[[i]]$population_description,
+        population_description
+      )
+    }
+  }
   
   bruker <- Sys.getenv(
     "GIT_USER_MAIL",
@@ -5017,21 +5483,8 @@ create_empty_datadoc <- function(filsti) {
   
   if (!is.na(bruker) && nzchar(bruker)) {
     
-    datadoc <- jsonlite::read_json(
-      datadoc_filsti,
-      simplifyVector = FALSE
-    )
-    
     datadoc$datadoc$dataset$metadata_created_by <- bruker
     datadoc$datadoc$dataset$metadata_last_updated_by <- bruker
-    
-    jsonlite::write_json(
-      datadoc,
-      path = datadoc_filsti,
-      pretty = TRUE,
-      auto_unbox = TRUE,
-      null = "null"
-    )
     
   } else {
     warning(
@@ -5040,6 +5493,14 @@ create_empty_datadoc <- function(filsti) {
     )
   }
   
+  jsonlite::write_json(
+    datadoc,
+    path = datadoc_filsti,
+    pretty = TRUE,
+    auto_unbox = TRUE,
+    null = "null",
+    digits = NA
+  )
   
   # ------------------------------------------------------------------
   # 10. Ferdig
