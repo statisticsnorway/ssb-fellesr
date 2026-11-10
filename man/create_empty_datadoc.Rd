@@ -4,23 +4,51 @@
 \alias{create_empty_datadoc}
 \title{Opprett et tomt Datadoc-dokument}
 \usage{
-create_empty_datadoc(filsti)
+create_empty_datadoc(
+  filsti,
+  population_description = NULL,
+  name = NULL,
+  description = NULL,
+  version_description = NULL,
+  language_code = "nb",
+  quiet = FALSE
+)
 }
 \arguments{
-\item{filsti}{En tegnstreng med full filsti til en Parquet-fil.
+\item{filsti}{En tekststreng med full filsti til en Parquet-fil.
 Filen må ligge under en produktsti på formen
 \code{"/buckets/produkt/<statistikk>/..."}, der \verb{<statistikk>} er
 statistikkens kortnavn.}
+
+\item{population_description}{En tekststreng som beskriver populasjonen.
+Samme tekst legges i \code{population_description} på datasettnivå og for
+alle variabler. Standard er \code{NULL}, som lar feltene være uendret.}
+
+\item{name}{En tekststreng med datasettets navn. Gjelder bare
+datasettnivå. Standard er \code{NULL}.}
+
+\item{description}{En tekststreng med beskrivelse av datasettet.
+Gjelder bare datasettnivå. Standard er \code{NULL}.}
+
+\item{version_description}{En tekststreng med beskrivelse av denne
+versjonen av datasettet. Gjelder bare datasettnivå. Standard er \code{NULL}.}
+
+\item{language_code}{En tekststreng med språkkoden for tekstfeltene,
+for eksempel \code{"nb"}, \code{"nn"} eller \code{"en"}. Standard er \code{"nb"}.}
+
+\item{quiet}{Logisk verdi. Standard er \code{FALSE}. Med \code{TRUE} skjules
+meldinger, advarsler og konsollutskrifter fra R og Python under
+kjøringen. Feil som stopper kjøringen, vises fortsatt.}
 }
 \value{
-Usynlig (\code{invisible}) tegnstreng med filstien til det
+Usynlig (\code{invisible}) tekststreng med filstien til det
 opprettede Datadoc-dokumentet.
 }
 \description{
 Oppretter et nytt Datadoc-metadatadokument for en Parquet-fil.
 Dokumentet opprettes på tilsvarende måte som når en udokumentert
 Parquet-fil åpnes og lagres i Datadoc Editor uten at metadata fylles
-ut manuelt.
+ut manuelt. Valgfrie argumenter fyller ut tekstfelter ved opprettelsen.
 }
 \details{
 Funksjonen bruker Python-pakken \code{dapla-toolbelt-metadata} via
@@ -34,9 +62,7 @@ Statistikkområdet (\code{subject_field}) hentes fra SSBs emnestruktur
 basert på statistikkens primære plassering.
 
 Feltene \code{metadata_created_by} og \code{metadata_last_updated_by} settes
-fra miljøvariabelen \code{GIT_USER_MAIL}. Dette brukes som en tilpasning
-for RStudio-miljøer der \code{dapla-toolbelt-metadata} ikke har tilgang
-til brukerens \code{OIDC_TOKEN}.
+fra miljøvariabelen \code{GIT_USER_MAIL}.
 
 Metadatadokumentet lagres i samme mappe som Parquet-filen og får
 samme filnavn med suffikset \code{"__DOC.json"}. For eksempel vil
@@ -48,11 +74,36 @@ dersom Datadoc-filen allerede finnes.
 
 Det gis en advarsel dersom statistikkområdet ikke kan bestemmes,
 eller dersom miljøvariabelen \code{GIT_USER_MAIL} ikke er tilgjengelig.
+
+Tekstfeltene lagres som språkposter med \code{languageCode} og
+\code{languageText}. En eksisterende tekst på valgt språk erstattes når
+argumentet er angitt; eventuelle andre språk beholdes. \code{NULL} betyr
+at feltet beholdes slik Python-pakken opprettet det. Angitte tekster
+må være én ikke-tom tekststreng og kan ikke være \code{NA}.
+
+Populasjonsteksten kopieres til alle variabler, også administrative
+og avledede variabler. Den beskriver en felles populasjon; eventuell
+spørsmålsruting eller andre avgrensninger må dokumenteres separat.
+
+Tekstfeltene fylles ut etter at Python-pakken har skrevet dokumentet.
+Pakken kan derfor varsle om manglende obligatoriske metadata før
+disse feltene fylles ut. Andre obligatoriske felter kan fortsatt
+mangle etter opprettelsen.
 }
 \examples{
 \dontrun{
 create_empty_datadoc(
   "/buckets/produkt/speshelse/klargjorte-data/data_p2025_v1.parquet"
+)
+
+create_empty_datadoc(
+  filsti = "/buckets/produkt/royk/klargjorte-data/royk_p2026.parquet",
+  population_description = "Beskriv undersøkelsens populasjon her.",
+  name = "Røyk, alkohol og andre rusmidler 2026",
+  description = "Klargjorte data fra undersøkelsen i 2026.",
+  version_description = "Første klargjorte versjon.",
+  language_code = "nb",
+  quiet = TRUE
 )
 }
 
