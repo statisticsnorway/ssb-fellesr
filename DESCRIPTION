@@ -1,7 +1,7 @@
 Package: fellesr
 Type: Package
 Title: General R functions for SSB
-Version: 0.4.4
+Version: 0.4.5
 Authors@R: 
   c(person(given = "Sindre",
            family = "Haugen",
@@ -39,7 +39,8 @@ Imports:
     purrr,
     sjlabelled,
     tibble,
-    tidyselect
+    tidyselect,
+    reticulate
 License: Apache license 2.0
 Encoding: UTF-8
 LazyData: true
@@ -55,4 +56,4 @@ Suggests:
     sfarrow
 URL: https://statisticsnorway.github.io/fellesr/
 VignetteBuilder: knitr
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
