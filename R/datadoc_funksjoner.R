@@ -663,78 +663,41 @@ vardef_get_klass_id <- function(variable_definition) {
 }
 
 
+
 #' Lag oversikt over variabler i en Datadoc-fil
 #'
 #' Leser variabelmetadata fra en Datadoc-fil og lager en oversikt
 #' over variablene. Dersom en variabel har en referanse til en
-#' variabeldefinisjon, hentes supplerende metadata fra SSBs tjeneste for
-#' variabeldefinisjoner.
+#' variabeldefinisjon, hentes supplerende metadata fra Vardef.
 #'
-#' @param filsti Filsti til en DataDoc-fil eller en Parquet-fil. Filstien til
-#'   den tilhørende Datadoc-filen utledes ved hjelp av [datadoc_path()].
-#' @param language En tekststreng med språkkoden som skal brukes ved uthenting
-#'   av navn og annen språkavhengig metadata. Standardverdien er `"nb"`.
-#'
-#' @param include_vardef Logisk verdi. Med `FALSE` leses bare lokale
-#'   metadata, uten nettverkskall til Vardef. Standard er `TRUE`.
-#'
-#' @return En `data.frame` med én rad per variabel og følgende kolonner:
-#'
-#' \describe{
-#'   \item{`short_name`}{Variabelens kortnavn fra Datadoc-filen.}
-#'   \item{`name`}{Variabelens navn på det valgte språket.}
-#'   \item{`data_type`}{Variabelens datatype.}
-#'   \item{`classification_uri`}{KLASS-ID hentet fra variabelens
-#'     `classification_uri` i DataDoc-filen.}
-#'   \item{`vardef_definition_uri`}{ID-en til variabeldefinisjonen som ble
-#'     hentet fra tjenesten for variabeldefinisjoner.}
-#'   \item{`vardef_name`}{Navnet fra variabeldefinisjonen på det valgte
-#'     språket.}
-#'   \item{`vardef_short_name`}{Kortnavnet fra variabeldefinisjonen.}
-#'   \item{`vardef_classification_uri`}{KLASS-ID hentet fra
-#'     `classification_uri` i variabeldefinisjonen.}
-#'   \item{`contains_data_from`}{Startdatoen for perioden variabelen
-#'     inneholder data for.}
-#'   \item{`contains_data_until`}{Sluttdatoen for perioden variabelen
-#'     inneholder data for.}
-#' }
+#' @param filsti Filsti til en Datadoc-fil eller tilhørende
+#'   Parquet-fil.
+#' @param language Språkkode: "nb", "nn" eller "en".
+#'   Standardverdien er "nb".
+#' @param include_vardef Logisk verdi. Med FALSE leses bare
+#'   lokale metadata uten oppslag i Vardef.
+#'   Standardverdien er TRUE.
+#' @param status "auto" (standard), "ekstern" eller "intern".
+#'   Med "auto" søkes det først i ekstern Vardef, deretter
+#'   intern Vardef for definisjoner som ikke finnes eksternt.
 #'
 #' @details
-#' Funksjonen forventer at Datadoc-filen har samme filsti som Parquet-filen,
-#' men med filendelsen `.parquet` erstattet med `__DOC.json`.
+#' Vardef-oppslag gjøres etter definition_uri uten filtrering
+#' på gyldighetsdato. Dataperioden i Datadoc påvirker dermed
+#' ikke hvilken Vardef-definisjon som kan hentes.
 #'
-#' Språkavhengige felt kan være lagret som tekstvektorer, data frames eller
-#' lister. Funksjonen forsøker først å hente tekst for språket angitt i
-#' `language`. Dersom dette språket ikke finnes, brukes den første
-#' tilgjengelige ikke-tomme teksten.
+#' contains_data_from og contains_data_until beholdes fra
+#' Datadoc og kan brukes ved senere oppslag i KLASS.
 #'
-#' Verdiene i `classification_uri` omgjøres til KLASS-ID-er. Dersom URI-en
-#' mangler eller ikke avsluttes med en numerisk ID, returneres
-#' `NA_character_`.
+#' Både classification_uri og classification_reference fra
+#' Vardef støttes. KLASS-referanser returneres som KLASS-ID.
 #'
-#' Dersom en variabel inneholder en `definition_uri`, brukes sluttdatoen i
-#' `contains_data_until` som gyldighetsdato ved oppslag i tjenesten for
-#' variabeldefinisjoner. Dersom sluttdatoen mangler, brukes dagens dato.
-#'
-#' Hver kombinasjon av variabeldefinisjons-ID og gyldighetsdato hentes bare
-#' én gang. Dersom oppslaget feiler, vises en advarsel og de tilhørende
-#' Vardef-feltene fylles med manglende verdier.
-#'
-#' @seealso
-#' [datadoc_path()] for å opprette filstien til DataDoc-filen og
-#' [get_variable_definition_by_id()] for å hente én variabeldefinisjon.
-#'
-#' @examples
-#' \dontrun{
-#' datadoc_variabeloversikt(
-#'   filsti = "/buckets/data/personell_v1.parquet"
-#' )
-#'
-#' datadoc_variabeloversikt(
-#'   filsti = "/buckets/data/personell_v1.parquet",
-#'   language = "en"
-#' )
-#' }
+#' @return En data.frame med én rad per variabel og følgende
+#'   kolonner:
+#'   short_name, name, data_type, classification_uri,
+#'   vardef_definition_uri, vardef_name, vardef_short_name,
+#'   vardef_classification_uri, contains_data_from og
+#'   contains_data_until.
 #'
 #' @export
 datadoc_variabeloversikt <- function(
@@ -743,75 +706,360 @@ datadoc_variabeloversikt <- function(
     include_vardef = TRUE,
     status = "auto"
 ) {
+  
   language <- match.arg(language, c("nb", "nn", "en"))
   status <- match.arg(status, c("auto", "ekstern", "intern"))
+  
   .datadoc_flag(include_vardef, "include_vardef")
+  
+  # ------------------------------------------------------------
+  # 1. Les Datadoc
+  # ------------------------------------------------------------
+  
   doc <- .datadoc_read(filsti)
+  
   variables <- doc$datadoc$variables
-  if (is.null(variables)) variables <- list()
-  felt <- function(navn) vapply(variables, function(x) .datadoc_first(x[[navn]]), character(1))
+  
+  if (is.null(variables)) {
+    variables <- list()
+  }
+  
+  felt <- function(navn) {
+    vapply(
+      variables,
+      function(x) .datadoc_first(x[[navn]]),
+      character(1)
+    )
+  }
+  
   n <- length(variables)
+  
+  # ------------------------------------------------------------
+  # 2. Opprett oversikt fra lokale metadata
+  # ------------------------------------------------------------
+  
   result <- data.frame(
     short_name = felt("short_name"),
-    name = vapply(variables, function(x) .datadoc_language_text(x$name, language), character(1)),
+    
+    name = vapply(
+      variables,
+      function(x) {
+        .datadoc_language_text(x$name, language)
+      },
+      character(1)
+    ),
+    
     data_type = felt("data_type"),
-    classification_uri = vapply(variables, function(x) .datadoc_klass_id(x$classification_uri), character(1)),
+    
+    classification_uri = vapply(
+      variables,
+      function(x) {
+        .datadoc_klass_id(x$classification_uri)
+      },
+      character(1)
+    ),
+    
     vardef_definition_uri = rep(NA_character_, n),
     vardef_name = rep(NA_character_, n),
     vardef_short_name = rep(NA_character_, n),
     vardef_classification_uri = rep(NA_character_, n),
+    
     contains_data_from = felt("contains_data_from"),
     contains_data_until = felt("contains_data_until"),
+    
     stringsAsFactors = FALSE
   )
-  if (!include_vardef || !n) return(result)
-  ids <- vapply(variables, function(x) .datadoc_uri_id(x$definition_uri), character(1))
-  dates <- result$contains_data_until
-  dates[is.na(dates) | !nzchar(dates)] <- as.character(Sys.Date())
+  
+  if (!include_vardef || !n) {
+    return(result)
+  }
+  
+  # ------------------------------------------------------------
+  # 3. Finn Vardef-ID-er fra Datadoc
+  # ------------------------------------------------------------
+  
+  ids <- vapply(
+    variables,
+    function(x) {
+      .datadoc_uri_id(x$definition_uri)
+    },
+    character(1)
+  )
+  
+  relevante_ids <- unique(
+    ids[!is.na(ids) & nzchar(ids)]
+  )
+  
+  if (!length(relevante_ids)) {
+    return(result)
+  }
+  
+  # Behold ID fra Datadoc også når oppslaget ikke gir treff.
+  result$vardef_definition_uri <- ids
+  
+  # ------------------------------------------------------------
+  # 4. Hjelpefunksjoner for Vardef-responser
+  # ------------------------------------------------------------
+  
+  # Hent ett metadatafelt fra én rad i Vardef-oversikten.
+  hent_felt <- function(tab, felt, i) {
+    
+    if (!felt %in% names(tab)) {
+      return(NULL)
+    }
+    
+    kolonne <- tab[[felt]]
+    
+    # Nøstede data frames: hent riktig rad
+    if (is.data.frame(kolonne)) {
+      return(kolonne[i, , drop = FALSE])
+    }
+    
+    # Listekolonner: hent riktig element
+    if (is.list(kolonne)) {
+      return(kolonne[[i]])
+    }
+    
+    # Vanlige vektorer: hent riktig verdi
+    kolonne[[i]]
+  }
+  
+  # Konverter et enkelt felt til én tekstverdi.
+  tekst <- function(x) {
+    
+    if (is.null(x)) {
+      return(NA_character_)
+    }
+    
+    x <- unlist(x, use.names = FALSE)
+    
+    if (!length(x)) {
+      return(NA_character_)
+    }
+    
+    if (length(x) != 1L) {
+      stop(
+        "Forventet én verdi i Vardef-feltet.",
+        call. = FALSE
+      )
+    }
+    
+    .datadoc_first(x)
+  }
+  
+  # Hent navn på ønsket språk.
+  vardef_navn <- function(tab, i) {
+    
+    flat <- paste0("name.", language)
+    
+    if (flat %in% names(tab)) {
+      
+      navn <- tekst(hent_felt(tab, flat, i))
+      
+      if (!is.na(navn) && nzchar(trimws(navn))) {
+        return(navn)
+      }
+      
+      # Bruk bokmål som reserve.
+      navn_nb <- tekst(hent_felt(tab, "name.nb", i))
+      
+      if (!is.na(navn_nb) && nzchar(trimws(navn_nb))) {
+        return(navn_nb)
+      }
+      
+      return(NA_character_)
+    }
+    
+    # Nøstet språkformat fra Vardef.
+    navn <- hent_felt(tab, "name", i)
+    
+    .vardef_language_text(
+      navn,
+      language
+    )
+  }
+  
+  # Hent KLASS-ID fra Vardef.
+  vardef_klass_id <- function(tab, i) {
+    
+    # Intern Vardef bruker classification_reference.
+    ref <- tekst(
+      hent_felt(tab, "classification_reference", i)
+    )
+    
+    if (!is.na(ref) && nzchar(trimws(ref))) {
+      
+      if (grepl("^[0-9]+$", ref)) {
+        return(ref)
+      }
+      
+      return(.datadoc_klass_id(ref))
+    }
+    
+    # Ekstern Vardef kan bruke classification_uri.
+    uri <- hent_felt(tab, "classification_uri", i)
+    
+    .datadoc_klass_id(uri)
+  }
+  
+  # ------------------------------------------------------------
+  # 5. Hent definisjoner fra Vardef
+  # ------------------------------------------------------------
+  
+  tjenester <- if (status == "auto") {
+    c("ekstern", "intern")
+  } else {
+    status
+  }
+  
+  # Lagre resultater etter Vardef-ID.
   cache <- new.env(parent = emptyenv())
-  for (i in which(!is.na(ids))) {
-    key <- paste(ids[[i]], dates[[i]], sep = "|")
-    if (!exists(key, envir = cache, inherits = FALSE)) {
-      value <- tryCatch(
-        get_variable_definition_by_id(
-          id = ids[[i]],
-          date = dates[[i]],
-          language = language,
-          status = status
+  
+  gjenstaar <- relevante_ids
+  
+  for (tjeneste in tjenester) {
+    
+    if (!length(gjenstaar)) {
+      break
+    }
+    
+    # Viktig:
+    # date = NULL gjør at oppslaget ikke filtreres
+    # på Datadoc-variabelens dataperiode.
+    tab <- get_all_variable_definitions(
+      date = NULL,
+      language = language,
+      status = tjeneste
+    )
+    
+    if (is.null(tab)) {
+      next
+    }
+    
+    if (!is.data.frame(tab)) {
+      stop(
+        "Uventet responsformat fra ",
+        tjeneste,
+        " Vardef.",
+        call. = FALSE
+      )
+    }
+    
+    if (!nrow(tab)) {
+      next
+    }
+    
+    if (!"id" %in% names(tab)) {
+      stop(
+        "Responsen fra ",
+        tjeneste,
+        " Vardef mangler `id`.",
+        call. = FALSE
+      )
+    }
+    
+    # Undersøk bare Vardef-ID-er som mangler treff.
+    treff_indeks <- which(
+      !is.na(tab$id) &
+        tab$id %in% gjenstaar
+    )
+    
+    if (!length(treff_indeks)) {
+      next
+    }
+    
+    funnet <- character()
+    
+    for (i in treff_indeks) {
+      
+      id <- as.character(tab$id[[i]])
+      
+      definisjon <- list(
+        id = id,
+        
+        name = vardef_navn(tab, i),
+        
+        short_name = tekst(
+          hent_felt(tab, "short_name", i)
         ),
-        error = function(e) {
-          warning(
-            "Kunne ikke hente Vardef-metadata for `",
-            ids[[i]], "`: ",
-            conditionMessage(e),
+        
+        classification_uri = vardef_klass_id(tab, i)
+      )
+      
+      # Ikke velg vilkårlig mellom ulike poster med samme ID.
+      if (exists(id, envir = cache, inherits = FALSE)) {
+        
+        eksisterende <- get(
+          id,
+          envir = cache,
+          inherits = FALSE
+        )
+        
+        if (!identical(eksisterende, definisjon)) {
+          stop(
+            "Fant motstridende Vardef-poster med ID `",
+            id,
+            "` i ",
+            tjeneste,
+            " Vardef.",
             call. = FALSE
           )
-          NULL
         }
-      )
-      assign(key, value, envir = cache)
+        
+      } else {
+        
+        assign(
+          id,
+          definisjon,
+          envir = cache
+        )
+      }
+      
+      funnet <- c(funnet, id)
     }
-    value <- get(key, envir = cache, inherits = FALSE)
-    result$vardef_definition_uri[[i]] <- ids[[i]]
-    if (is.null(value)) next
-    value_id <- .datadoc_first(value$id)
-    if (!is.na(value_id)) result$vardef_definition_uri[[i]] <- value_id
-    # result$vardef_name[[i]] <- .datadoc_language_text(value$name, language)
-    result$vardef_name[[i]] <- .vardef_language_text(value$name, language)
-    result$vardef_short_name[[i]] <- .datadoc_first(value$short_name)
-    # result$vardef_classification_uri[[i]] <- .datadoc_klass_id(value$classification_uri)
-    result$vardef_classification_uri[[i]] <- if (
-      "classification_reference" %in% names(value) &&
-      length(value$classification_reference) == 1L &&
-      !is.na(value$classification_reference)
-    ) {
-      as.character(value$classification_reference)
-    } else {
-      .datadoc_klass_id(value$classification_uri)
-    }
+    
+    # Søk internt bare for ID-er uten eksternt treff.
+    gjenstaar <- setdiff(
+      gjenstaar,
+      unique(funnet)
+    )
   }
+  
+  # ------------------------------------------------------------
+  # 6. Koble Vardef-metadata til Datadoc-variablene
+  # ------------------------------------------------------------
+  
+  for (i in which(!is.na(ids) & nzchar(ids))) {
+    
+    id <- ids[[i]]
+    
+    if (!exists(id, envir = cache, inherits = FALSE)) {
+      next
+    }
+    
+    value <- get(
+      id,
+      envir = cache,
+      inherits = FALSE
+    )
+    
+    result$vardef_definition_uri[[i]] <- value$id
+    
+    result$vardef_name[[i]] <- value$name
+    
+    result$vardef_short_name[[i]] <- value$short_name
+    
+    result$vardef_classification_uri[[i]] <-
+      value$classification_uri
+  }
+  
+  # ------------------------------------------------------------
+  # 7. Returner oversikten
+  # ------------------------------------------------------------
+  
   result
 }
+
 
 
 
@@ -5659,4 +5907,845 @@ check_variables_in_vardef <- function(
   }
   
   resultat
+}
+
+
+
+#' Kopier metadata fra Vardef til DataDoc
+#'
+#' Kopierer navn, Vardef-ID og første enhetstype ved treff på
+#' kortnavn. KLASS-ID og øvrige dokumentasjonsfelt endres ikke.
+#'
+#' @param filsti_datadoc Filsti til DataDoc JSON eller tilhørende
+#'   Parquet-fil.
+#' @param variabler Valgfri tekstvektor med kortnavn. NULL velger alle.
+#'   En navngitt vektor kan brukes til mapping mellom DataDoc og Vardef,
+#'   f.eks. c(komm_nr_2019 = "komm_nr").
+#' @param overwrite Med FALSE (standard) hoppes hele variabelen over
+#'   dersom name, definition_uri eller unit_type allerede har innhold.
+#'   TRUE erstatter disse feltene når Vardef har en verdi.
+#'   Manglende kildeverdier sletter ikke eksisterende innhold.
+#' @param date Valgfri gyldighetsdato for oppslag i Vardef,
+#'   som Date eller YYYY-MM-DD. NULL (standard) inkluderer
+#'   alle gyldighetsperioder.
+#' @param dato_unntak NULL eller en data frame med egne
+#'   dataperioder for enkeltvariabler. Må inneholde
+#'   short_name, contains_data_from og contains_data_until.
+#'   Kortnavnene viser til DataDoc, ikke Vardef.
+#'   Datoene brukes bare til å oppdatere DataDoc og påvirker
+#'   ikke oppslag eller filtrering i Vardef.
+#'   Datoene oppdateres bare for variabler som får treff i
+#'   Vardef og som ikke hoppes over.
+#' @param language Språk for navnet: nb, nn eller en.
+#'   Standard nb.
+#' @param status auto (standard) søker først eksternt og
+#'   deretter internt for kortnavn uten eksternt treff.
+#' @param quiet Skjul statusmeldinger. Standard TRUE.
+#'   Advarsler og feil vises fortsatt.
+#'
+#' @details
+#' Første ikke-tomme enhetstype fra Vardef brukes.
+#' Navn kopieres bare på valgt språk, uten fallback.
+#' Publiseringsstatus filtreres ikke.
+#' Flere motstridende definisjoner gir advarsel og hoppes over.
+#'
+#' @return Usynlig tibble med variabel, vardef_kortnavn,
+#'   resultat og endrede_felt.
+#'
+#' @export
+copy_vardef_to_datadoc <- function(
+    filsti_datadoc,
+    variabler = NULL,
+    overwrite = FALSE,
+    date = NULL,
+    dato_unntak = NULL,
+    language = "nb",
+    status = "auto",
+    quiet = TRUE
+) {
+  
+  .datadoc_flag(overwrite, "overwrite")
+  .datadoc_flag(quiet, "quiet")
+  
+  language <- match.arg(language, c("nb", "nn", "en"))
+  status <- match.arg(status, c("auto", "ekstern", "intern"))
+  
+  # ------------------------------------------------------------
+  # 1. Kontroller gyldighetsdato for Vardef
+  # ------------------------------------------------------------
+  
+  if (!is.null(date)) {
+    date <- as.Date(.datadoc_date(date))
+    
+    if (length(date) != 1L || is.na(date)) {
+      stop(
+        "`date` må være én gyldig dato.",
+        call. = FALSE
+      )
+    }
+  }
+  
+  # ------------------------------------------------------------
+  # 2. Kontroller dato_unntak
+  # ------------------------------------------------------------
+  
+  if (!is.null(dato_unntak)) {
+    
+    if (!is.data.frame(dato_unntak)) {
+      stop(
+        "`dato_unntak` må være en data frame.",
+        call. = FALSE
+      )
+    }
+    
+    nodvendige <- c(
+      "short_name",
+      "contains_data_from",
+      "contains_data_until"
+    )
+    
+    mangler <- setdiff(
+      nodvendige,
+      names(dato_unntak)
+    )
+    
+    if (length(mangler)) {
+      stop(
+        "`dato_unntak` mangler kolonnene: ",
+        paste(mangler, collapse = ", "),
+        call. = FALSE
+      )
+    }
+    
+    dato_unntak <- dato_unntak[nodvendige]
+    
+    dato_unntak[] <- lapply(
+      dato_unntak,
+      as.character
+    )
+    
+    dato_unntak$short_name <- trimws(
+      dato_unntak$short_name
+    )
+    
+    if (
+      anyNA(dato_unntak$short_name) ||
+      any(!nzchar(dato_unntak$short_name)) ||
+      anyDuplicated(dato_unntak$short_name)
+    ) {
+      stop(
+        "`short_name` i `dato_unntak` må være ",
+        "unikt og ikke-tomt.",
+        call. = FALSE
+      )
+    }
+    
+    for (felt in c(
+      "contains_data_from",
+      "contains_data_until"
+    )) {
+      
+      verdi <- dato_unntak[[felt]]
+      
+      if (
+        anyNA(verdi) ||
+        any(!grepl(
+          "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          verdi
+        ))
+      ) {
+        stop(
+          "Ugyldig datoformat i `",
+          felt,
+          "`. Bruk YYYY-MM-DD.",
+          call. = FALSE
+        )
+      }
+      
+      dato <- as.Date(
+        verdi,
+        format = "%Y-%m-%d"
+      )
+      
+      if (
+        anyNA(dato) ||
+        any(as.character(dato) != verdi)
+      ) {
+        stop(
+          "Ugyldige datoer i `",
+          felt,
+          "`.",
+          call. = FALSE
+        )
+      }
+    }
+    
+    if (any(
+      as.Date(dato_unntak$contains_data_from) >
+      as.Date(dato_unntak$contains_data_until)
+    )) {
+      stop(
+        "`contains_data_from` kan ikke være senere ",
+        "enn `contains_data_until`.",
+        call. = FALSE
+      )
+    }
+  }
+  
+  # ------------------------------------------------------------
+  # 3. Les DataDoc
+  # ------------------------------------------------------------
+  
+  path <- .datadoc_resolve_path(filsti_datadoc)
+  
+  doc <- .datadoc_read(path)
+  
+  vars <- doc$datadoc$variables
+  
+  navn <- vapply(
+    vars,
+    function(x) .datadoc_first(x$short_name),
+    character(1)
+  )
+  
+  if (
+    anyNA(navn) ||
+    any(!nzchar(trimws(navn))) ||
+    anyDuplicated(navn)
+  ) {
+    stop(
+      "DataDoc må ha unike, ikke-tomme kortnavn.",
+      call. = FALSE
+    )
+  }
+  
+  # ------------------------------------------------------------
+  # 4. Opprett kobling mellom DataDoc og Vardef
+  # ------------------------------------------------------------
+  
+  if (is.null(variabler)) {
+    
+    kobling <- stats::setNames(
+      navn,
+      navn
+    )
+    
+  } else {
+    
+    if (
+      !is.character(variabler) ||
+      anyNA(variabler) ||
+      any(!nzchar(trimws(variabler)))
+    ) {
+      stop(
+        "`variabler` må være en tekstvektor ",
+        "uten NA eller tomme verdier.",
+        call. = FALSE
+      )
+    }
+    
+    vardef_navn <- trimws(
+      unname(variabler)
+    )
+    
+    datadoc_navn <- names(variabler)
+    
+    if (is.null(datadoc_navn)) {
+      
+      datadoc_navn <- vardef_navn
+      
+    } else {
+      
+      if (
+        anyNA(datadoc_navn) ||
+        any(!nzchar(trimws(datadoc_navn)))
+      ) {
+        stop(
+          "Ved mapping må alle elementene ",
+          "ha et DataDoc-navn.",
+          call. = FALSE
+        )
+      }
+      
+      datadoc_navn <- trimws(datadoc_navn)
+    }
+    
+    if (anyDuplicated(datadoc_navn)) {
+      stop(
+        "Hver DataDoc-variabel kan bare angis ",
+        "én gang i `variabler`.",
+        call. = FALSE
+      )
+    }
+    
+    mangler <- setdiff(
+      datadoc_navn,
+      navn
+    )
+    
+    if (length(mangler)) {
+      stop(
+        "Variabler mangler i DataDoc: ",
+        paste(mangler, collapse = ", "),
+        call. = FALSE
+      )
+    }
+    
+    kobling <- stats::setNames(
+      vardef_navn,
+      datadoc_navn
+    )
+  }
+  
+  indeks <- match(
+    names(kobling),
+    navn
+  )
+  
+  # ------------------------------------------------------------
+  # 5. Kontroller at dato_unntak gjelder valgte variabler
+  # ------------------------------------------------------------
+  
+  if (!is.null(dato_unntak)) {
+    
+    ukjente <- setdiff(
+      dato_unntak$short_name,
+      names(kobling)
+    )
+    
+    if (length(ukjente)) {
+      stop(
+        "Dato er angitt for variabler som ikke er valgt: ",
+        paste(ukjente, collapse = ", "),
+        call. = FALSE
+      )
+    }
+  }
+  
+  # ------------------------------------------------------------
+  # 6. Opprett resultatoversikt
+  # ------------------------------------------------------------
+  
+  resultat <- tibble::tibble(
+    variabel = navn[indeks],
+    vardef_kortnavn = unname(kobling),
+    resultat = rep(
+      "ingen_treff",
+      length(indeks)
+    ),
+    endrede_felt = rep(
+      "",
+      length(indeks)
+    )
+  )
+  
+  if (!length(indeks)) {
+    
+    if (!quiet) {
+      message("Ingen variabler å behandle.")
+    }
+    
+    return(invisible(resultat))
+  }
+  
+  # ------------------------------------------------------------
+  # 7. Kontroller eksisterende metadata
+  # ------------------------------------------------------------
+  
+  dokumentasjonsfelt <- c(
+    "name",
+    "definition_uri",
+    "unit_type"
+  )
+  
+  har_innhold <- vapply(
+    indeks,
+    function(i) {
+      
+      any(vapply(
+        dokumentasjonsfelt,
+        function(felt) {
+          !.datadoc_is_empty(vars[[i]][[felt]])
+        },
+        logical(1)
+      ))
+    },
+    logical(1)
+  )
+  
+  beskyttet <- !overwrite & har_innhold
+  
+  resultat$resultat[beskyttet] <- "beholdt"
+  
+  # ------------------------------------------------------------
+  # 8. Hjelpefunksjoner for Vardef-respons
+  # ------------------------------------------------------------
+  
+  rad <- function(tab, i) {
+    
+    lapply(tab, function(x) {
+      
+      if (is.data.frame(x)) {
+        
+        rad(x, i)
+        
+      } else if (is.list(x)) {
+        
+        x[[i]]
+        
+      } else {
+        
+        x[i]
+      }
+    })
+  }
+  
+  tekst <- function(x) {
+    
+    x <- unlist(
+      x,
+      use.names = FALSE
+    )
+    
+    if (!length(x)) {
+      return(NA_character_)
+    }
+    
+    if (length(x) != 1L) {
+      stop(
+        "Forventet én verdi i Vardef-feltet.",
+        call. = FALSE
+      )
+    }
+    
+    .datadoc_first(x)
+  }
+  
+  navn_paa_sprak <- function(x) {
+    
+    flat <- paste0(
+      "name.",
+      language
+    )
+    
+    if (flat %in% names(x)) {
+      return(tekst(x[[flat]]))
+    }
+    
+    if (
+      is.list(x$name) &&
+      any(c("nb", "nn", "en") %in% names(x$name))
+    ) {
+      return(tekst(x$name[[language]]))
+    }
+    
+    .datadoc_language_text(
+      x$name,
+      language,
+      fallback = FALSE
+    )
+  }
+  
+  # Kontroller om Vardef-definisjonen er gyldig på date.
+  gyldig_paa_dato <- function(post) {
+    
+    fra <- tekst(post$valid_from)
+    til <- tekst(post$valid_until)
+    
+    fra <- if (is.na(fra) || !nzchar(fra)) {
+      as.Date(NA)
+    } else {
+      as.Date(.datadoc_date(fra))
+    }
+    
+    til <- if (is.na(til) || !nzchar(til)) {
+      as.Date(NA)
+    } else {
+      as.Date(.datadoc_date(til))
+    }
+    
+    if (
+      !is.na(fra) &&
+      !is.na(til) &&
+      fra > til
+    ) {
+      stop(
+        "Ugyldig gyldighetsperiode i Vardef: ",
+        tekst(post$short_name),
+        call. = FALSE
+      )
+    }
+    
+    # NULL inkluderer alle gyldighetsperioder.
+    if (is.null(date)) {
+      return(TRUE)
+    }
+    
+    (is.na(fra) || date >= fra) &&
+      (is.na(til) || date <= til)
+  }
+  
+  # ------------------------------------------------------------
+  # 9. Hent definisjoner fra Vardef
+  # ------------------------------------------------------------
+  
+  poster <- vector(
+    "list",
+    length(indeks)
+  )
+  
+  tjenester <- if (status == "auto") {
+    c("ekstern", "intern")
+  } else {
+    status
+  }
+  
+  gjenstaar <- which(!beskyttet)
+  
+  for (tjeneste in tjenester) {
+    
+    if (!length(gjenstaar)) {
+      break
+    }
+    
+    maal <- unique(
+      resultat$vardef_kortnavn[gjenstaar]
+    )
+    
+    if (!quiet) {
+      message(
+        "Søker i ",
+        tjeneste,
+        " Vardef etter ",
+        length(maal),
+        " kortnavn."
+      )
+    }
+    
+    hent <- function() {
+      get_all_variable_definitions(
+        date = NULL,
+        language = language,
+        status = tjeneste
+      )
+    }
+    
+    tab <- if (quiet) {
+      suppressMessages(hent())
+    } else {
+      hent()
+    }
+    
+    if (is.null(tab)) {
+      next
+    }
+    
+    if (!is.data.frame(tab)) {
+      stop(
+        "Uventet respons fra ",
+        tjeneste,
+        " Vardef.",
+        call. = FALSE
+      )
+    }
+    
+    if (!nrow(tab)) {
+      next
+    }
+    
+    if (!"short_name" %in% names(tab)) {
+      stop(
+        "Responsen fra ",
+        tjeneste,
+        " Vardef mangler `short_name`.",
+        call. = FALSE
+      )
+    }
+    
+    funnet <- integer()
+    
+    for (i in which(
+      tab$short_name %in% maal
+    )) {
+      
+      post <- rad(tab, i)
+      
+      if (!gyldig_paa_dato(post)) {
+        next
+      }
+      
+      kortnavn <- tekst(
+        post$short_name
+      )
+      
+      aktuelle <- gjenstaar[
+        resultat$vardef_kortnavn[gjenstaar] ==
+          kortnavn
+      ]
+      
+      for (j in aktuelle) {
+        
+        poster[[j]][[
+          length(poster[[j]]) + 1L
+        ]] <- post
+        
+        funnet <- c(
+          funnet,
+          j
+        )
+      }
+    }
+    
+    # Søk bare internt for variabler uten eksternt treff.
+    gjenstaar <- setdiff(
+      gjenstaar,
+      unique(funnet)
+    )
+  }
+  
+  # ------------------------------------------------------------
+  # 10. Kopier metadata til DataDoc
+  # ------------------------------------------------------------
+  
+  problemer <- character()
+  
+  for (j in which(!beskyttet)) {
+    
+    i <- indeks[[j]]
+    
+    treff <- poster[[j]]
+    
+    if (!length(treff)) {
+      next
+    }
+    
+    forslag <- lapply(treff, function(x) {
+      
+      units <- x$unit_types
+      
+      if (.datadoc_is_empty(units)) {
+        units <- x$unit_type
+      }
+      
+      units <- trimws(as.character(
+        unlist(units, use.names = FALSE)
+      ))
+      
+      units <- unique(
+        units[!is.na(units) & nzchar(units)]
+      )
+      
+      list(
+        name = navn_paa_sprak(x),
+        definition_uri = tekst(x$id),
+        unit_type = if (length(units)) {
+          units[[1L]]
+        } else {
+          NA_character_
+        }
+      )
+    })
+    
+    forslag <- unique(forslag)
+    
+    problem <- if (length(forslag) > 1L) {
+      
+      "flere_treff"
+      
+    } else if (
+      is.na(forslag[[1L]]$definition_uri)
+    ) {
+      
+      "mangler_vardef_id"
+      
+    } else {
+      
+      ""
+    }
+    
+    if (nzchar(problem)) {
+      
+      resultat$resultat[[j]] <- problem
+      
+      problemer <- c(
+        problemer,
+        paste0(
+          navn[[i]],
+          " (",
+          problem,
+          ")"
+        )
+      )
+      
+      next
+    }
+    
+    kilde <- forslag[[1L]]
+    
+    ny <- vars[[i]]
+    
+    endret <- character()
+    
+    # ----------------------------------------------------------
+    # 11. Oppdater metadata fra Vardef
+    # ----------------------------------------------------------
+    
+    for (felt in dokumentasjonsfelt) {
+      
+      verdi <- kilde[[felt]]
+      
+      # Manglende kildeverdi sletter ikke eksisterende verdi.
+      if (is.na(verdi)) {
+        next
+      }
+      
+      gammel <- if (felt == "name") {
+        
+        .datadoc_language_text(
+          ny$name,
+          language,
+          fallback = FALSE
+        )
+        
+      } else {
+        
+        tekst(ny[[felt]])
+      }
+      
+      if (identical(gammel, verdi)) {
+        next
+      }
+      
+      ny[[felt]] <- if (felt == "name") {
+        
+        .datadoc_set_language(
+          ny$name,
+          verdi,
+          language,
+          overwrite = TRUE
+        )
+        
+      } else {
+        
+        verdi
+      }
+      
+      endret <- c(
+        endret,
+        felt
+      )
+    }
+    
+    # ----------------------------------------------------------
+    # 12. Oppdater datoperiode fra dato_unntak
+    # ----------------------------------------------------------
+    
+    # Datoene brukes bare til DataDoc.
+    # De påvirker ikke Vardef-oppslaget.
+    
+    if (!is.null(dato_unntak)) {
+      
+      indeks_unntak <- match(
+        navn[[i]],
+        dato_unntak$short_name
+      )
+      
+      if (!is.na(indeks_unntak)) {
+        
+        for (felt in c(
+          "contains_data_from",
+          "contains_data_until"
+        )) {
+          
+          ny_verdi <- dato_unntak[[felt]][[
+            indeks_unntak
+          ]]
+          
+          gammel_verdi <- tekst(
+            ny[[felt]]
+          )
+          
+          if (identical(gammel_verdi, ny_verdi)) {
+            next
+          }
+          
+          ny[[felt]] <- ny_verdi
+          
+          endret <- c(
+            endret,
+            felt
+          )
+        }
+      }
+    }
+    
+    # ----------------------------------------------------------
+    # 13. Registrer endringer
+    # ----------------------------------------------------------
+    
+    if (length(endret)) {
+      
+      doc$datadoc$variables[[i]] <- ny
+      
+      resultat$resultat[[j]] <- "oppdatert"
+      
+      resultat$endrede_felt[[j]] <- paste(
+        endret,
+        collapse = ", "
+      )
+      
+    } else {
+      
+      resultat$resultat[[j]] <- "uendret"
+    }
+  }
+  
+  # ------------------------------------------------------------
+  # 14. Advar om problemer
+  # ------------------------------------------------------------
+  
+  if (length(problemer)) {
+    
+    warning(
+      "Hoppet over: ",
+      paste(problemer, collapse = "; "),
+      call. = FALSE
+    )
+  }
+  
+  # ------------------------------------------------------------
+  # 15. Lagre DataDoc dersom noe er endret
+  # ------------------------------------------------------------
+  
+  antall <- sum(
+    resultat$resultat == "oppdatert"
+  )
+  
+  if (antall > 0L) {
+    .datadoc_write(
+      doc,
+      path
+    )
+  }
+  
+  # ------------------------------------------------------------
+  # 16. Oppsummer
+  # ------------------------------------------------------------
+  
+  if (!quiet) {
+    
+    message(
+      "Oppdaterte ",
+      antall,
+      " av ",
+      nrow(resultat),
+      " valgte variabler. ",
+      sum(resultat$resultat == "beholdt"),
+      " ble beholdt på grunn av eksisterende innhold; ",
+      sum(resultat$resultat == "ingen_treff"),
+      " manglet treff."
+    )
+  }
+  
+  invisible(resultat)
 }
