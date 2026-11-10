@@ -48,8 +48,12 @@ on.exit(unlink(tf))
 
 # write out object
 st_write_feather(obj = nc, dsn = tf)
+#> Warning: write_feather(version = 2) has been superseded by write_ipc_file().
 
 # In Python, read the new file with geopandas.read_feather(...)
 # read back into R
 nc_f <- st_read_feather(tf)
+#> Warning: 'arrow::read_feather' is deprecated.
+#> Use 'read_ipc_file' instead.
+#> See help("Deprecated")
 ```

@@ -48,6 +48,9 @@ the Python `GeoPandas` library.
 path <- system.file("extdata", package = "sfarrow")
 
 world <- st_read_feather(file.path(path, "world.feather"))
+#> Warning: 'arrow::read_feather' is deprecated.
+#> Use 'read_ipc_file' instead.
+#> See help("Deprecated")
 #> Error in metadata$columns[[col]]$crs$id: $ operator is invalid for atomic vectors
 
 world

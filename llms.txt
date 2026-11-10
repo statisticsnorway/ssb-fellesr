@@ -109,6 +109,10 @@ under er det bare å ta kontakt.
 
 ## All functions
 
+- [`add_column_labels_from_file()`](add_column_labels_from_file.md) :
+
+  av duplikater. Plassholdere som `^BedrNavn` og teksten `<.>` beholdes.
+
 - [`add_labelled_columns()`](add_labelled_columns.md) : Legg til
   kolonner med verdietiketter
 
@@ -117,6 +121,9 @@ under er det bare å ta kontakt.
 
 - [`add_value_labels()`](add_value_labels.md) : Legg til verdietiketter
   fra KLASS
+
+- [`add_value_labels_from_file()`](add_value_labels_from_file.md) : Legg
+  til verdietiketter fra en lokal kodeliste
 
 - [`compare_variable_metadata()`](compare_variable_metadata.md) :
   Sammenlign variabelmetadata mellom to DataDoc-filer
@@ -129,6 +136,9 @@ under er det bare å ta kontakt.
 
 - [`copy_metadata_variable()`](copy_metadata_variable.md) : Kopier
   variabelmetadata mellom DataDoc-filer
+
+- [`create_empty_datadoc()`](create_empty_datadoc.md) : Opprett et tomt
+  Datadoc-dokument
 
 - [`datadoc_path()`](datadoc_path.md) : Konverter filsti mellom Parquet
   og Datadoc
@@ -243,6 +253,9 @@ under er det bare å ta kontakt.
 
 - [`set_project_root()`](set_project_root.md) : Set Working Directory to
   Project Root
+
+- [`set_variable_names_from_labels()`](set_variable_names_from_labels.md)
+  : Oppdater variabelnavn og intervjumetadata i DataDoc
 
 - [`set_version_description()`](set_version_description.md) : Sett
   versjonsbeskrivelse i en DataDoc-fil
