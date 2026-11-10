@@ -4785,112 +4785,6 @@ summarise_missing_required_metadata <- function(
 }
 
 
-#' Legg til verdietiketter fra en lokal kodeliste
-#'
-#' Kobler kolonnenavn i data til `variabel` i kodelisten. For hver variabel
-#' brukes `kode` som underliggende verdi og `betydning` som verdietikett.
-#' Taggene `<rt>` og `</rt>` fjernes fra etiketten.
-#'
-#' @param data En data.frame eller tibble som skal få etiketter.
-#' @param kodelister En data.frame eller tibble med kodelistene, eller en
-#'   tekststreng med filstien til en Parquet-fil i samme format.
-#' @param quiet Logisk verdi. Hvis FALSE, gis en advarsel når en variabel
-#'   konverteres til tekst. Standard er TRUE.
-#' @details Som i add_value_labels() behandles koder som tekst. Ledende
-#'   nuller bevares når kodene er lagret som tekst. Eksisterende verdietiketter
-#'   erstattes for variabler med en gyldig kodeliste. Variabler uten treff og
-#'   rader uten kode eller etikett hoppes over. To ulike etiketter for samme
-#'   variabel og kode gir en feil. Eksisterende kolonneetiketter bevares.
-#' @return Datasettet med verdietiketter på de aktuelle variablene.
-#' @examples
-#' data <- data.frame(nrinnled = c("1", "2"))
-#' kodelister <- data.frame(
-#'   variabel = c("nrinnled", "nrinnled"),
-#'   kode = c("1", "2"),
-#'   betydning = c("intervju", "<rt>Frafall</rt>")
-#' )
-#' resultat <- add_value_labels_from_file(data, kodelister)
-#' labelled::val_labels(resultat$nrinnled)
-#' @export
-add_value_labels_from_file <- function(data, kodelister, quiet = TRUE) {
-  if (!is.logical(quiet) || length(quiet) != 1L || is.na(quiet)) {
-    stop("`quiet` må være TRUE eller FALSE.", call. = FALSE)
-  }
-  
-  oppslag <- .les_etikettoppslag(data, kodelister, c("kode", "betydning"))
-  oppslag$kode <- trimws(as.character(oppslag$kode))
-  oppslag$betydning <- trimws(gsub(
-    "</?rt>", "", as.character(oppslag$betydning), ignore.case = TRUE
-  ))
-  gyldig <- !is.na(oppslag$kode) & nzchar(oppslag$kode) &
-    !is.na(oppslag$betydning) & nzchar(oppslag$betydning)
-  oppslag <- unique(oppslag[gyldig, , drop = FALSE])
-  
-  for (variabel in unique(oppslag$variabel)) {
-    rader <- oppslag[oppslag$variabel == variabel, , drop = FALSE]
-    duplikat <- anyDuplicated(rader$kode)
-    if (duplikat > 0L) {
-      stop("Flere betydninger for kode `", rader$kode[[duplikat]],
-           "` i variabelen `", variabel, "`.", call. = FALSE)
-    }
-    
-    x <- data[[variabel]]
-    if (!is.character(x)) {
-      if (!quiet) {
-        warning("Konverterer `", variabel, "` til tekst.", call. = FALSE)
-      }
-      kolonneetikett <- labelled::var_label(x)
-      if (inherits(x, "haven_labelled")) {
-        x <- unclass(x)
-      }
-      x <- as.character(x)
-      labelled::var_label(x) <- kolonneetikett
-    }
-    
-    data[[variabel]] <- labelled::set_value_labels(
-      x, .labels = stats::setNames(rader$kode, rader$betydning)
-    )
-  }
-  data
-}
-
-#' Legg til kolonneetiketter fra en lokal kodeliste
-#'
-#' Bruker `variable_text` som kolonneetikett for hver kolonne som har treff
-#' i `variabel`. Funksjonen kan også brukes for variabler uten svarkoder.
-#'
-#' @inheritParams add_value_labels_from_file
-#' @details Bare kolonnene `variabel` og `variable_text` kreves. Tomme
-#'   tekster hoppes over. Samme tekst kan forekomme på flere rader.
-#'   Ulike, ikke-tomme tekster for samme variabel gir en feil.
-#'   Ved treff erstattes en eventuell eksisterende kolonneetikett.
-#' @return Datasettet med kolonneetiketter. Verdier, datatyper og
-#'   verdietiketter beholdes.
-#' @examples
-#' data <- data.frame(nrinnled = c("1", "2"))
-#' kodelister <- data.frame(variabel = "nrinnled", variable_text = "Status på IO")
-#' resultat <- add_column_labels_from_file(data, kodelister)
-#' labelled::var_label(resultat$nrinnled)
-#' @export
-add_column_labels_from_file <- function(data, kodelister) {
-  oppslag <- .les_etikettoppslag(data, kodelister, "variable_text")
-  oppslag$variable_text <- trimws(as.character(oppslag$variable_text))
-  gyldig <- !is.na(oppslag$variable_text) & nzchar(oppslag$variable_text)
-  oppslag <- unique(oppslag[gyldig, , drop = FALSE])
-  
-  duplikat <- anyDuplicated(oppslag$variabel)
-  if (duplikat > 0L) {
-    stop("Flere kolonneetiketter for variabelen `",
-         oppslag$variabel[[duplikat]], "`.", call. = FALSE)
-  }
-  
-  for (i in seq_len(nrow(oppslag))) {
-    variabel <- oppslag$variabel[[i]]
-    labelled::var_label(data[[variabel]]) <- oppslag$variable_text[[i]]
-  }
-  data
-}
-
 # Felles innlesing og utvalg av kolonner som finnes i datasettet.
 .les_etikettoppslag <- function(data, kodelister, felt) {
   if (!is.data.frame(data)) {
@@ -5576,3 +5470,223 @@ create_empty_datadoc <- function(
   
   invisible(suppressMessages(suppressWarnings(kjor())))
 }
+
+#' Legg til verdietiketter fra en lokal kodeliste
+#'
+#' Kobler kolonnenavn i data til variabelkolonnen i kodelisten. Som standard
+#' brukes `variabel` til koblingen, `varnavn` som underliggende verdi og
+#' `sporsmaal_text` som verdietikett. Kolonnenavnene kan tilpasses.
+#' Taggene `<rt>` og `</rt>` fjernes fra etiketten.
+#'
+#' @param data En data.frame eller tibble som skal få etiketter.
+#' @param kodelister En data.frame eller tibble med kodelistene, eller en
+#'   tekststreng med filstien til en Parquet-fil i samme format.
+#' @param quiet Logisk verdi. Hvis FALSE, gis en advarsel når en variabel
+#'   konverteres til tekst. Standard er TRUE.
+#' @param variabel_kolonne Navnet på kolonnen med variabelnavnene som skal
+#'   matches mot kolonnenavn i `data`. Standard er `"variabel"`.
+#' @param kode_kolonne Navnet på kolonnen med svarkodene som skal få
+#'   verdietiketter. Standard er `"varnavn"`.
+#' @param betydning_kolonne Navnet på kolonnen med teksten til hver
+#'   svarkode. Standard er `"sporsmaal_text"`.
+#' @details Som i add_value_labels() behandles koder som tekst. Ledende
+#'   nuller bevares når kodene er lagret som tekst. Eksisterende verdietiketter
+#'   erstattes for variabler med en gyldig kodeliste. Variabler uten treff og
+#'   rader uten kode eller etikett hoppes over. To ulike etiketter for samme
+#'   variabel og kode gir en feil. Eksisterende kolonneetiketter bevares.
+#' @return Datasettet med verdietiketter på de aktuelle variablene.
+#' @examples
+#' data <- data.frame(nrinnled = c("1", "2"))
+#' kodelister <- data.frame(
+#'   variabel = c("nrinnled", "nrinnled"),
+#'   varnavn = c("1", "2"),
+#'   sporsmaal_text = c("intervju", "<rt>Frafall</rt>")
+#' )
+#' resultat <- add_value_labels_from_file(data, kodelister)
+#' labelled::val_labels(resultat$nrinnled)
+#' @export
+add_value_labels_from_file <- function(
+    data,
+    kodelister,
+    quiet = TRUE,
+    variabel_kolonne = "variabel",
+    kode_kolonne = "varnavn",
+    betydning_kolonne = "sporsmaal_text") {
+  if (!is.logical(quiet) || length(quiet) != 1L || is.na(quiet)) {
+    stop("`quiet` må være TRUE eller FALSE.", call. = FALSE)
+  }
+  
+  kolonneargumenter <- list(
+    variabel_kolonne = variabel_kolonne,
+    kode_kolonne = kode_kolonne,
+    betydning_kolonne = betydning_kolonne
+  )
+  for (argument in names(kolonneargumenter)) {
+    x <- kolonneargumenter[[argument]]
+    if (!is.character(x) || length(x) != 1L || is.na(x) ||
+        !nzchar(trimws(x))) {
+      stop("`", argument, "` må være ett ikke-tomt kolonnenavn.",
+           call. = FALSE)
+    }
+  }
+  if (anyDuplicated(unlist(kolonneargumenter, use.names = FALSE))) {
+    stop("Variabel, kode og betydning må angis med tre ulike kolonnenavn.",
+         call. = FALSE)
+  }
+  
+  oppslag <- .les_etikettoppslag(
+    data,
+    kodelister,
+    felt = c(kode = kode_kolonne, betydning = betydning_kolonne),
+    variabel_kolonne = variabel_kolonne
+  )
+  oppslag$kode <- trimws(as.character(oppslag$kode))
+  oppslag$betydning <- trimws(gsub(
+    "</?rt>", "", as.character(oppslag$betydning), ignore.case = TRUE
+  ))
+  gyldig <- !is.na(oppslag$kode) & nzchar(oppslag$kode) &
+    !is.na(oppslag$betydning) & nzchar(oppslag$betydning)
+  oppslag <- unique(oppslag[gyldig, , drop = FALSE])
+  
+  for (variabel in unique(oppslag$variabel)) {
+    rader <- oppslag[oppslag$variabel == variabel, , drop = FALSE]
+    duplikat <- anyDuplicated(rader$kode)
+    if (duplikat > 0L) {
+      stop("Flere betydninger for kode `", rader$kode[[duplikat]],
+           "` i variabelen `", variabel, "`.", call. = FALSE)
+    }
+    
+    x <- data[[variabel]]
+    if (!is.character(x)) {
+      if (!quiet) {
+        warning("Konverterer `", variabel, "` til tekst.", call. = FALSE)
+      }
+      kolonneetikett <- labelled::var_label(x)
+      if (inherits(x, "haven_labelled")) {
+        x <- unclass(x)
+      }
+      x <- as.character(x)
+      labelled::var_label(x) <- kolonneetikett
+    }
+    
+    data[[variabel]] <- labelled::set_value_labels(
+      x, .labels = stats::setNames(rader$kode, rader$betydning)
+    )
+  }
+  data
+}
+
+#'   av duplikater. Plassholdere som `^BedrNavn` og teksten `<.>` beholdes.
+#' @return Datasettet med kolonneetiketter. Verdier, datatyper og
+#'   verdietiketter beholdes.
+#' @examples
+#' data <- data.frame(nrinnled = c("1", "2"))
+#' kodelister <- data.frame(varnavn = "nrinnled", sporsmaal_text = "Status på IO")
+#' resultat <- add_column_labels_from_file(data, kodelister)
+#' labelled::var_label(resultat$nrinnled)
+#'
+#' # Fjern HTML fra kolonneetikettene:
+#' kodelister$sporsmaal_text <- "Status<br><gt>på IO</gt>"
+#' resultat <- add_column_labels_from_file(data, kodelister, clean_labels = TRUE)
+#' labelled::var_label(resultat$nrinnled) # "Status på IO"
+#'
+#' # Det tidligere formatet:
+#' kodelister <- data.frame(variabel = "nrinnled", variable_text = "Status på IO")
+#' resultat <- add_column_labels_from_file(
+#'   data, kodelister,
+#'   variabel_kolonne = "variabel",
+#'   betydning_kolonne = "variable_text"
+#' )
+#' @export
+add_column_labels_from_file <- function(
+    data,
+    kodelister,
+    variabel_kolonne = "varnavn",
+    betydning_kolonne = "sporsmaal_text",
+    clean_labels = FALSE) {
+  if (!is.logical(clean_labels) || length(clean_labels) != 1L ||
+      is.na(clean_labels)) {
+    stop("`clean_labels` må være TRUE eller FALSE.", call. = FALSE)
+  }
+  
+  kolonneargumenter <- list(
+    variabel_kolonne = variabel_kolonne,
+    betydning_kolonne = betydning_kolonne
+  )
+  for (argument in names(kolonneargumenter)) {
+    x <- kolonneargumenter[[argument]]
+    if (!is.character(x) || length(x) != 1L || is.na(x) ||
+        !nzchar(trimws(x))) {
+      stop("`", argument, "` må være ett ikke-tomt kolonnenavn.",
+           call. = FALSE)
+    }
+  }
+  if (identical(variabel_kolonne, betydning_kolonne)) {
+    stop("Variabel og betydning må angis med to ulike kolonnenavn.",
+         call. = FALSE)
+  }
+  
+  oppslag <- .les_etikettoppslag(
+    data,
+    kodelister,
+    felt = c(variable_text = betydning_kolonne),
+    variabel_kolonne = variabel_kolonne
+  )
+  tekst <- as.character(oppslag$variable_text)
+  if (clean_labels) {
+    # Behold teksten, men fjern HTML og spørreskjemaets formateringstagger.
+    # Krev et taggnavn som starter med en bokstav, slik at <.> beholdes.
+    tekst <- gsub("<\\s*/?\\s*[A-Za-z][^>]*>", " ", tekst, perl = TRUE)
+    tekst <- gsub("[[:space:]\u00a0]+", " ", tekst, perl = TRUE)
+    tekst <- gsub(" +([,;:!?]|\\.(?!\\.))", "\\1", tekst, perl = TRUE)
+  }
+  oppslag$variable_text <- trimws(tekst)
+  gyldig <- !is.na(oppslag$variable_text) & nzchar(oppslag$variable_text)
+  oppslag <- unique(oppslag[gyldig, , drop = FALSE])
+  
+  duplikat <- anyDuplicated(oppslag$variabel)
+  if (duplikat > 0L) {
+    stop("Flere kolonneetiketter for variabelen `",
+         oppslag$variabel[[duplikat]], "`.", call. = FALSE)
+  }
+  
+  for (i in seq_len(nrow(oppslag))) {
+    variabel <- oppslag$variabel[[i]]
+    labelled::var_label(data[[variabel]]) <- oppslag$variable_text[[i]]
+  }
+  data
+}
+
+# Felles innlesing og utvalg av kolonner som finnes i datasettet.
+.les_etikettoppslag <- function(
+    data, kodelister, felt, variabel_kolonne = "variabel") {
+  if (!is.data.frame(data)) {
+    stop("`data` må være en data.frame eller tibble.", call. = FALSE)
+  }
+  
+  if (is.character(kodelister) && length(kodelister) == 1L &&
+      !is.na(kodelister)) {
+    if (tolower(tools::file_ext(kodelister)) != "parquet") {
+      stop("Oppgi en Parquet-fil eller les kodelisten inn som en tabell.",
+           call. = FALSE)
+    }
+    kodelister <- arrow::read_parquet(kodelister)
+  }
+  
+  if (!is.data.frame(kodelister)) {
+    stop("`kodelister` må være en tabell eller en filsti.", call. = FALSE)
+  }
+  kolonner <- c(variabel_kolonne, unname(felt))
+  mangler <- setdiff(kolonner, names(kodelister))
+  if (length(mangler)) {
+    stop("Kodelisten mangler ", paste(mangler, collapse = ", "), ".",
+         call. = FALSE)
+  }
+  
+  oppslag <- as.data.frame(kodelister)[kolonner]
+  # Standardiser navn først etter utvalg, slik at kildekolonner ikke overskrives.
+  names(oppslag) <- c("variabel", if (is.null(names(felt))) felt else names(felt))
+  oppslag$variabel <- trimws(as.character(oppslag$variabel))
+  oppslag[oppslag$variabel %in% names(data), , drop = FALSE]
+}
+
