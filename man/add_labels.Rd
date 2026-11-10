@@ -4,7 +4,7 @@
 \alias{add_labels}
 \title{Legg til kolonneetiketter fra Datadoc}
 \usage{
-add_labels(data, filsti, show_labels = TRUE)
+add_labels(data, filsti, show_labels = TRUE, language = "nb")
 }
 \arguments{
 \item{data}{Et datasett som skal få lagt til kolonneetiketter.}
@@ -15,6 +15,8 @@ er lest fra. Filstien brukes til å finne den tilhørende DataDoc-filen.}
 \item{show_labels}{En logisk verdi som angir om kolonneetikettene også skal
 vises ved utskrift av datasettet. Når verdien er \code{TRUE}, behandles
 datasettet med \code{\link[=show_column_labels]{show_column_labels()}}. Standardverdien er \code{TRUE}.}
+
+\item{language}{Språkkode: \code{"nb"} (standard), \code{"nn"} eller \code{"en"}.}
 }
 \value{
 Datasettet som ble oppgitt i \code{data}, med kolonneetiketter lagt til
@@ -25,7 +27,8 @@ Legger til kolonneetiketter på variablene i et datasett basert på
 variabelnavnene i den tilhørende DataDoc-filen.
 }
 \details{
-Variabeloversikten hentes med \code{\link[=datadoc_variabeloversikt]{datadoc_variabeloversikt()}}. Verdiene i
+Variabeloversikten hentes lokalt med \code{\link[=datadoc_variabeloversikt]{datadoc_variabeloversikt()}}
+og \code{include_vardef = FALSE}, uten nettverkskall. Verdiene i
 kolonnen \code{name} brukes som kolonneetiketter, mens \code{short_name} brukes til
 å koble etikettene til variablene i \code{data}.
 

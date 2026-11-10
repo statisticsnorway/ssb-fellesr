@@ -27,8 +27,8 @@ Variabler uten verdietiketter beholdes uendret.
 Funksjonen identifiserer merkede variabler ved hjelp av
 \code{\link[haven:is.labelled]{haven::is.labelled()}} og konverterer dem med \code{\link[haven:as_factor]{haven::as_factor()}}.
 
-Ved konverteringen brukes \code{levels = "labels"}, slik at faktorverdiene
-består av verdietikettene og ikke de underliggende kodene. Dette fungerer
+Ved konverteringen brukes \code{levels = "default"}. Verdier med etikett
+vises med etiketten; øvrige verdier vises med koden og gir en advarsel. Dette fungerer
 både for numeriske og tekstbaserte merkede variabler, inkludert
 tekstkoder med ledende nuller, som \code{"01"} og \code{"02"}.
 

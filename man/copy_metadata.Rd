@@ -10,7 +10,8 @@ copy_metadata(
   variabler = NULL,
   ekskluder_variabler = NULL,
   overwrite = TRUE,
-  dato_unntak = NULL
+  dato_unntak = NULL,
+  quiet = TRUE
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ kolonnene \code{short_name}, \code{contains_data_from} og \code{contains_data_un
 Datoene skal være på formatet \code{"YYYY-MM-DD"}. En variabel kan ikke
 samtidig være oppgitt i \code{ekskluder_variabler}. Standardverdien er
 \code{NULL}.}
+
+\item{quiet}{Med \code{TRUE} (standard) skjules statusmeldinger.}
 }
 \value{
 Den oppdaterte Datadoc-strukturen som en liste. Strukturen skrives
@@ -60,7 +63,8 @@ Variabler kan ekskluderes fullstendig fra oppdateringen ved hjelp av
 \code{ekskluder_variabler}. For disse variablene kopieres verken metadata eller
 gyldighetsperiode.
 
-Gyldighetsperioden for øvrige variabler i mottakerfilen settes automatisk
+Variabler som hoppes over med \code{overwrite = FALSE}, beholdes helt uendret,
+også når det gjelder datoer. Gyldighetsperioden for øvrige variabler settes
 ut fra perioden i filnavnet. For eksempel gir \verb{_p2025_v1} perioden
 \code{2025-01-01} til \code{2025-12-31}. Det kan angis egne gyldighetsperioder for
 enkeltvariabler ved hjelp av \code{dato_unntak}.
@@ -78,18 +82,19 @@ variabler som skal få kopiert metadata. De hoppes også over når
 gyldighetsperioden oppdateres. Disse variablene beholdes derfor uendret i
 mottakerfilen.
 
-For hver øvrige variabel kopieres hele metadataobjektet fra originalfilen.
-Feltet \code{short_name} erstattes deretter med kortnavnet som brukes i filen
-som oppdateres.
+Kjente dokumentasjonsfelt kopieres fra originalfilen. Felt som finnes i
+kilden, erstattes samlet, også når kildeverdien er \code{NULL}. Mottakerens
+kortnavn, ID, datatype, dataelementsti og pseudonymiseringsmetadata
+beholdes. Ukjente felt og felt som ikke finnes i kilden, beholdes.
 
 Når \code{overwrite = FALSE}, regnes en variabel som å ha eksisterende metadata
 dersom feltet \code{name} ikke er \code{NULL}. Andre metadatafelt tas ikke med i
 denne vurderingen.
 
-Gyldighetsperioden oppdateres uavhengig av \code{overwrite}. Dette innebærer at
-også variabler som ikke får kopiert metadata fordi de allerede har
-metadata, får oppdatert feltene \code{contains_data_from} og
-\code{contains_data_until}.
+Når \code{overwrite = FALSE}, beholdes dokumenterte variabler helt uendret,
+inkludert \code{contains_data_from} og \code{contains_data_until}. Dette gjelder
+også dersom variabelen er oppgitt i \code{dato_unntak}. Øvrige variabler får
+oppdatert perioden som beskrevet nedenfor.
 
 Variabler i \code{ekskluder_variabler} er unntatt fra denne oppdateringen og
 beholdes fullstendig uendret.

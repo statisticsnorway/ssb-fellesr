@@ -7,7 +7,7 @@
 metadata_variable(filsti, variabel)
 }
 \arguments{
-\item{filsti}{En tekststreng med filstien til Parquet-filen. Filstien
+\item{filsti}{Filsti til en DataDoc-fil eller en Parquet-fil. Filstien
 til den tilhørende DataDoc-filen utledes med \code{\link[=datadoc_path]{datadoc_path()}}.}
 
 \item{variabel}{En tekststreng med kortnavnet til variabelen som

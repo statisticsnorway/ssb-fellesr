@@ -11,7 +11,7 @@ variables_with_classification_uri(
 )
 }
 \arguments{
-\item{filsti}{En tekststreng med filstien til en Parquet-fil. Filstien til
+\item{filsti}{Filsti til en DataDoc-fil eller en Parquet-fil. Filstien til
 den tilhørende DataDoc-filen utledes ved hjelp av \code{\link[=datadoc_path]{datadoc_path()}}.}
 
 \item{with_codelist}{En logisk verdi som angir hvilke variabler som skal

@@ -31,9 +31,9 @@ uten å endre de opprinnelige variablene.
 }
 \details{
 Funksjonen konverterer de valgte variablene med \code{\link[haven:as_factor]{haven::as_factor()}} og
-\code{levels = "labels"}. Dette innebærer at de nye kolonnene inneholder
-verdietikettene, mens de opprinnelige kodene beholdes i de opprinnelige
-variablene.
+\code{levels = "default"}. Dette innebærer at de nye kolonnene inneholder
+verdietikettene der de finnes, ellers kodene. De opprinnelige variablene
+beholdes uendret.
 
 Dersom \code{variables = NULL}, identifiseres alle merkede variabler i
 datasettet ved hjelp av \code{\link[haven:is.labelled]{haven::is.labelled()}}. Dersom ingen merkede
@@ -54,10 +54,10 @@ variabelnavn.
 \item \code{postfix} ikke er én enkelt tekststreng.
 }
 
-Det gis en advarsel dersom konverteringen introduserer nye
-missing-verdier. Missing-verdier som allerede finnes i de opprinnelige
-variablene utløser ikke advarselen. Nye missing-verdier kan blant annet
-oppstå dersom enkelte verdier ikke har en tilhørende verdietikett.
+Observerte verdier uten etikett gir en advarsel med variabelnavn og
+koder. Disse vises som koder i faktorkolonnen og blir ikke gjort om til
+\code{NA}. Vanlige manglende verdier utløser ikke advarselen. Gruppering
+beholdes, og grupperingsvariabler kan også velges.
 }
 \examples{
 data <- data.frame(

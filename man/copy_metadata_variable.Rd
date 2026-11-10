@@ -4,7 +4,13 @@
 \alias{copy_metadata_variable}
 \title{Kopier variabelmetadata mellom DataDoc-filer}
 \usage{
-copy_metadata_variable(filsti_datadoc_egen, filsti_datadoc_original, variabler)
+copy_metadata_variable(
+  filsti_datadoc_egen,
+  filsti_datadoc_original,
+  variabler,
+  overwrite = TRUE,
+  quiet = TRUE
+)
 }
 \arguments{
 \item{filsti_datadoc_egen}{En tekststreng med filstien til DataDoc-filen
@@ -20,6 +26,11 @@ kopieres for. En unavngitt verdi tolkes som at variabelen har samme
 \code{short_name} i begge filer. I en navngitt vektor angir navnet
 \code{short_name} i filen som skal oppdateres, mens verdien angir
 \code{short_name} i originalfilen.}
+
+\item{overwrite}{Med \code{TRUE} (standard) erstattes dokumentasjonsfeltene.
+Med \code{FALSE} hoppes hele variabelen over når \code{name} ikke er \code{NULL}.}
+
+\item{quiet}{Med \code{TRUE} (standard) skjules statusmeldinger.}
 }
 \value{
 Den oppdaterte DataDoc-strukturen som en liste. Den oppdaterte
@@ -36,25 +47,27 @@ filendelsen \code{.json}, eller som filstier til Parquet-filer med
 filendelsen \code{.parquet}. Parquet-filstier konverteres automatisk til
 tilhørende DataDoc-filstier med \code{\link[=datadoc_path]{datadoc_path()}}.
 
-Hele metadataobjektet for hver valgt variabel erstattes. Variabelens
-\code{short_name} beholdes imidlertid slik det er angitt i DataDoc-filen
-som metadataene kopieres til.
+Dokumentasjonsfeltene for hver valgt variabel kopieres. Mottakerens
+\code{short_name}, ID, datatype, dataelementsti og pseudonymiseringsmetadata
+beholdes. Ukjente felt beholdes fra mottakeren.
 
 Dersom en filsti slutter på \code{.parquet}, erstattes filendelsen med
 \verb{__DOC.json} ved hjelp av \code{\link[=datadoc_path]{datadoc_path()}}. Filstier som allerede
 slutter på \code{.json}, brukes uendret.
 
-De endelige JSON-filstiene skrives ut før filene leses. Funksjonen
+Med \code{quiet = FALSE} skrives JSON-filstiene ut før filene leses. Funksjonen
 stopper med en feilmelding dersom én eller begge DataDoc-filene ikke
 finnes. Alle manglende filer oppgis i samme feilmelding.
 
 Begge DataDoc-filene leses med \code{\link[jsonlite:fromJSON]{jsonlite::fromJSON()}} med
 \code{simplifyVector = FALSE}.
 
-For hver valgt variabel kopieres hele elementet fra
-\code{datadoc$variables} i originalfilen til den tilsvarende variabelen i
-filen som skal oppdateres. Feltet \code{short_name} erstattes deretter med
-variabelnavnet som brukes i mottakerfilen.
+Kjente dokumentasjonsfelt kopieres samlet for hver valgt variabel.
+\code{overwrite = FALSE} gjør at hele variabelen hoppes over når mottakerens
+\code{name} ikke er \code{NULL}. Andre felt brukes ikke til å avgjøre dette.
+Med \code{overwrite = TRUE} erstattes dokumentasjonsfeltene som finnes i
+kilden, også når kildeverdien er \code{NULL}. Felt som ikke finnes i kilden,
+beholdes fra mottakeren. Tekniske felt overskrives aldri.
 
 Følgende kontroller utføres før filen endres:
 

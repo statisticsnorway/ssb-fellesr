@@ -15,14 +15,19 @@ set_variable_names_from_labels(
   data_source = "67",
   variable_role = "MEASURE",
   population_description = NULL,
-  language_code = "nb"
+  language_code = "nb",
+  variabel_kolonne = "variabel",
+  betydning_kolonne = "variable_text",
+  clean_labels = TRUE,
+  quiet = TRUE
 )
 }
 \arguments{
 \item{filsti_datadoc}{Filsti til DataDoc-filen (.json) eller til den
 tilhørende Parquet-filen. JSON-filen må allerede finnes.}
 
-\item{metadata}{En metadatatabell med \code{variabel} og \code{variable_text},
+\item{metadata}{En metadatatabell med kolonnene angitt i
+\code{variabel_kolonne} og \code{betydning_kolonne},
 filstien til en slik tabell i Parquet-format, eller et data.frame med
 kolonneetiketter i attributtet \code{label}. Gjentatte, identiske tekster
 for samme variabel er tillatt. Tomme etiketter brukes ikke som navn.}
@@ -57,6 +62,16 @@ Manglende populasjon vil fortsatt kunne utløse valideringsadvarsler.}
 
 \item{language_code}{Språk for navn og eventuell populasjonstekst.
 Standard er "nb". Tillatte verdier er "nb", "nn" og "en".}
+
+\item{variabel_kolonne}{Kolonnen med kortnavn i en metadatatabell.
+Standard er \code{"variabel"} for bakoverkompatibilitet.}
+
+\item{betydning_kolonne}{Kolonnen med spørsmålstekst. Standard er
+\code{"variable_text"}. Bruk \code{"sporsmaal_text"} for EHIS.}
+
+\item{clean_labels}{Med \code{TRUE} (standard) renses etiketttekst for tagger.}
+
+\item{quiet}{Med \code{TRUE} (standard) skjules statusmeldinger.}
 }
 \value{
 Det oppdaterte DataDoc-dokumentet, usynlig. Antall endrede

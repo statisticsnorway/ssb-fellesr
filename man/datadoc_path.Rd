@@ -28,7 +28,9 @@ Datadoc JSON-filen.
 \details{
 Standardoppførselen er å konvertere fra \code{.parquet} til \verb{__DOC.json}.
 Ved å sette \code{to = "parquet"} konverteres en Datadoc-fil tilbake til
-den tilhørende Parquet-filstien.
+den tilhørende Parquet-filstien. Filstier som allerede har ønsket
+format, returneres uendret. Ved \code{to = "json"} godtas også andre
+JSON-filnavn enn \verb{__DOC.json}.
 }
 \examples{
 datadoc_path("/buckets/data/personell_v1.parquet")

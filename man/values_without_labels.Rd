@@ -28,6 +28,9 @@ Finner observerte verdier i merkede variabler som ikke har en
 tilhørende verdietikett.
 }
 \details{
+Kolonnen \code{value_without_label} er tekst slik at numeriske og
+tekstbaserte koder kan samles i samme oversikt. Inndata endres ikke.
+
 Funksjonen undersøker variablene som returneres av
 \code{\link[=vars_with_value_labels]{vars_with_value_labels()}}. Det betyr at bare variabler som allerede har
 minst én verdietikett, blir kontrollert.

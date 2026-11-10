@@ -7,7 +7,9 @@
 get_variable_definition_by_shortname(
   short_name,
   date = format(Sys.Date(), "\%Y-\%m-\%d"),
-  language = "nb"
+  language = "nb",
+  status = "ekstern",
+  token = NULL
 )
 }
 \arguments{
@@ -20,6 +22,10 @@ dagens dato.}
 
 \item{language}{En tekststreng med språkkoden som skal brukes for
 tekstinnholdet i responsen. Standardverdien er \code{"nb"}.}
+
+\item{status}{\code{"ekstern"} (standard) eller \code{"intern"}.}
+
+\item{token}{Valgfritt Bearer-token til intern tjeneste.}
 }
 \value{
 Et objekt opprettet fra JSON-responsen fra tjenesten.

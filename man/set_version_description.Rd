@@ -41,7 +41,8 @@ dokumentasjonen tilbake til samme fil.
 Versjonsbeskrivelsen lagres som en liste med \code{languageCode} og
 \code{languageText}.
 
-Dersom \code{version_description} allerede er utfylt og \code{overwrite = FALSE},
+Bare teksten på valgt språk vurderes og oppdateres; andre språk beholdes.
+Dersom teksten på valgt språk allerede er utfylt og \code{overwrite = FALSE},
 blir filen ikke endret, og funksjonen gir en advarsel. Sett
 \code{overwrite = TRUE} for å erstatte en eksisterende versjonsbeskrivelse.
 }

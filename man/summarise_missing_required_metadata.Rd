@@ -46,6 +46,10 @@ metadatafelt for hver variabel:
 \item \code{temporality_type}
 }
 
+Dette er en utfyllingskontroll av de seks feltene ovenfor, ikke full
+validering mot DataDoc-modellen. Betingede krav kontrolleres ikke.
+For språkposter kontrolleres tekstinnholdet, ikke bare at språk finnes.
+
 Et metadatafelt regnes som manglende dersom verdien er \code{NULL}, har
 lengde null, er \code{NA}, eller består av tom tekst eller bare mellomrom.
 

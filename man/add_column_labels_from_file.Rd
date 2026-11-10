@@ -9,7 +9,7 @@ add_column_labels_from_file(
   kodelister,
   variabel_kolonne = "varnavn",
   betydning_kolonne = "sporsmaal_text",
-  clean_labels = FALSE
+  clean_labels = TRUE
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ kolonnenavnene i \code{data}. Standard er \code{"varnavn"}.}
 \code{kodelister} som inneholder kolonneetikettene, for eksempel
 spørsmålsteksten. Standard er \code{"sporsmaal_text"}.}
 
-\item{clean_labels}{Logisk verdi. Standard er \code{FALSE}.
+\item{clean_labels}{Logisk verdi. Standard er \code{TRUE}.
 Med \code{TRUE} fjernes HTML- og formateringstagger fra kolonneetikettene,
 og mellomrom ryddes opp. Teksten mellom taggene beholdes.}
 }

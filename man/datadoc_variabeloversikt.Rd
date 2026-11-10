@@ -4,14 +4,17 @@
 \alias{datadoc_variabeloversikt}
 \title{Lag oversikt over variabler i en Datadoc-fil}
 \usage{
-datadoc_variabeloversikt(filsti, language = "nb")
+datadoc_variabeloversikt(filsti, language = "nb", include_vardef = TRUE)
 }
 \arguments{
-\item{filsti}{En tekststreng med filstien til en Parquet-fil. Filstien til
+\item{filsti}{Filsti til en DataDoc-fil eller en Parquet-fil. Filstien til
 den tilhørende Datadoc-filen utledes ved hjelp av \code{\link[=datadoc_path]{datadoc_path()}}.}
 
 \item{language}{En tekststreng med språkkoden som skal brukes ved uthenting
 av navn og annen språkavhengig metadata. Standardverdien er \code{"nb"}.}
+
+\item{include_vardef}{Logisk verdi. Med \code{FALSE} leses bare lokale
+metadata, uten nettverkskall til Vardef. Standard er \code{TRUE}.}
 }
 \value{
 En \code{data.frame} med én rad per variabel og følgende kolonner:

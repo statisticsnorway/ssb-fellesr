@@ -7,7 +7,10 @@
 get_variable_definition_by_id(
   id,
   date = format(Sys.Date(), "\%Y-\%m-\%d"),
-  language = "nb"
+  language = "nb",
+  status = "ekstern",
+  token = NULL,
+  quiet = TRUE
 )
 }
 \arguments{
@@ -20,6 +23,12 @@ dagens dato.}
 
 \item{language}{En tekststreng med språkkoden som skal brukes for
 tekstinnholdet i responsen. Standardverdien er \code{"nb"}.}
+
+\item{status}{\code{"ekstern"} (standard) eller \code{"intern"}.}
+
+\item{token}{Valgfritt Bearer-token til intern tjeneste.}
+
+\item{quiet}{Med \code{TRUE} (standard) skjules statusmeldingen ved 404.}
 }
 \value{
 Et objekt opprettet fra JSON-responsen fra tjenesten.
@@ -36,7 +45,7 @@ ID-en legges til URL-en til tjenesten, mens datoen sendes som
 parameteren \code{date_of_validity}. Språket sendes i HTTP-hodet
 \code{Accept-Language}.
 
-Dersom tjenesten returnerer HTTP-status 404, vises en melding om at
+Dersom tjenesten returnerer HTTP-status 404 og \code{quiet = FALSE}, vises en melding om at
 variabeldefinisjonen ikke ble funnet. Funksjonen returnerer samtidig
 innholdet i feilresponsen.
 

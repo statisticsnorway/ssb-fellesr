@@ -11,7 +11,7 @@ create_empty_datadoc(
   description = NULL,
   version_description = NULL,
   language_code = "nb",
-  quiet = FALSE
+  quiet = TRUE
 )
 }
 \arguments{
@@ -36,7 +36,7 @@ versjonen av datasettet. Gjelder bare datasettnivå. Standard er \code{NULL}.}
 \item{language_code}{En tekststreng med språkkoden for tekstfeltene,
 for eksempel \code{"nb"}, \code{"nn"} eller \code{"en"}. Standard er \code{"nb"}.}
 
-\item{quiet}{Logisk verdi. Standard er \code{FALSE}. Med \code{TRUE} skjules
+\item{quiet}{Logisk verdi. Standard er \code{TRUE}. Med \code{TRUE} skjules
 meldinger, advarsler og konsollutskrifter fra R og Python under
 kjøringen. Feil som stopper kjøringen, vises fortsatt.}
 }
