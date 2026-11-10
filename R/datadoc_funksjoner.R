@@ -98,10 +98,11 @@ vardef_url <- function(status = "ekstern") {
   )
 }
 
+
 .vardef_get <- function(
     path = NULL,
     query = list(),
-    status = "ekstern",
+    status = "auto",
     language = "nb",
     token = NULL,
     allow_not_found = FALSE,
@@ -110,136 +111,147 @@ vardef_url <- function(status = "ekstern") {
   
   status <- match.arg(
     status,
-    choices = c("ekstern", "intern")
+    c("auto", "ekstern", "intern")
   )
   
   language <- match.arg(
     language,
-    choices = c("nb", "nn", "en")
+    c("nb", "nn", "en")
   )
   
-  url <- vardef_url(
-    status = status
-  )
+  .datadoc_flag(quiet, "quiet")
   
   if (!is.null(path)) {
+    .datadoc_text(path, "path")
+  }
+  
+  # Bestem rekkefølgen på oppslagene
+  tjenester <- if (status == "auto") {
+    c("ekstern", "intern")
+  } else {
+    status
+  }
+  
+  for (tjeneste in tjenester) {
     
-    if (
-      !is.character(path) ||
-      length(path) != 1L ||
-      is.na(path) ||
-      path == ""
-    ) {
+    url <- vardef_url(status = tjeneste)
+    
+    if (!is.null(path)) {
+      url <- paste0(
+        url,
+        "/",
+        utils::URLencode(path, reserved = TRUE)
+      )
+    }
+    
+    headers <- c(
+      `Accept-Language` = language
+    )
+    
+    # Autentisering bare ved internt oppslag
+    if (tjeneste == "intern") {
+      
+      access_token <- token
+      
+      if (is.null(access_token)) {
+        access_token <- tryCatch(
+          .vardef_token(),
+          error = function(e) {
+            stop(
+              "Kunne ikke autentisere mot intern Vardef: ",
+              conditionMessage(e),
+              call. = FALSE
+            )
+          }
+        )
+      }
+      
+      headers <- c(
+        headers,
+        Authorization = paste("Bearer", access_token)
+      )
+    }
+    
+    response <- httr::GET(
+      url = url,
+      query = query,
+      httr::add_headers(.headers = headers)
+    )
+    
+    http_status <- httr::status_code(response)
+    
+    # Ikke funnet: prøv neste tjeneste
+    if (http_status == 404L) {
+      next
+    }
+    
+    response_text <- httr::content(
+      response,
+      as = "text",
+      encoding = "UTF-8"
+    )
+    
+    # Andre HTTP-feil skal ikke tolkes som manglende definisjon
+    if (httr::http_error(response)) {
+      
+      problem <- tryCatch(
+        jsonlite::fromJSON(response_text),
+        error = function(e) NULL
+      )
+      
+      detail <- if (
+        is.list(problem) &&
+        !is.null(problem$detail)
+      ) {
+        as.character(problem$detail)
+      } else {
+        "Tjenesten returnerte ingen lesbar feilmelding."
+      }
+      
       stop(
-        "`path` må være én ikke-tom tekststreng.",
+        "Vardef-oppslaget feilet (",
+        tjeneste,
+        ", HTTP ",
+        http_status,
+        ").\nURL: ",
+        response$url,
+        "\nFeilmelding: ",
+        detail,
         call. = FALSE
       )
     }
     
-    url <- paste0(
-      url,
-      "/",
-      utils::URLencode(
-        path,
-        reserved = TRUE
-      )
-    )
-  }
-  
-  headers <- c(
-    `Accept-Language` = language
-  )
-  
-  if (!is.null(token)) {
-    headers <- c(
-      headers,
-      Authorization = paste(
-        "Bearer",
-        token
-      )
-    )
-  }
-  
-  response <- httr::GET(
-    url = url,
-    query = query,
-    httr::add_headers(
-      .headers = headers
-    )
-  )
-  
-  response_text <- httr::content(
-    response,
-    as = "text",
-    encoding = "UTF-8"
-  )
-  
-  if (httr::status_code(response) == 404L && allow_not_found) {
-    problem <- tryCatch(jsonlite::fromJSON(response_text), error = function(e) NULL)
-    if (!quiet) message("Fant ikke variabeldefinisjonen med ID `", path, "`.")
-    return(problem)
-  }
-  
-  if (httr::http_error(response)) {
-    
-    content_type <- httr::http_type(response)
-    
-    problem <- if (
-      content_type %in% c(
-        "application/json",
-        "application/problem+json"
-      )
-    ) {
-      tryCatch(
-        jsonlite::fromJSON(
-          response_text,
-          simplifyVector = TRUE
-        ),
-        error = function(e) NULL
-      )
-    } else {
-      NULL
+    if (!nzchar(response_text)) {
+      return(NULL)
     }
     
-    detail <- if (
-      is.list(problem) &&
-      !is.null(problem$detail) &&
-      length(problem$detail) == 1L
-    ) {
-      problem$detail
-    } else if (identical(content_type, "text/html")) {
-      paste0(
-        "Tjenesten returnerte en HTML-side i stedet for et API-svar. ",
-        "Kontroller endepunktet."
+    return(
+      jsonlite::fromJSON(
+        response_text,
+        simplifyDataFrame = TRUE
       )
-    } else {
-      "Tjenesten returnerte ingen lesbar feilmelding."
-    }
-    
-    stop(
-      paste0(
-        "Forespørselen til Vardef feilet med HTTP-status ",
-        httr::status_code(response),
-        ".\n",
-        "URL: ",
-        response$url,
-        "\n",
-        "Feilmelding: ",
-        detail
-      ),
-      call. = FALSE
     )
   }
   
-  if (!nzchar(response_text)) {
+  # Alle aktuelle tjenester returnerte 404
+  beskjed <- if (status == "auto") {
+    "Variabeldefinisjonen finnes verken i ekstern eller intern Vardef."
+  } else {
+    paste0(
+      "Variabeldefinisjonen finnes ikke i ",
+      status,
+      " Vardef."
+    )
+  }
+  
+  if (allow_not_found) {
+    if (!quiet) message(beskjed)
     return(NULL)
   }
   
-  jsonlite::fromJSON(
-    response_text,
-    simplifyDataFrame = TRUE
-  )
+  stop(beskjed, call. = FALSE)
 }
+
 
 #' Hent variabeldefinisjoner
 #'
@@ -302,7 +314,7 @@ vardef_url <- function(status = "ekstern") {
 get_all_variable_definitions <- function(
     date = NULL,
     language = "nb",
-    status = "ekstern",
+    status = "auto",
     token = NULL
 ) {
   
@@ -451,14 +463,91 @@ get_all_variable_definitions <- function(
 #' }
 #'
 #' @export
+
 get_variable_definition_by_shortname <- function(
-    short_name, date = format(Sys.Date(), "%Y-%m-%d"), language = "nb",
-    status = "ekstern", token = NULL) {
+    short_name,
+    date = format(Sys.Date(), "%Y-%m-%d"),
+    language = "nb",
+    status = "auto",
+    quiet = TRUE,
+    token = NULL
+) {
+  
   .datadoc_text(short_name, "short_name")
-  .vardef_get(query = list(short_name = short_name,
-                           date_of_validity = .datadoc_date(date)),
-              status = status, language = language, token = token)
+  
+  status <- match.arg(
+    status,
+    c("auto", "ekstern", "intern")
+  )
+  
+  language <- match.arg(
+    language,
+    c("nb", "nn", "en")
+  )
+  
+  query <- list(
+    short_name = short_name,
+    date_of_validity = .datadoc_date(date)
+  )
+  
+  # Kontroller om resultatet inneholder riktig definisjon
+  gyldig_treff <- function(x) {
+    
+    if (is.null(x) || NROW(x) == 0L) {
+      return(FALSE)
+    }
+    
+    if (!is.list(x) ||
+        !"short_name" %in% names(x)) {
+      return(FALSE)
+    }
+    
+    any(
+      !is.na(x$short_name) &
+        x$short_name == short_name
+    )
+  }
+  
+  # Bestem hvilke tjenester som skal forsøkes
+  tjenester <- if (status == "auto") {
+    c("ekstern", "intern")
+  } else {
+    status
+  }
+  
+  for (tjeneste in tjenester) {
+    
+    resultat <- .vardef_get(
+      query = query,
+      status = tjeneste,
+      language = language,
+      token = token,
+      allow_not_found = TRUE,
+      quiet = TRUE
+    )
+    
+    if (gyldig_treff(resultat)) {
+      return(resultat)
+    }
+  }
+  
+  # Ingen treff
+  if (!quiet) {
+    message(
+      "Fant ikke variabeldefinisjonen '",
+      short_name,
+      "' i ",
+      if (status == "auto") {
+        "verken ekstern eller intern Vardef."
+      } else {
+        paste0(status, " Vardef.")
+      }
+    )
+  }
+  
+  NULL
 }
+
 
 
 #' Hent variabeldefinisjon etter ID
@@ -510,8 +599,11 @@ get_variable_definition_by_shortname <- function(
 #'
 #' @export
 get_variable_definition_by_id <- function(
-    id, date = format(Sys.Date(), "%Y-%m-%d"), language = "nb",
-    status = "ekstern", token = NULL, quiet = TRUE) {
+    id, date = format(Sys.Date(), "%Y-%m-%d"), 
+    language = "nb",
+    status = "auto", 
+    token = NULL, 
+    quiet = TRUE) {
   .datadoc_text(id, "id")
   .datadoc_flag(quiet, "quiet")
   .vardef_get(path = id, query = list(date_of_validity = .datadoc_date(date)),
@@ -645,8 +737,14 @@ vardef_get_klass_id <- function(variable_definition) {
 #' }
 #'
 #' @export
-datadoc_variabeloversikt <- function(filsti, language = "nb", include_vardef = TRUE) {
+datadoc_variabeloversikt <- function(
+    filsti,
+    language = "nb",
+    include_vardef = TRUE,
+    status = "auto"
+) {
   language <- match.arg(language, c("nb", "nn", "en"))
+  status <- match.arg(status, c("auto", "ekstern", "intern"))
   .datadoc_flag(include_vardef, "include_vardef")
   doc <- .datadoc_read(filsti)
   variables <- doc$datadoc$variables
@@ -675,10 +773,19 @@ datadoc_variabeloversikt <- function(filsti, language = "nb", include_vardef = T
     key <- paste(ids[[i]], dates[[i]], sep = "|")
     if (!exists(key, envir = cache, inherits = FALSE)) {
       value <- tryCatch(
-        get_variable_definition_by_id(ids[[i]], date = dates[[i]], language = language),
+        get_variable_definition_by_id(
+          id = ids[[i]],
+          date = dates[[i]],
+          language = language,
+          status = status
+        ),
         error = function(e) {
-          warning("Kunne ikke hente Vardef-metadata for `", ids[[i]], "`: ",
-                  conditionMessage(e), call. = FALSE)
+          warning(
+            "Kunne ikke hente Vardef-metadata for `",
+            ids[[i]], "`: ",
+            conditionMessage(e),
+            call. = FALSE
+          )
           NULL
         }
       )
@@ -689,9 +796,19 @@ datadoc_variabeloversikt <- function(filsti, language = "nb", include_vardef = T
     if (is.null(value)) next
     value_id <- .datadoc_first(value$id)
     if (!is.na(value_id)) result$vardef_definition_uri[[i]] <- value_id
-    result$vardef_name[[i]] <- .datadoc_language_text(value$name, language)
+    # result$vardef_name[[i]] <- .datadoc_language_text(value$name, language)
+    result$vardef_name[[i]] <- .vardef_language_text(value$name, language)
     result$vardef_short_name[[i]] <- .datadoc_first(value$short_name)
-    result$vardef_classification_uri[[i]] <- .datadoc_klass_id(value$classification_uri)
+    # result$vardef_classification_uri[[i]] <- .datadoc_klass_id(value$classification_uri)
+    result$vardef_classification_uri[[i]] <- if (
+      "classification_reference" %in% names(value) &&
+      length(value$classification_reference) == 1L &&
+      !is.na(value$classification_reference)
+    ) {
+      as.character(value$classification_reference)
+    } else {
+      .datadoc_klass_id(value$classification_uri)
+    }
   }
   result
 }
@@ -825,7 +942,10 @@ variables_with_classification_uri <- function(
 #' resultat <- add_value_labels(data, "data__DOC.json")
 #' }
 #' @export
-add_value_labels <- function(data, filsti, language = "nb", quiet = TRUE,
+add_value_labels <- function(data, 
+                             filsti, 
+                             language = "nb", 
+                             quiet = TRUE,
                              clean_labels = TRUE) {
   .datadoc_flag(quiet, "quiet")
   .datadoc_flag(clean_labels, "clean_labels")
@@ -5221,4 +5341,322 @@ add_column_labels_from_file <- function(
     attr(x, "labels") <- labs[valid]
   }
   haven::as_factor(x, levels = "default")
+}
+
+
+
+#' Hent Access Token for intern Vardef
+#'
+#' @return Et Access Token som tekststreng.
+#' @keywords internal
+
+.vardef_token <- function() {
+  
+  reticulate::py_require("dapla-toolbelt-metadata")
+  
+  auth <- reticulate::import(
+    "dapla_auth_client",
+    convert = FALSE
+  )
+  
+  token <- reticulate::py_to_r(
+    auth$AuthClient$fetch_personal_token(
+      scopes = list("all_groups", "current_group"),
+      audiences = list("vardef")
+    )
+  )
+  
+  if (!is.character(token) ||
+      length(token) != 1L ||
+      is.na(token) ||
+      !nzchar(token)) {
+    stop("Kunne ikke hente Access Token for Vardef.", call. = FALSE)
+  }
+  
+  token
+}
+
+.vardef_language_text <- function(x, language = "nb") {
+  
+  language <- match.arg(language, c("nb", "nn", "en"))
+  
+  if (is.null(x) || length(x) == 0L) {
+    return(NA_character_)
+  }
+  
+  # Vardef-format: list(nb = "...", nn = NULL, en = "...")
+  if (
+    is.list(x) &&
+    !is.null(names(x)) &&
+    all(names(x) %in% c("nb", "nn", "en"))
+  ) {
+    
+    hent_tekst <- function(verdi) {
+      if (
+        is.character(verdi) &&
+        length(verdi) == 1L &&
+        !is.na(verdi) &&
+        nzchar(trimws(verdi))
+      ) {
+        return(trimws(verdi))
+      }
+      
+      NA_character_
+    }
+    
+    # Forsøk først ønsket språk
+    tekst <- hent_tekst(x[[language]])
+    
+    if (!is.na(tekst)) {
+      return(tekst)
+    }
+    
+    # Bruk første tilgjengelige språk som reserve
+    for (sprak in c("nb", "nn", "en")) {
+      tekst <- hent_tekst(x[[sprak]])
+      
+      if (!is.na(tekst)) {
+        return(tekst)
+      }
+    }
+    
+    return(NA_character_)
+  }
+  
+  # Støtt også eksisterende Datadoc-format
+  .datadoc_language_text(x, language)
+}
+
+
+
+#' Kontroller om variabler finnes i Vardef
+#'
+#' Kontrollerer om variabler finnes i ekstern eller intern Vardef,
+#' uavhengig av gyldighetsdato og publiseringsstatus.
+#'
+#' @param variabler Karaktervektor med variabelnavn.
+#' @param date Valgfri gyldighetsdato. NULL (standard) inkluderer
+#'   alle definisjoner, også historiske.
+#' @param language Språkkode: "nb", "nn" eller "en".
+#' @param status "auto" (standard), "ekstern" eller "intern".
+#' @param quiet Skjul statusmeldinger. Standard er TRUE.
+#'
+#' @return En tibble med én rad per variabel og informasjon
+#'   om treff i Vardef.
+#'
+#' @export
+check_variables_in_vardef <- function(
+    variabler,
+    date = NULL,
+    language = "nb",
+    status = "auto",
+    quiet = TRUE
+) {
+  
+  language <- match.arg(language, c("nb", "nn", "en"))
+  status <- match.arg(status, c("auto", "ekstern", "intern"))
+  .datadoc_flag(quiet, "quiet")
+  
+  if (!is.character(variabler) ||
+      anyNA(variabler) ||
+      any(!nzchar(trimws(variabler)))) {
+    stop(
+      "`variabler` må være en karaktervektor uten NA eller tomme navn.",
+      call. = FALSE
+    )
+  }
+  
+  variabler <- unique(trimws(variabler))
+  
+  if (!quiet) {
+    message(
+      "Kontrollerer ",
+      length(variabler),
+      " variabler mot Vardef."
+    )
+  }
+  
+  # ------------------------------------------------------------
+  # 1. Bestem hvilke tjenester som skal brukes
+  # ------------------------------------------------------------
+  
+  tjenester <- if (status == "auto") {
+    c("ekstern", "intern")
+  } else {
+    status
+  }
+  
+  # ------------------------------------------------------------
+  # 2. Hent definisjoner fra begge tjenester
+  # ------------------------------------------------------------
+  
+  alle_definisjoner <- lapply(tjenester, function(tjeneste) {
+    
+    definisjoner <- get_all_variable_definitions(
+      date = date,
+      language = language,
+      status = tjeneste
+    )
+    
+    if (is.null(definisjoner)) {
+      return(tibble::tibble())
+    }
+    
+    if (!is.data.frame(definisjoner)) {
+      stop(
+        "Uventet responsformat fra ",
+        tjeneste,
+        " Vardef.",
+        call. = FALSE
+      )
+    }
+    
+    if (!"short_name" %in% names(definisjoner)) {
+      stop(
+        "Responsen fra ",
+        tjeneste,
+        " Vardef mangler `short_name`.",
+        call. = FALSE
+      )
+    }
+    
+    # Behold bare relevante variabler
+    definisjoner <- definisjoner |>
+      dplyr::filter(
+        .data$short_name %in% variabler
+      )
+    
+    if (nrow(definisjoner) == 0L) {
+      return(tibble::tibble())
+    }
+    
+    # Felles kolonner på tvers av API-ene
+    hent_kolonne <- function(navn) {
+      if (navn %in% names(definisjoner)) {
+        as.character(definisjoner[[navn]])
+      } else {
+        rep(NA_character_, nrow(definisjoner))
+      }
+    }
+    
+    # Navn fra valgt språk, med fallback til bokmål
+    navn <- hent_kolonne(paste0("name.", language))
+    navn_nb <- hent_kolonne("name.nb")
+    
+    mangler_navn <- is.na(navn) | !nzchar(navn)
+    navn[mangler_navn] <- navn_nb[mangler_navn]
+    
+    # KLASS-ID: internt brukes classification_reference,
+    # eksternt kan classification_uri brukes.
+    klass_id <- hent_kolonne("classification_reference")
+    klass_uri <- hent_kolonne("classification_uri")
+    
+    mangler_klass <- is.na(klass_id) | !nzchar(klass_id)
+    
+    klass_id[mangler_klass] <- vapply(
+      klass_uri[mangler_klass],
+      .datadoc_klass_id,
+      character(1)
+    )
+    
+    tibble::tibble(
+      variabel = hent_kolonne("short_name"),
+      vardef_id = hent_kolonne("id"),
+      vardef_navn = navn,
+      vardef_klass_id = klass_id,
+      variable_status = hent_kolonne("variable_status"),
+      valid_from = hent_kolonne("valid_from"),
+      valid_until = hent_kolonne("valid_until"),
+      kilde = tjeneste
+    )
+  })
+  
+  definisjoner <- dplyr::bind_rows(alle_definisjoner)
+  
+  # ------------------------------------------------------------
+  # 3. Velg definisjon for hver variabel
+  # ------------------------------------------------------------
+  
+  if (nrow(definisjoner) > 0L) {
+    
+    definisjoner <- definisjoner |>
+      dplyr::mutate(
+        .valid_from = as.Date(valid_from),
+        .oppdatert = dplyr::coalesce(
+          .valid_from,
+          as.Date("1900-01-01")
+        )
+      ) |>
+      dplyr::group_by(variabel) |>
+      dplyr::arrange(
+        dplyr::desc(.oppdatert),
+        kilde,
+        .by_group = TRUE
+      ) |>
+      dplyr::mutate(
+        antall_definisjoner = dplyr::n(),
+        finnes_ekstern = any(kilde == "ekstern"),
+        finnes_intern = any(kilde == "intern")
+      ) |>
+      dplyr::slice(1L) |>
+      dplyr::ungroup() |>
+      dplyr::select(
+        -.valid_from,
+        -.oppdatert
+      )
+  }
+  
+  # ------------------------------------------------------------
+  # 4. Koble resultatet mot variabelnavnene
+  # ------------------------------------------------------------
+  
+  resultat <- tibble::tibble(
+    variabel = variabler
+  ) |>
+    dplyr::left_join(
+      definisjoner,
+      by = "variabel"
+    ) |>
+    dplyr::mutate(
+      finnes_i_vardef = !is.na(vardef_id),
+      finnes_ekstern = dplyr::coalesce(
+        finnes_ekstern, FALSE
+      ),
+      finnes_intern = dplyr::coalesce(
+        finnes_intern, FALSE
+      ),
+      antall_definisjoner = dplyr::coalesce(
+        antall_definisjoner, 0L
+      )
+    ) |>
+    dplyr::select(
+      variabel,
+      finnes_i_vardef,
+      finnes_ekstern,
+      finnes_intern,
+      vardef_id,
+      vardef_navn,
+      vardef_klass_id,
+      variable_status,
+      valid_from,
+      valid_until,
+      kilde,
+      antall_definisjoner
+    )
+  
+  # ------------------------------------------------------------
+  # 5. Oppsummering
+  # ------------------------------------------------------------
+  
+  if (!quiet) {
+    message(
+      "Fant ",
+      sum(resultat$finnes_i_vardef),
+      " av ",
+      nrow(resultat),
+      " variabler i Vardef."
+    )
+  }
+  
+  resultat
 }
