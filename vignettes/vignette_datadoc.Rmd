@@ -55,27 +55,27 @@ demodata_filsti_2024 <- glue::glue("{arbeidsmappe}/klargjorte-data/datadoc-demod
 
 # 1. Hent kommune og fylkesnummer fra KLASS
 klass_kommune_fylke_2024 <- klassR::get_klass(131, date = glue::glue("{aargang_2024}-01-01")) |> 
-  rename(komm_nr = code) |> 
-  select(komm_nr) |>
-  mutate(fylke_nr = substr(komm_nr, 1, 2))
+  dplyr::rename(komm_nr = code) |> 
+  dplyr::select(komm_nr) |>
+  dplyr::mutate(fylke_nr = substr(komm_nr, 1, 2))
 
 # 2. Hent helseregion-korrespondanse
 klass_kommune_hr_2024 <- klassR::get_klass(131, correspond = 603, date = glue::glue("{aargang_2024}-01-01")) |> 
-  rename(komm_nr = sourceCode, 
+  dplyr::rename(komm_nr = sourceCode, 
          helseregion = targetCode) |> 
-  select(komm_nr, helseregion) |> 
-  mutate(helseregion = glue::glue("H{helseregion}"))
+  dplyr::select(komm_nr, helseregion) |> 
+  dplyr::mutate(helseregion = glue::glue("H{helseregion}"))
 
 # 3. Hent landsdel-korrespondanse
 klass_fylke_landsdel_2024 <- klassR::get_klass(104, correspond = 106, date = glue::glue("{aargang_2024}-01-01")) |> 
-  rename(fylke_nr = sourceCode, 
+  dplyr::rename(fylke_nr = sourceCode, 
          landsdel_nr = targetCode) |> 
-  select(fylke_nr, landsdel_nr)
+  dplyr::select(fylke_nr, landsdel_nr)
 
 # 4. Sett sammen til et regionalt datasett
 demodata_2024 <- klass_kommune_fylke_2024 |> 
-  left_join(klass_kommune_hr_2024, by = "komm_nr") |> 
-  left_join(klass_fylke_landsdel_2024, by = "fylke_nr")
+  dplyr::left_join(klass_kommune_hr_2024, by = "komm_nr") |> 
+  dplyr::left_join(klass_fylke_landsdel_2024, by = "fylke_nr")
 
 # 5. Lagre datasettet som Parquet
 arrow::write_parquet(demodata_2024, demodata_filsti_2024)
@@ -141,27 +141,27 @@ demodata_filsti_2025 <- glue::glue("{arbeidsmappe}/klargjorte-data/datadoc-demod
 
 # 1. Hent kommune og fylkesnummer fra KLASS for 2025
 klass_kommune_fylke_2025 <- klassR::get_klass(131, date = glue::glue("{aargang_2025}-01-01")) |> 
-  rename(komm_nr = code) |> 
-  select(komm_nr) |>
-  mutate(fylke_nr = substr(komm_nr, 1, 2))
+  dplyr::rename(komm_nr = code) |> 
+  dplyr::select(komm_nr) |>
+  dplyr::mutate(fylke_nr = substr(komm_nr, 1, 2))
 
 # 2. Hent helseregion-korrespondanse for 2025
 klass_kommune_hr_2025 <- klassR::get_klass(131, correspond = 603, date = glue::glue("{aargang_2025}-01-01")) |> 
-  rename(komm_nr = sourceCode, 
+  dplyr::rename(komm_nr = sourceCode, 
          helseregion = targetCode) |> 
-  select(komm_nr, helseregion) |> 
-  mutate(helseregion = glue::glue("H{helseregion}"))
+  dplyr::select(komm_nr, helseregion) |> 
+  dplyr::mutate(helseregion = glue::glue("H{helseregion}"))
 
 # 3. Hent landsdel-korrespondanse for 2025
 klass_fylke_landsdel_2025 <- klassR::get_klass(104, correspond = 106, date = glue::glue("{aargang_2025}-01-01")) |> 
-  rename(fylke_nr = sourceCode, 
+  dplyr::rename(fylke_nr = sourceCode, 
          landsdel_nr = targetCode) |> 
-  select(fylke_nr, landsdel_nr)
+  dplyr::select(fylke_nr, landsdel_nr)
 
 # 4. Sett sammen til et regionalt datasett for 2025
 demodata_2025 <- klass_kommune_fylke_2025 |> 
-  left_join(klass_kommune_hr_2025, by = "komm_nr") |> 
-  left_join(klass_fylke_landsdel_2025, by = "fylke_nr")
+  dplyr::left_join(klass_kommune_hr_2025, by = "komm_nr") |> 
+  dplyr::left_join(klass_fylke_landsdel_2025, by = "fylke_nr")
 
 # 5. Lagre datasettet som Parquet
 arrow::write_parquet(demodata_2025, demodata_filsti_2025)
