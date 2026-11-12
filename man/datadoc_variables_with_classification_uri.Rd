@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{datadoc_variables_with_classification_uri}
 \alias{datadoc_variables_with_classification_uri}
-\title{Finn variabler med eller uten kodeliste}
+\title{Finn variabler med eller uten kodeliste i en Datadoc-fil}
 \usage{
 datadoc_variables_with_classification_uri(
   filsti,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{vardef_get_klass_id}
 \alias{vardef_get_klass_id}
-\title{Hent KLASS-ID fra en variabeldefinisjon}
+\title{Hent KLASS-ID fra en variabeldefinisjon i Vardef}
 \usage{
 vardef_get_klass_id(variable_definition)
 }

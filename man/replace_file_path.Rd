@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{replace_file_path}
 \alias{replace_file_path}
-\title{Erstatt filsti i Datadoc-metadata}
+\title{Erstatt filsti i en Datadoc-fil}
 \usage{
 replace_file_path(filsti, ny_filsti)
 }

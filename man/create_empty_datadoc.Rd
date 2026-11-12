@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{create_empty_datadoc}
 \alias{create_empty_datadoc}
-\title{Opprett et tomt Datadoc-dokument}
+\title{Opprett en tom Datadoc-fil}
 \usage{
 create_empty_datadoc(
   filsti,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{get_variable_definition_by_shortname}
 \alias{get_variable_definition_by_shortname}
-\title{Hent variabeldefinisjon etter kortnavn}
+\title{Hent variabeldefinisjon fra Vardef etter kortnavn}
 \usage{
 get_variable_definition_by_shortname(
   short_name,

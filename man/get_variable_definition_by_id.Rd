@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{get_variable_definition_by_id}
 \alias{get_variable_definition_by_id}
-\title{Hent variabeldefinisjon etter ID}
+\title{Hent variabeldefinisjon fra Vardef etter ID}
 \usage{
 get_variable_definition_by_id(
   id,

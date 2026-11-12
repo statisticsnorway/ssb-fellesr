@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{add_value_labels}
 \alias{add_value_labels}
-\title{Legg til verdietiketter fra KLASS}
+\title{Legg til verdietiketter fra en Datadoc-fil}
 \usage{
 add_value_labels(
   data,

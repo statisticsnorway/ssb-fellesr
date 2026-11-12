@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{set_variable_names_from_labels}
 \alias{set_variable_names_from_labels}
-\title{Oppdater variabelnavn og intervjumetadata i Datadoc}
+\title{Oppdater variabelnavn og intervjumetadata i en Datadoc-fil}
 \usage{
 set_variable_names_from_labels(
   filsti,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{copy_vardef_to_datadoc}
 \alias{copy_vardef_to_datadoc}
-\title{Kopier metadata fra Vardef til Datadoc}
+\title{Kopier metadata fra Vardef til en Datadoc-fil}
 \usage{
 copy_vardef_to_datadoc(
   filsti,

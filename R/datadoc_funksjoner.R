@@ -63,7 +63,7 @@ datadoc_path <- function(filsti, to = c("json", "parquet"), warn_if_missing = TR
   output
 }
 
-#' Hent URL til tjenesten for variabeldefinisjoner
+#' Hent URL til Vardef
 #'
 #' Returnerer endepunktet til SSBs tjeneste for variabeldefinisjoner.
 #'
@@ -167,7 +167,7 @@ vardef_url <- function(status = "ekstern") {
 }
 
 
-#' Hent variabeldefinisjoner
+#' Hent alle variabeldefinisjoner fra Vardef
 #'
 #' Henter variabeldefinisjoner fra SSBs tjeneste for
 #' variabeldefinisjoner. Dersom en dato oppgis, returneres bare
@@ -270,7 +270,7 @@ get_all_variable_definitions <- function(
 
 
 
-#' Hent variabeldefinisjon etter kortnavn
+#' Hent variabeldefinisjon fra Vardef etter kortnavn
 #'
 #' Henter en variabeldefinisjon fra SSBs tjeneste for
 #' variabeldefinisjoner basert på variabelens kortnavn og en
@@ -366,7 +366,7 @@ get_variable_definition_by_shortname <- function(
 
 
 
-#' Hent variabeldefinisjon etter ID
+#' Hent variabeldefinisjon fra Vardef etter ID
 #'
 #' Henter en variabeldefinisjon fra SSBs tjeneste for
 #' variabeldefinisjoner basert på variabeldefinisjonens unike ID og en
@@ -427,7 +427,7 @@ get_variable_definition_by_id <- function(
 }
 
 
-#' Hent KLASS-ID fra en variabeldefinisjon
+#' Hent KLASS-ID fra en variabeldefinisjon i Vardef
 #'
 #' Henter den numeriske KLASS-ID-en fra feltet `classification_uri` i en
 #' variabeldefinisjon.
@@ -663,7 +663,7 @@ datadoc_variabeloversikt <- function(
 
 
 
-#' Finn variabler med eller uten kodeliste
+#' Finn variabler med eller uten kodeliste i en Datadoc-fil
 #'
 #' Henter en oversikt over variablene i en Datadoc-fil og filtrerer
 #' variablene etter om de har en tilknyttet kodeliste.
@@ -740,7 +740,7 @@ datadoc_variables_with_classification_uri <- function(
     )
 }
 
-#' Legg til verdietiketter fra KLASS
+#' Legg til verdietiketter fra en Datadoc-fil
 #'
 #' Henter kodelister som er referert fra Datadoc eller Vardef. En direkte
 #' KLASS-referanse i Datadoc har forrang. Språk og datoperiode brukes ved
@@ -956,7 +956,7 @@ show_column_labels <- function(data) {
 
 
 
-#' Legg til kolonneetiketter fra Datadoc
+#' Legg til kolonneetiketter fra en Datadoc-fil
 #'
 #' Legger til kolonneetiketter på variablene i et datasett basert på
 #' variabelnavnene i den tilhørende Datadoc-filen.
@@ -1275,7 +1275,7 @@ remove_all_labels <- function(data) {
 }
 
 
-#' Hent metadata for én variabel fra Datadoc
+#' Hent metadata for én variabel fra en Datadoc-fil
 #'
 #' Leser en Datadoc-fil og henter det fullstendige metadataobjektet for
 #' en bestemt variabel.
@@ -2789,7 +2789,7 @@ copy_metadata <- function(
   invisible(datadoc_egen)
 }
 
-#' Erstatt filsti i Datadoc-metadata
+#' Erstatt filsti i en Datadoc-fil
 #'
 #' Oppdaterer filstien som er lagret i datasettmetadataene i en Datadoc JSON-fil.
 #'
@@ -3520,7 +3520,7 @@ compare_variable_metadata <- function(
 }
 
 
-#' Finn variabler som mangler obligatorisk metadata
+#' Finn variabler som mangler obligatoriske metadata i en Datadoc-fil
 #'
 #' Lager en oversikt over hvilke variabler i en Datadoc-fil som mangler
 #' ett eller flere obligatoriske metadatafelt.
@@ -3670,7 +3670,7 @@ summarise_missing_required_metadata <- function(
 # Felles innlesing og utvalg av kolonner som finnes i datasettet.
 
 
-#' Oppdater variabelnavn og intervjumetadata i Datadoc
+#' Oppdater variabelnavn og intervjumetadata i en Datadoc-fil
 #'
 #' Henter variabelnavn fra en metadatatabell eller fra kolonneetiketter i
 #' et datasett. Koblingen skjer på eksakt likhet med `short_name`.
@@ -3885,7 +3885,7 @@ set_variable_names_from_labels <- function(
   invisible(doc)
 }
 
-#' Opprett et tomt Datadoc-dokument
+#' Opprett en tom Datadoc-fil
 #'
 #' Oppretter et nytt Datadoc-metadatadokument for en Parquet-fil.
 #' Dokumentet opprettes på tilsvarende måte som når en udokumentert
@@ -5257,7 +5257,7 @@ check_variables_in_vardef <- function(
 
 
 
-#' Kopier metadata fra Vardef til Datadoc
+#' Kopier metadata fra Vardef til en Datadoc-fil
 #'
 #' Kopierer navn, Vardef-ID og første enhetstype ved treff på
 #' kortnavn. KLASS-ID og øvrige dokumentasjonsfelt endres ikke.

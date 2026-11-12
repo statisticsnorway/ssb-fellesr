@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{datadoc_variable_metadata}
 \alias{datadoc_variable_metadata}
-\title{Hent metadata for én variabel fra Datadoc}
+\title{Hent metadata for én variabel fra en Datadoc-fil}
 \usage{
 datadoc_variable_metadata(filsti, variabel)
 }

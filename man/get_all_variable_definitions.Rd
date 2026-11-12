@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{get_all_variable_definitions}
 \alias{get_all_variable_definitions}
-\title{Hent variabeldefinisjoner}
+\title{Hent alle variabeldefinisjoner fra Vardef}
 \usage{
 get_all_variable_definitions(
   date = NULL,

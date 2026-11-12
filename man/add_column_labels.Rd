@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{add_column_labels}
 \alias{add_column_labels}
-\title{Legg til kolonneetiketter fra Datadoc}
+\title{Legg til kolonneetiketter fra en Datadoc-fil}
 \usage{
 add_column_labels(data, filsti, show_labels = TRUE, language = "nb")
 }
