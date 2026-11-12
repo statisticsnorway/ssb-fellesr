@@ -7,7 +7,7 @@
 value_label_expectations(
   data,
   filsti = NULL,
-  variables = NULL,
+  variabler = NULL,
   character_variables = TRUE,
   missing_only = FALSE
 )
@@ -15,11 +15,11 @@ value_label_expectations(
 \arguments{
 \item{data}{Et datasett som skal undersøkes for verdietiketter.}
 
-\item{filsti}{\code{NULL} eller en tekststreng med filstien til en DataDoc
+\item{filsti}{\code{NULL} eller en tekststreng med filstien til en Datadoc
 JSON-fil. Dersom en filsti oppgis, hentes \code{vardef_id} og \code{klass_id}
-fra variabelmetadataene i DataDoc-filen. Standardverdien er \code{NULL}.}
+fra variabelmetadataene i Datadoc-filen. Standardverdien er \code{NULL}.}
 
-\item{variables}{\code{NULL} eller en tekstvektor med navn på variabler som
+\item{variabler}{\code{NULL} eller en karaktervektor med navn på variabler som
 forventes å ha verdietiketter. Variabler som oppgis her, markeres som
 forventet å ha verdietiketter uavhengig av datatype. Standardverdien
 er \code{NULL}.}
@@ -49,10 +49,10 @@ har minst én registrert verdietikett.}
 dersom variabelen forventes å ha verdietiketter, men ikke har noen
 registrerte verdietiketter.}
 \item{\code{vardef_id}}{ID-en til variabeldefinisjonen hentet fra
-\code{definition_uri} i DataDoc-filen. Kolonnen inkluderes bare når
+\code{definition_uri} i Datadoc-filen. Kolonnen inkluderes bare når
 \code{filsti} er oppgitt.}
 \item{\code{klass_id}}{KLASS-ID-en hentet fra \code{classification_uri} i
-DataDoc-filen. Kolonnen inkluderes bare når \code{filsti} er oppgitt.}
+Datadoc-filen. Kolonnen inkluderes bare når \code{filsti} er oppgitt.}
 }
 }
 \description{
@@ -62,28 +62,28 @@ som mangler forventede verdietiketter.
 }
 \details{
 Forventningen kan baseres på variabeltype og på en eksplisitt angitt
-tekstvektor med variabelnavn. Dersom en DataDoc-fil oppgis, hentes i tillegg
+karaktervektor med variabelnavn. Dersom en Datadoc-fil oppgis, hentes i tillegg
 ID-er for variabeldefinisjoner og KLASS-klassifikasjoner.
 
 En variabel regnes som å ha verdietiketter dersom
 \code{\link[labelled:val_labels]{labelled::val_labels()}} returnerer minst én etikett.
 
 Når \code{character_variables = TRUE}, forventes alle tekstvariabler å ha
-verdietiketter. Variabler som oppgis eksplisitt i \code{variables}, forventes
+verdietiketter. Variabler som oppgis eksplisitt i \code{variabler}, forventes
 også å ha verdietiketter, uavhengig av datatype.
 
-Dersom både \code{character_variables = FALSE} og \code{variables = NULL}, forventes
+Dersom både \code{character_variables = FALSE} og \code{variabler = NULL}, forventes
 ingen variabler å ha verdietiketter.
 
-Når \code{filsti} er oppgitt, leses DataDoc-filen med
+Når \code{filsti} er oppgitt, leses Datadoc-filen med
 \code{\link[jsonlite:fromJSON]{jsonlite::fromJSON()}}. Funksjonen bruker \code{short_name} til å koble
-metadataene i DataDoc-filen til variablene i \code{data}.
+metadataene i Datadoc-filen til variablene i \code{data}.
 
 ID-en i \code{definition_uri} og \code{classification_uri} hentes fra teksten etter
 siste skråstrek (\code{/}) eller kolon (\code{:}). En eventuell avsluttende skråstrek
 fjernes før ID-en hentes.
 
-Dersom et av URI-feltene mangler i DataDoc-filen, settes den tilhørende
+Dersom et av URI-feltene mangler i Datadoc-filen, settes den tilhørende
 ID-en til \code{NA}.
 
 Når \code{missing_only = TRUE}, filtreres resultatet slik at bare variabler der
@@ -106,7 +106,7 @@ value_label_expectations(data)
 
 value_label_expectations(
   data,
-  variables = "alder"
+  variabler = "alder"
 )
 
 value_label_expectations(

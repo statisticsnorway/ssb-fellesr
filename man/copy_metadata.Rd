@@ -5,8 +5,8 @@
 \title{Kopier metadata mellom Datadoc-filer}
 \usage{
 copy_metadata(
-  filsti_datadoc_egen,
-  filsti_datadoc_original,
+  filsti_egen,
+  filsti_original,
   variabler = NULL,
   ekskluder_variabler = NULL,
   overwrite = TRUE,
@@ -15,19 +15,19 @@ copy_metadata(
 )
 }
 \arguments{
-\item{filsti_datadoc_egen}{En tekststreng med filstien til Datadoc-filen
+\item{filsti_egen}{En tekststreng med filstien til Datadoc-filen
 som skal oppdateres. Filnavnet må inneholde periode og versjon på formen
 \verb{_pYYYY_vN}, for eksempel \verb{_p2025_v1__DOC.json}.}
 
-\item{filsti_datadoc_original}{En tekststreng med filstien til Datadoc-filen
+\item{filsti_original}{En tekststreng med filstien til Datadoc-filen
 som metadata skal kopieres fra.}
 
-\item{variabler}{\code{NULL} eller en navngitt tekstvektor med eksplisitte
+\item{variabler}{\code{NULL} eller en navngitt karaktervektor med eksplisitte
 koblinger mellom variabler. Navnet på hvert element angir \code{short_name}
 i filen som skal oppdateres, mens verdien angir \code{short_name} i
 originalfilen. Standardverdien er \code{NULL}.}
 
-\item{ekskluder_variabler}{\code{NULL} eller en tekstvektor med \code{short_name}
+\item{ekskluder_variabler}{\code{NULL} eller en karaktervektor med \code{short_name}
 for variabler i mottakerfilen som ikke skal endres. For disse variablene
 kopieres verken metadata eller gyldighetsperiode. En variabel kan ikke
 samtidig være oppgitt i \code{dato_unntak}. Standardverdien er \code{NULL}.}
@@ -50,7 +50,7 @@ samtidig være oppgitt i \code{ekskluder_variabler}. Standardverdien er
 }
 \value{
 Den oppdaterte Datadoc-strukturen som en liste. Strukturen skrives
-samtidig tilbake til filen angitt i \code{filsti_datadoc_egen}.
+samtidig tilbake til filen angitt i \code{filsti_egen}.
 }
 \description{
 Kopierer variabelmetadata fra en original Datadoc-fil til en annen
@@ -99,7 +99,7 @@ oppdatert perioden som beskrevet nedenfor.
 Variabler i \code{ekskluder_variabler} er unntatt fra denne oppdateringen og
 beholdes fullstendig uendret.
 
-Standardperioden hentes fra filnavnet til \code{filsti_datadoc_egen}.
+Standardperioden hentes fra filnavnet til \code{filsti_egen}.
 Et filnavn som inneholder \verb{_p2025_v1} gir
 \code{contains_data_from = "2025-01-01"} og
 \code{contains_data_until = "2025-12-31"}.
@@ -117,13 +117,13 @@ Følgende kontroller utføres før filen endres:
 \itemize{
 \item \code{overwrite} må være én enkelt logisk verdi;
 \item \code{short_name} må være unik i begge Datadoc-filene;
-\item \code{variabler} må være en navngitt tekstvektor dersom argumentet
+\item \code{variabler} må være en navngitt karaktervektor dersom argumentet
 ikke er \code{NULL};
 \item samme mottakervariabel kan ikke oppgis flere ganger i
 \code{variabler};
 \item alle eksplisitt oppgitte variabler må finnes i de respektive
 Datadoc-filene;
-\item \code{ekskluder_variabler} må være en tekstvektor dersom argumentet
+\item \code{ekskluder_variabler} må være en karaktervektor dersom argumentet
 ikke er \code{NULL};
 \item alle variabler i \code{ekskluder_variabler} må finnes i
 mottakerfilen;
@@ -138,33 +138,33 @@ og \code{dato_unntak}; og
 \code{"YYYY-MM-DD"}.
 }
 
-Den oppdaterte strukturen skrives til \code{filsti_datadoc_egen} med
+Den oppdaterte strukturen skrives til \code{filsti_egen} med
 \code{\link[jsonlite:write_json]{jsonlite::write_json()}}. Den eksisterende filen overskrives.
 }
 \examples{
 \dontrun{
 # Kopier metadata og sett perioden til 2025 for alle aktuelle variabler
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json"
 )
 
 # Kopier bare til variabler som ikke allerede har metadata
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json",
   overwrite = FALSE
 )
 
 # Legg til eksplisitte koblinger mellom ulike kortnavn
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json",
   variabler = c(
     kjoenn = "sex",
@@ -174,9 +174,9 @@ copy_metadata(
 
 # Ikke gjør noen endringer i enkelte variabler
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json",
   ekskluder_variabler = c(
     "orgnr_frtk",
@@ -201,9 +201,9 @@ dato_unntak <- data.frame(
 )
 
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json",
   dato_unntak = dato_unntak
 )

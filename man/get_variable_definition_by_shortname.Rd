@@ -8,7 +8,8 @@ get_variable_definition_by_shortname(
   short_name,
   date = format(Sys.Date(), "\%Y-\%m-\%d"),
   language = "nb",
-  status = "ekstern",
+  status = "auto",
+  quiet = TRUE,
   token = NULL
 )
 }
@@ -23,7 +24,9 @@ dagens dato.}
 \item{language}{En tekststreng med språkkoden som skal brukes for
 tekstinnholdet i responsen. Standardverdien er \code{"nb"}.}
 
-\item{status}{\code{"ekstern"} (standard) eller \code{"intern"}.}
+\item{status}{\code{"auto"} (standard), \code{"ekstern"} eller \code{"intern"}.}
+
+\item{quiet}{Med \code{TRUE} (standard) skjules statusmeldingen ved 404.}
 
 \item{token}{Valgfritt Bearer-token til intern tjeneste.}
 }

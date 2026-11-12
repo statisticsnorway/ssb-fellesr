@@ -2,10 +2,10 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{set_variable_names_from_labels}
 \alias{set_variable_names_from_labels}
-\title{Oppdater variabelnavn og intervjumetadata i DataDoc}
+\title{Oppdater variabelnavn og intervjumetadata i Datadoc}
 \usage{
 set_variable_names_from_labels(
-  filsti_datadoc,
+  filsti,
   metadata,
   variabler = NULL,
   overwrite = FALSE,
@@ -15,7 +15,7 @@ set_variable_names_from_labels(
   data_source = "67",
   variable_role = "MEASURE",
   population_description = NULL,
-  language_code = "nb",
+  language = "nb",
   variabel_kolonne = "variabel",
   betydning_kolonne = "variable_text",
   clean_labels = TRUE,
@@ -23,7 +23,7 @@ set_variable_names_from_labels(
 )
 }
 \arguments{
-\item{filsti_datadoc}{Filsti til DataDoc-filen (.json) eller til den
+\item{filsti}{Filsti til Datadoc-filen (.json) eller til den
 tilhørende Parquet-filen. JSON-filen må allerede finnes.}
 
 \item{metadata}{En metadatatabell med kolonnene angitt i
@@ -33,7 +33,7 @@ kolonneetiketter i attributtet \code{label}. Gjentatte, identiske tekster
 for samme variabel er tillatt. Tomme etiketter brukes ikke som navn.}
 
 \item{variabler}{Tekstvektor med kortnavn som skal oppdateres.
-NULL velger alle kortnavn som finnes i både kilden og DataDoc.}
+NULL velger alle kortnavn som finnes i både kilden og Datadoc.}
 
 \item{overwrite}{Logisk verdi. FALSE fyller bare manglende navn på
 valgt språk. TRUE tillater også å erstatte navnet på dette språket.
@@ -56,11 +56,11 @@ støttes også og slår opp SSB i KLASS for datasettets sluttdato.}
 \item{variable_role}{Standard er "MEASURE" for selve intervjusvaret.}
 
 \item{population_description}{Eventuell dokumentert populasjonstekst
-for alle valgte intervjuspørsmål, på \code{language_code}. Standard NULL
+for alle valgte intervjuspørsmål, på \code{language}. Standard NULL
 hopper over feltet. Funksjonen utleder ikke hvem som fikk spørsmålet.
 Manglende populasjon vil fortsatt kunne utløse valideringsadvarsler.}
 
-\item{language_code}{Språk for navn og eventuell populasjonstekst.
+\item{language}{Språk for navn og eventuell populasjonstekst.
 Standard er "nb". Tillatte verdier er "nb", "nn" og "en".}
 
 \item{variabel_kolonne}{Kolonnen med kortnavn i en metadatatabell.
@@ -74,7 +74,7 @@ Standard er \code{"variabel"} for bakoverkompatibilitet.}
 \item{quiet}{Med \code{TRUE} (standard) skjules statusmeldinger.}
 }
 \value{
-Det oppdaterte DataDoc-dokumentet, usynlig. Antall endrede
+Det oppdaterte Datadoc-dokumentet, usynlig. Antall endrede
 variabler meldes i konsollen. Ved null endringer skrives ikke filen.
 }
 \description{
@@ -92,13 +92,13 @@ beholdes, også eventuell tidligere beregnet fullføringsprosent.
 \examples{
 \dontrun{
 # Fyll navn og tomme fagfelt for alle matchende variabler.
-set_variable_names_from_labels(filsti_datadoc, kodelister)
+set_variable_names_from_labels(filsti, kodelister)
 # Fyll bare navn.
 set_variable_names_from_labels(
-  filsti_datadoc, kodelister, intervjuvariabler = character()
+  filsti, kodelister, intervjuvariabler = character()
 )
 set_variable_names_from_labels(
-  filsti_datadoc, royk_med_labels,
+  filsti, royk_med_labels,
   variabler = c("tob1", "tob2")
 )
 }

@@ -4,13 +4,13 @@
 \alias{add_labelled_columns}
 \title{Legg til kolonner med verdietiketter}
 \usage{
-add_labelled_columns(data, variables = NULL, postfix = "_labelled")
+add_labelled_columns(data, variabler = NULL, postfix = "_labelled")
 }
 \arguments{
 \item{data}{Et datasett som inneholder én eller flere merkede variabler
 med verdietiketter.}
 
-\item{variables}{En karaktervektor med navn på variablene det skal
+\item{variabler}{En karaktervektor med navn på variablene det skal
 opprettes nye etikettkolonner for. Alle variablene må finnes i \code{data}
 og være merkede variabler som gjenkjennes av \code{\link[haven:is.labelled]{haven::is.labelled()}}.
 Dersom \code{NULL}, opprettes nye kolonner for alle merkede variabler i
@@ -35,7 +35,7 @@ Funksjonen konverterer de valgte variablene med \code{\link[haven:as_factor]{hav
 verdietikettene der de finnes, ellers kodene. De opprinnelige variablene
 beholdes uendret.
 
-Dersom \code{variables = NULL}, identifiseres alle merkede variabler i
+Dersom \code{variabler = NULL}, identifiseres alle merkede variabler i
 datasettet ved hjelp av \code{\link[haven:is.labelled]{haven::is.labelled()}}. Dersom ingen merkede
 variabler finnes, returneres datasettet uendret og det gis en advarsel.
 
@@ -46,10 +46,10 @@ etterfulgt av verdien i \code{postfix}. Dersom for eksempel variabelen heter
 
 Funksjonen gir en feil dersom:
 \itemize{
-\item \code{variables} ikke er \code{NULL} eller en karaktervektor med minst ett
+\item \code{variabler} ikke er \code{NULL} eller en karaktervektor med minst ett
 variabelnavn.
-\item én eller flere av variablene i \code{variables} ikke finnes i \code{data}.
-\item én eller flere av variablene i \code{variables} ikke er merkede variabler.
+\item én eller flere av variablene i \code{variabler} ikke finnes i \code{data}.
+\item én eller flere av variablene i \code{variabler} ikke er merkede variabler.
 \item én eller flere av de nye variablene allerede finnes i \code{data}.
 \item \code{postfix} ikke er én enkelt tekststreng.
 }
@@ -86,13 +86,13 @@ add_labelled_columns(
 # Opprett etikettkolonne for én bestemt variabel
 add_labelled_columns(
   data = data,
-  variables = "kjoenn"
+  variabler = "kjoenn"
 )
 
 # Opprett etikettkolonner for flere bestemte variabler
 add_labelled_columns(
   data = data,
-  variables = c(
+  variabler = c(
     "kjoenn",
     "region"
   )
@@ -101,7 +101,7 @@ add_labelled_columns(
 # Bruk et annet postfiks
 add_labelled_columns(
   data = data,
-  variables = "kjoenn",
+  variabler = "kjoenn",
   postfix = "_navn"
 )
 

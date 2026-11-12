@@ -4,18 +4,14 @@
 \alias{copy_metadata_dataset}
 \title{Kopier metadata på datasett-nivå mellom Datadoc-filer}
 \usage{
-copy_metadata_dataset(
-  filsti_datadoc_egen,
-  filsti_datadoc_original,
-  overwrite = FALSE
-)
+copy_metadata_dataset(filsti_egen, filsti_original, overwrite = FALSE)
 }
 \arguments{
-\item{filsti_datadoc_egen}{En tekststreng med filsti til Datadoc-filen
+\item{filsti_egen}{En tekststreng med filsti til Datadoc-filen
 som skal oppdateres. Kan også være filstien til den tilhørende
 Parquet-filen.}
 
-\item{filsti_datadoc_original}{En tekststreng med filsti til Datadoc-filen
+\item{filsti_original}{En tekststreng med filsti til Datadoc-filen
 metadata skal kopieres fra. Kan også være filstien til den tilhørende
 Parquet-filen.}
 
@@ -27,7 +23,7 @@ identifiserer målfilen overskrives ikke uavhengig av verdien til
 }
 \value{
 Returnerer den oppdaterte Datadoc-strukturen usynlig som en liste.
-Datadoc-filen som er angitt i \code{filsti_datadoc_egen} oppdateres
+Datadoc-filen som er angitt i \code{filsti_egen} oppdateres
 samtidig på disk.
 }
 \description{
@@ -83,15 +79,15 @@ beholdes.
 \examples{
 \dontrun{
 copy_metadata_dataset(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/produkt/speshelse/klargjorte-data/regnskap/2025/resultatregnskap-klargjort_p2025_v1.parquet",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/produkt/speshelse/klargjorte-data/regnskap/2024/resultatregnskap-klargjort_p2024_v3.parquet"
 )
 
 copy_metadata_dataset(
-  filsti_datadoc_egen = "data/resultat_p2025_v2.parquet",
-  filsti_datadoc_original = "data/resultat_p2024_v1.parquet",
+  filsti_egen = "data/resultat_p2025_v2.parquet",
+  filsti_original = "data/resultat_p2024_v1.parquet",
   overwrite = TRUE
 )
 }

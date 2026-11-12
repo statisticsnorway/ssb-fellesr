@@ -47,7 +47,7 @@ metadatafelt for hver variabel:
 }
 
 Dette er en utfyllingskontroll av de seks feltene ovenfor, ikke full
-validering mot DataDoc-modellen. Betingede krav kontrolleres ikke.
+validering mot Datadoc-modellen. Betingede krav kontrolleres ikke.
 For språkposter kontrolleres tekstinnholdet, ikke bare at språk finnes.
 
 Et metadatafelt regnes som manglende dersom verdien er \code{NULL}, har

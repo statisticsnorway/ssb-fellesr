@@ -4,81 +4,49 @@
 \alias{datadoc_variabeloversikt}
 \title{Lag oversikt over variabler i en Datadoc-fil}
 \usage{
-datadoc_variabeloversikt(filsti, language = "nb", include_vardef = TRUE)
+datadoc_variabeloversikt(
+  filsti,
+  language = "nb",
+  include_vardef = TRUE,
+  status = "auto"
+)
 }
 \arguments{
-\item{filsti}{Filsti til en DataDoc-fil eller en Parquet-fil. Filstien til
-den tilhørende Datadoc-filen utledes ved hjelp av \code{\link[=datadoc_path]{datadoc_path()}}.}
+\item{filsti}{Filsti til en Datadoc-fil eller tilhørende
+Parquet-fil.}
 
-\item{language}{En tekststreng med språkkoden som skal brukes ved uthenting
-av navn og annen språkavhengig metadata. Standardverdien er \code{"nb"}.}
+\item{language}{Språkkode: "nb", "nn" eller "en".
+Standardverdien er "nb".}
 
-\item{include_vardef}{Logisk verdi. Med \code{FALSE} leses bare lokale
-metadata, uten nettverkskall til Vardef. Standard er \code{TRUE}.}
+\item{include_vardef}{Logisk verdi. Med FALSE leses bare
+lokale metadata uten oppslag i Vardef.
+Standardverdien er TRUE.}
+
+\item{status}{"auto" (standard), "ekstern" eller "intern".
+Med "auto" søkes det først i ekstern Vardef, deretter
+intern Vardef for definisjoner som ikke finnes eksternt.}
 }
 \value{
-En \code{data.frame} med én rad per variabel og følgende kolonner:
-
-\describe{
-\item{\code{short_name}}{Variabelens kortnavn fra Datadoc-filen.}
-\item{\code{name}}{Variabelens navn på det valgte språket.}
-\item{\code{data_type}}{Variabelens datatype.}
-\item{\code{classification_uri}}{KLASS-ID hentet fra variabelens
-\code{classification_uri} i DataDoc-filen.}
-\item{\code{vardef_definition_uri}}{ID-en til variabeldefinisjonen som ble
-hentet fra tjenesten for variabeldefinisjoner.}
-\item{\code{vardef_name}}{Navnet fra variabeldefinisjonen på det valgte
-språket.}
-\item{\code{vardef_short_name}}{Kortnavnet fra variabeldefinisjonen.}
-\item{\code{vardef_classification_uri}}{KLASS-ID hentet fra
-\code{classification_uri} i variabeldefinisjonen.}
-\item{\code{contains_data_from}}{Startdatoen for perioden variabelen
-inneholder data for.}
-\item{\code{contains_data_until}}{Sluttdatoen for perioden variabelen
-inneholder data for.}
-}
+En data.frame med én rad per variabel og følgende
+kolonner:
+short_name, name, data_type, classification_uri,
+vardef_definition_uri, vardef_name, vardef_short_name,
+vardef_classification_uri, contains_data_from og
+contains_data_until.
 }
 \description{
 Leser variabelmetadata fra en Datadoc-fil og lager en oversikt
 over variablene. Dersom en variabel har en referanse til en
-variabeldefinisjon, hentes supplerende metadata fra SSBs tjeneste for
-variabeldefinisjoner.
+variabeldefinisjon, hentes supplerende metadata fra Vardef.
 }
 \details{
-Funksjonen forventer at Datadoc-filen har samme filsti som Parquet-filen,
-men med filendelsen \code{.parquet} erstattet med \verb{__DOC.json}.
+Vardef-oppslag gjøres etter definition_uri uten filtrering
+på gyldighetsdato. Dataperioden i Datadoc påvirker dermed
+ikke hvilken Vardef-definisjon som kan hentes.
 
-Språkavhengige felt kan være lagret som tekstvektorer, data frames eller
-lister. Funksjonen forsøker først å hente tekst for språket angitt i
-\code{language}. Dersom dette språket ikke finnes, brukes den første
-tilgjengelige ikke-tomme teksten.
+contains_data_from og contains_data_until beholdes fra
+Datadoc og kan brukes ved senere oppslag i KLASS.
 
-Verdiene i \code{classification_uri} omgjøres til KLASS-ID-er. Dersom URI-en
-mangler eller ikke avsluttes med en numerisk ID, returneres
-\code{NA_character_}.
-
-Dersom en variabel inneholder en \code{definition_uri}, brukes sluttdatoen i
-\code{contains_data_until} som gyldighetsdato ved oppslag i tjenesten for
-variabeldefinisjoner. Dersom sluttdatoen mangler, brukes dagens dato.
-
-Hver kombinasjon av variabeldefinisjons-ID og gyldighetsdato hentes bare
-én gang. Dersom oppslaget feiler, vises en advarsel og de tilhørende
-Vardef-feltene fylles med manglende verdier.
-}
-\examples{
-\dontrun{
-datadoc_variabeloversikt(
-  filsti = "/buckets/data/personell_v1.parquet"
-)
-
-datadoc_variabeloversikt(
-  filsti = "/buckets/data/personell_v1.parquet",
-  language = "en"
-)
-}
-
-}
-\seealso{
-\code{\link[=datadoc_path]{datadoc_path()}} for å opprette filstien til DataDoc-filen og
-\code{\link[=get_variable_definition_by_id]{get_variable_definition_by_id()}} for å hente én variabeldefinisjon.
+Både classification_uri og classification_reference fra
+Vardef støttes. KLASS-referanser returneres som KLASS-ID.
 }

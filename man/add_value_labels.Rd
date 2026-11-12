@@ -15,7 +15,7 @@ add_value_labels(
 \arguments{
 \item{data}{En data.frame eller tibble med numeriske eller tekstbaserte koder.}
 
-\item{filsti}{Filsti til DataDoc-filen eller den tilhørende Parquet-filen.}
+\item{filsti}{Filsti til Datadoc-filen eller den tilhørende Parquet-filen.}
 
 \item{language}{Språkkode: \code{"nb"} (standard), \code{"nn"} eller \code{"en"}.}
 
@@ -29,8 +29,8 @@ formateringstagger fra etikettene og mellomrom ryddes opp.}
 Datasettet med verdietiketter på variabler med treff.
 }
 \description{
-Henter kodelister som er referert fra DataDoc eller Vardef. En direkte
-KLASS-referanse i DataDoc har forrang. Språk og datoperiode brukes ved
+Henter kodelister som er referert fra Datadoc eller Vardef. En direkte
+KLASS-referanse i Datadoc har forrang. Språk og datoperiode brukes ved
 oppslag; dagens dato brukes hvis sluttdato mangler.
 }
 \details{

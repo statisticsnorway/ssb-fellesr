@@ -8,7 +8,7 @@ get_variable_definition_by_id(
   id,
   date = format(Sys.Date(), "\%Y-\%m-\%d"),
   language = "nb",
-  status = "ekstern",
+  status = "auto",
   token = NULL,
   quiet = TRUE
 )
@@ -24,7 +24,7 @@ dagens dato.}
 \item{language}{En tekststreng med språkkoden som skal brukes for
 tekstinnholdet i responsen. Standardverdien er \code{"nb"}.}
 
-\item{status}{\code{"ekstern"} (standard) eller \code{"intern"}.}
+\item{status}{\code{"auto"} (standard), \code{"ekstern"} eller \code{"intern"}.}
 
 \item{token}{Valgfritt Bearer-token til intern tjeneste.}
 
@@ -46,8 +46,7 @@ parameteren \code{date_of_validity}. Språket sendes i HTTP-hodet
 \code{Accept-Language}.
 
 Dersom tjenesten returnerer HTTP-status 404 og \code{quiet = FALSE}, vises en melding om at
-variabeldefinisjonen ikke ble funnet. Funksjonen returnerer samtidig
-innholdet i feilresponsen.
+variabeldefinisjonen ikke ble funnet. Funksjonen returnerer da \code{NULL}.
 
 Andre HTTP-feil fører til at funksjonen stopper med en feilmelding.
 }

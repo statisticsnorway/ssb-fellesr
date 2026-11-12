@@ -9,7 +9,8 @@ add_column_labels_from_file(
   kodelister,
   variabel_kolonne = "varnavn",
   betydning_kolonne = "sporsmaal_text",
-  clean_labels = TRUE
+  clean_labels = TRUE,
+  show_labels = TRUE
 )
 }
 \arguments{
@@ -30,6 +31,10 @@ spørsmålsteksten. Standard er \code{"sporsmaal_text"}.}
 \item{clean_labels}{Logisk verdi. Standard er \code{TRUE}.
 Med \code{TRUE} fjernes HTML- og formateringstagger fra kolonneetikettene,
 og mellomrom ryddes opp. Teksten mellom taggene beholdes.}
+
+\item{show_labels}{En logisk verdi som angir om kolonneetikettene også skal
+vises ved utskrift av datasettet. Når verdien er \code{TRUE}, behandles
+datasettet med \code{\link[=show_column_labels]{show_column_labels()}}. Standardverdien er \code{TRUE}.}
 }
 \value{
 Datasettet med kolonneetiketter på variablene som har treff.
