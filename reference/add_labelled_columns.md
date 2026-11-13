@@ -6,7 +6,7 @@ endre de opprinnelige variablene.
 ## Usage
 
 ``` r
-add_labelled_columns(data, variables = NULL, postfix = "_labelled")
+add_labelled_columns(data, variabler = NULL, postfix = "_labelled")
 ```
 
 ## Arguments
@@ -16,7 +16,7 @@ add_labelled_columns(data, variables = NULL, postfix = "_labelled")
   Et datasett som inneholder én eller flere merkede variabler med
   verdietiketter.
 
-- variables:
+- variabler:
 
   En karaktervektor med navn på variablene det skal opprettes nye
   etikettkolonner for. Alle variablene må finnes i `data` og være
@@ -40,11 +40,11 @@ variablene er faktorer der verdietikettene brukes som faktorverdier.
 
 Funksjonen konverterer de valgte variablene med
 [`haven::as_factor()`](https://forcats.tidyverse.org/reference/as_factor.html)
-og `levels = "labels"`. Dette innebærer at de nye kolonnene inneholder
-verdietikettene, mens de opprinnelige kodene beholdes i de opprinnelige
-variablene.
+og `levels = "default"`. Dette innebærer at de nye kolonnene inneholder
+verdietikettene der de finnes, ellers kodene. De opprinnelige variablene
+beholdes uendret.
 
-Dersom `variables = NULL`, identifiseres alle merkede variabler i
+Dersom `variabler = NULL`, identifiseres alle merkede variabler i
 datasettet ved hjelp av
 [`haven::is.labelled()`](https://haven.tidyverse.org/reference/labelled.html).
 Dersom ingen merkede variabler finnes, returneres datasettet uendret og
@@ -57,21 +57,21 @@ etterfulgt av verdien i `postfix`. Dersom for eksempel variabelen heter
 
 Funksjonen gir en feil dersom:
 
-- `variables` ikke er `NULL` eller en karaktervektor med minst ett
+- `variabler` ikke er `NULL` eller en karaktervektor med minst ett
   variabelnavn.
 
-- én eller flere av variablene i `variables` ikke finnes i `data`.
+- én eller flere av variablene i `variabler` ikke finnes i `data`.
 
-- én eller flere av variablene i `variables` ikke er merkede variabler.
+- én eller flere av variablene i `variabler` ikke er merkede variabler.
 
 - én eller flere av de nye variablene allerede finnes i `data`.
 
 - `postfix` ikke er én enkelt tekststreng.
 
-Det gis en advarsel dersom konverteringen introduserer nye
-missing-verdier. Missing-verdier som allerede finnes i de opprinnelige
-variablene utløser ikke advarselen. Nye missing-verdier kan blant annet
-oppstå dersom enkelte verdier ikke har en tilhørende verdietikett.
+Observerte verdier uten etikett gir en advarsel med variabelnavn og
+koder. Disse vises som koder i faktorkolonnen og blir ikke gjort om til
+`NA`. Vanlige manglende verdier utløser ikke advarselen. Gruppering
+beholdes, og grupperingsvariabler kan også velges.
 
 ## Examples
 
@@ -106,7 +106,7 @@ add_labelled_columns(
 # Opprett etikettkolonne for én bestemt variabel
 add_labelled_columns(
   data = data,
-  variables = "kjoenn"
+  variabler = "kjoenn"
 )
 #>   kjoenn region alder kjoenn_labelled
 #> 1      1     01    30            Mann
@@ -116,7 +116,7 @@ add_labelled_columns(
 # Opprett etikettkolonner for flere bestemte variabler
 add_labelled_columns(
   data = data,
-  variables = c(
+  variabler = c(
     "kjoenn",
     "region"
   )
@@ -129,7 +129,7 @@ add_labelled_columns(
 # Bruk et annet postfiks
 add_labelled_columns(
   data = data,
-  variables = "kjoenn",
+  variabler = "kjoenn",
   postfix = "_navn"
 )
 #>   kjoenn region alder kjoenn_navn

@@ -35,7 +35,8 @@ For variabler av typen `haven_labelled_spss` vil brukerdefinerte
 manglende verdier som standard omgjøres til vanlige `NA`-verdier når
 verdietikettene fjernes.
 
-Andre metadataattributter, som formater og kolonnebredder, fjernes ikke.
+Visningsetiketten i `pillar` fjernes også. Andre metadataattributter,
+som formater og kolonnebredder, beholdes.
 
 ## See also
 

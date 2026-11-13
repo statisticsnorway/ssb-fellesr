@@ -1,4 +1,4 @@
-# Hent KLASS-ID fra en variabeldefinisjon
+# Hent KLASS-ID fra en variabeldefinisjon i Vardef
 
 Henter den numeriske KLASS-ID-en fra feltet `classification_uri` i en
 variabeldefinisjon.

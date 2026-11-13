@@ -10,7 +10,7 @@ variabler som mangler forventede verdietiketter.
 value_label_expectations(
   data,
   filsti = NULL,
-  variables = NULL,
+  variabler = NULL,
   character_variables = TRUE,
   missing_only = FALSE
 )
@@ -24,15 +24,15 @@ value_label_expectations(
 
 - filsti:
 
-  `NULL` eller en tekststreng med filstien til en DataDoc JSON-fil.
+  `NULL` eller en tekststreng med filstien til en Datadoc JSON-fil.
   Dersom en filsti oppgis, hentes `vardef_id` og `klass_id` fra
-  variabelmetadataene i DataDoc-filen. Standardverdien er `NULL`.
+  variabelmetadataene i Datadoc-filen. Standardverdien er `NULL`.
 
-- variables:
+- variabler:
 
-  `NULL` eller en tekstvektor med navn på variabler som forventes å ha
-  verdietiketter. Variabler som oppgis her, markeres som forventet å ha
-  verdietiketter uavhengig av datatype. Standardverdien er `NULL`.
+  `NULL` eller en karaktervektor med navn på variabler som forventes å
+  ha verdietiketter. Variabler som oppgis her, markeres som forventet å
+  ha verdietiketter uavhengig av datatype. Standardverdien er `NULL`.
 
 - character_variables:
 
@@ -78,17 +78,17 @@ En tibble med én rad per variabel og følgende kolonner:
 - `vardef_id`:
 
   ID-en til variabeldefinisjonen hentet fra `definition_uri` i
-  DataDoc-filen. Kolonnen inkluderes bare når `filsti` er oppgitt.
+  Datadoc-filen. Kolonnen inkluderes bare når `filsti` er oppgitt.
 
 - `klass_id`:
 
-  KLASS-ID-en hentet fra `classification_uri` i DataDoc-filen. Kolonnen
+  KLASS-ID-en hentet fra `classification_uri` i Datadoc-filen. Kolonnen
   inkluderes bare når `filsti` er oppgitt.
 
 ## Details
 
 Forventningen kan baseres på variabeltype og på en eksplisitt angitt
-tekstvektor med variabelnavn. Dersom en DataDoc-fil oppgis, hentes i
+karaktervektor med variabelnavn. Dersom en Datadoc-fil oppgis, hentes i
 tillegg ID-er for variabeldefinisjoner og KLASS-klassifikasjoner.
 
 En variabel regnes som å ha verdietiketter dersom
@@ -96,22 +96,22 @@ En variabel regnes som å ha verdietiketter dersom
 returnerer minst én etikett.
 
 Når `character_variables = TRUE`, forventes alle tekstvariabler å ha
-verdietiketter. Variabler som oppgis eksplisitt i `variables`, forventes
+verdietiketter. Variabler som oppgis eksplisitt i `variabler`, forventes
 også å ha verdietiketter, uavhengig av datatype.
 
-Dersom både `character_variables = FALSE` og `variables = NULL`,
+Dersom både `character_variables = FALSE` og `variabler = NULL`,
 forventes ingen variabler å ha verdietiketter.
 
-Når `filsti` er oppgitt, leses DataDoc-filen med
+Når `filsti` er oppgitt, leses Datadoc-filen med
 [`jsonlite::fromJSON()`](https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html).
-Funksjonen bruker `short_name` til å koble metadataene i DataDoc-filen
+Funksjonen bruker `short_name` til å koble metadataene i Datadoc-filen
 til variablene i `data`.
 
 ID-en i `definition_uri` og `classification_uri` hentes fra teksten
 etter siste skråstrek (`/`) eller kolon (`:`). En eventuell avsluttende
 skråstrek fjernes før ID-en hentes.
 
-Dersom et av URI-feltene mangler i DataDoc-filen, settes den tilhørende
+Dersom et av URI-feltene mangler i Datadoc-filen, settes den tilhørende
 ID-en til `NA`.
 
 Når `missing_only = TRUE`, filtreres resultatet slik at bare variabler
@@ -153,7 +153,7 @@ value_label_expectations(data)
 
 value_label_expectations(
   data,
-  variables = "alder"
+  variabler = "alder"
 )
 #> # A tibble: 3 × 5
 #>   variable type   should_have_value_la…¹ has_value_labels missing_expected_val…²

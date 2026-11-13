@@ -33,6 +33,9 @@ tibble.
 
 ## Details
 
+Kolonnen `value_without_label` er tekst slik at numeriske og
+tekstbaserte koder kan samles i samme oversikt. Inndata endres ikke.
+
 Funksjonen undersøker variablene som returneres av
 [`vars_with_value_labels()`](vars_with_value_labels.md). Det betyr at
 bare variabler som allerede har minst én verdietikett, blir kontrollert.
@@ -67,6 +70,8 @@ data <- data.frame(
 )
 
 values_without_labels(data)
+#> # A tibble: 1 × 2
 #>   variable value_without_label
-#> 1   kjoenn                   3
+#>   <chr>    <chr>              
+#> 1 kjoenn   3                  
 ```

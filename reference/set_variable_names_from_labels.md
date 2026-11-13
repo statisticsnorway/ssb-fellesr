@@ -1,4 +1,4 @@
-# Oppdater variabelnavn og intervjumetadata i DataDoc
+# Oppdater variabelnavn og intervjumetadata i en Datadoc-fil
 
 Henter variabelnavn fra en metadatatabell eller fra kolonneetiketter i
 et datasett. Koblingen skjer på eksakt likhet med `short_name`.
@@ -9,7 +9,7 @@ variabler. Utvalget kan avgrenses med `intervjuvariabler`.
 
 ``` r
 set_variable_names_from_labels(
-  filsti_datadoc,
+  filsti,
   metadata,
   variabler = NULL,
   overwrite = FALSE,
@@ -19,28 +19,33 @@ set_variable_names_from_labels(
   data_source = "67",
   variable_role = "MEASURE",
   population_description = NULL,
-  language_code = "nb"
+  language = "nb",
+  variabel_kolonne = "variabel",
+  betydning_kolonne = "variable_text",
+  clean_labels = TRUE,
+  quiet = TRUE
 )
 ```
 
 ## Arguments
 
-- filsti_datadoc:
+- filsti:
 
-  Filsti til DataDoc-filen (.json) eller til den tilhørende
+  Filsti til Datadoc-filen (.json) eller til den tilhørende
   Parquet-filen. JSON-filen må allerede finnes.
 
 - metadata:
 
-  En metadatatabell med `variabel` og `variable_text`, filstien til en
-  slik tabell i Parquet-format, eller et data.frame med kolonneetiketter
-  i attributtet `label`. Gjentatte, identiske tekster for samme variabel
-  er tillatt. Tomme etiketter brukes ikke som navn.
+  En metadatatabell med kolonnene angitt i `variabel_kolonne` og
+  `betydning_kolonne`, filstien til en slik tabell i Parquet-format,
+  eller et data.frame med kolonneetiketter i attributtet `label`.
+  Gjentatte, identiske tekster for samme variabel er tillatt. Tomme
+  etiketter brukes ikke som navn.
 
 - variabler:
 
   Tekstvektor med kortnavn som skal oppdateres. NULL velger alle
-  kortnavn som finnes i både kilden og DataDoc.
+  kortnavn som finnes i både kilden og Datadoc.
 
 - overwrite:
 
@@ -78,18 +83,36 @@ set_variable_names_from_labels(
 - population_description:
 
   Eventuell dokumentert populasjonstekst for alle valgte
-  intervjuspørsmål, på `language_code`. Standard NULL hopper over
-  feltet. Funksjonen utleder ikke hvem som fikk spørsmålet. Manglende
-  populasjon vil fortsatt kunne utløse valideringsadvarsler.
+  intervjuspørsmål, på `language`. Standard NULL hopper over feltet.
+  Funksjonen utleder ikke hvem som fikk spørsmålet. Manglende populasjon
+  vil fortsatt kunne utløse valideringsadvarsler.
 
-- language_code:
+- language:
 
   Språk for navn og eventuell populasjonstekst. Standard er "nb".
   Tillatte verdier er "nb", "nn" og "en".
 
+- variabel_kolonne:
+
+  Kolonnen med kortnavn i en metadatatabell. Standard er `"variabel"`
+  for bakoverkompatibilitet.
+
+- betydning_kolonne:
+
+  Kolonnen med spørsmålstekst. Standard er `"variable_text"`. Bruk
+  `"sporsmaal_text"` for EHIS.
+
+- clean_labels:
+
+  Med `TRUE` (standard) renses etiketttekst for tagger.
+
+- quiet:
+
+  Med `TRUE` (standard) skjules statusmeldinger.
+
 ## Value
 
-Det oppdaterte DataDoc-dokumentet, usynlig. Antall endrede variabler
+Det oppdaterte Datadoc-dokumentet, usynlig. Antall endrede variabler
 meldes i konsollen. Ved null endringer skrives ikke filen.
 
 ## Details
@@ -104,13 +127,13 @@ eventuell tidligere beregnet fullføringsprosent.
 ``` r
 if (FALSE) { # \dontrun{
 # Fyll navn og tomme fagfelt for alle matchende variabler.
-set_variable_names_from_labels(filsti_datadoc, kodelister)
+set_variable_names_from_labels(filsti, kodelister)
 # Fyll bare navn.
 set_variable_names_from_labels(
-  filsti_datadoc, kodelister, intervjuvariabler = character()
+  filsti, kodelister, intervjuvariabler = character()
 )
 set_variable_names_from_labels(
-  filsti_datadoc, royk_med_labels,
+  filsti, royk_med_labels,
   variabler = c("tob1", "tob2")
 )
 } # }

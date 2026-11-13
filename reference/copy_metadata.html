@@ -13,7 +13,7 @@ mellom variabler med ulike kortnavn."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,6 +27,7 @@ mellom variabler med ulike kortnavn."></head><body>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a></li>
     <li><a class="dropdown-item" href="../articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html">Kjøre R på sl-stata-p4 fra SAS</a></li>
     <li><a class="dropdown-item" href="../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a></li>
+    <li><a class="dropdown-item" href="../articles/vignette_datadoc.html">Datadoc og Vardef i R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_shiny_ssb.html">Kjøre shiny og Esquisse i Jupyter</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_SSB_fargepalett.html">SSB fargepallet fra KLASS</a></li>
@@ -61,12 +62,13 @@ mellom variabler med ulike kortnavn.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">copy_metadata</span><span class="op">(</span></span>
-<span>  <span class="va">filsti_datadoc_egen</span>,</span>
-<span>  <span class="va">filsti_datadoc_original</span>,</span>
+<span>  <span class="va">filsti_egen</span>,</span>
+<span>  <span class="va">filsti_original</span>,</span>
 <span>  variabler <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ekskluder_variabler <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  dato_unntak <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  dato_unntak <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -74,26 +76,26 @@ mellom variabler med ulike kortnavn.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-filsti-datadoc-egen">filsti_datadoc_egen<a class="anchor" aria-label="anchor" href="#arg-filsti-datadoc-egen"></a></dt>
+<dl><dt id="arg-filsti-egen">filsti_egen<a class="anchor" aria-label="anchor" href="#arg-filsti-egen"></a></dt>
 <dd><p>En tekststreng med filstien til Datadoc-filen
 som skal oppdateres. Filnavnet må inneholde periode og versjon på formen
 <code>_pYYYY_vN</code>, for eksempel <code>_p2025_v1__DOC.json</code>.</p></dd>
 
 
-<dt id="arg-filsti-datadoc-original">filsti_datadoc_original<a class="anchor" aria-label="anchor" href="#arg-filsti-datadoc-original"></a></dt>
+<dt id="arg-filsti-original">filsti_original<a class="anchor" aria-label="anchor" href="#arg-filsti-original"></a></dt>
 <dd><p>En tekststreng med filstien til Datadoc-filen
 som metadata skal kopieres fra.</p></dd>
 
 
 <dt id="arg-variabler">variabler<a class="anchor" aria-label="anchor" href="#arg-variabler"></a></dt>
-<dd><p><code>NULL</code> eller en navngitt tekstvektor med eksplisitte
+<dd><p><code>NULL</code> eller en navngitt karaktervektor med eksplisitte
 koblinger mellom variabler. Navnet på hvert element angir <code>short_name</code>
 i filen som skal oppdateres, mens verdien angir <code>short_name</code> i
 originalfilen. Standardverdien er <code>NULL</code>.</p></dd>
 
 
 <dt id="arg-ekskluder-variabler">ekskluder_variabler<a class="anchor" aria-label="anchor" href="#arg-ekskluder-variabler"></a></dt>
-<dd><p><code>NULL</code> eller en tekstvektor med <code>short_name</code>
+<dd><p><code>NULL</code> eller en karaktervektor med <code>short_name</code>
 for variabler i mottakerfilen som ikke skal endres. For disse variablene
 kopieres verken metadata eller gyldighetsperiode. En variabel kan ikke
 samtidig være oppgitt i <code>dato_unntak</code>. Standardverdien er <code>NULL</code>.</p></dd>
@@ -116,18 +118,23 @@ Datoene skal være på formatet <code>"YYYY-MM-DD"</code>. En variabel kan ikke
 samtidig være oppgitt i <code>ekskluder_variabler</code>. Standardverdien er
 <code>NULL</code>.</p></dd>
 
+
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p>Med <code>TRUE</code> (standard) skjules statusmeldinger.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Den oppdaterte Datadoc-strukturen som en liste. Strukturen skrives
-samtidig tilbake til filen angitt i <code>filsti_datadoc_egen</code>.</p>
+samtidig tilbake til filen angitt i <code>filsti_egen</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Variabler kan ekskluderes fullstendig fra oppdateringen ved hjelp av
 <code>ekskluder_variabler</code>. For disse variablene kopieres verken metadata eller
 gyldighetsperiode.</p>
-<p>Gyldighetsperioden for øvrige variabler i mottakerfilen settes automatisk
+<p>Variabler som hoppes over med <code>overwrite = FALSE</code>, beholdes helt uendret,
+også når det gjelder datoer. Gyldighetsperioden for øvrige variabler settes
 ut fra perioden i filnavnet. For eksempel gir <code>_p2025_v1</code> perioden
 <code>2025-01-01</code> til <code>2025-12-31</code>. Det kan angis egne gyldighetsperioder for
 enkeltvariabler ved hjelp av <code>dato_unntak</code>.</p>
@@ -141,19 +148,20 @@ variablene med identiske kortnavn.</p>
 variabler som skal få kopiert metadata. De hoppes også over når
 gyldighetsperioden oppdateres. Disse variablene beholdes derfor uendret i
 mottakerfilen.</p>
-<p>For hver øvrige variabel kopieres hele metadataobjektet fra originalfilen.
-Feltet <code>short_name</code> erstattes deretter med kortnavnet som brukes i filen
-som oppdateres.</p>
+<p>Kjente dokumentasjonsfelt kopieres fra originalfilen. Felt som finnes i
+kilden, erstattes samlet, også når kildeverdien er <code>NULL</code>. Mottakerens
+kortnavn, ID, datatype, dataelementsti og pseudonymiseringsmetadata
+beholdes. Ukjente felt og felt som ikke finnes i kilden, beholdes.</p>
 <p>Når <code>overwrite = FALSE</code>, regnes en variabel som å ha eksisterende metadata
 dersom feltet <code>name</code> ikke er <code>NULL</code>. Andre metadatafelt tas ikke med i
 denne vurderingen.</p>
-<p>Gyldighetsperioden oppdateres uavhengig av <code>overwrite</code>. Dette innebærer at
-også variabler som ikke får kopiert metadata fordi de allerede har
-metadata, får oppdatert feltene <code>contains_data_from</code> og
-<code>contains_data_until</code>.</p>
+<p>Når <code>overwrite = FALSE</code>, beholdes dokumenterte variabler helt uendret,
+inkludert <code>contains_data_from</code> og <code>contains_data_until</code>. Dette gjelder
+også dersom variabelen er oppgitt i <code>dato_unntak</code>. Øvrige variabler får
+oppdatert perioden som beskrevet nedenfor.</p>
 <p>Variabler i <code>ekskluder_variabler</code> er unntatt fra denne oppdateringen og
 beholdes fullstendig uendret.</p>
-<p>Standardperioden hentes fra filnavnet til <code>filsti_datadoc_egen</code>.
+<p>Standardperioden hentes fra filnavnet til <code>filsti_egen</code>.
 Et filnavn som inneholder <code>_p2025_v1</code> gir
 <code>contains_data_from = "2025-01-01"</code> og
 <code>contains_data_until = "2025-12-31"</code>.</p>
@@ -166,13 +174,13 @@ variablene.</p>
 <p>Følgende kontroller utføres før filen endres:</p>
 <ul><li><p><code>overwrite</code> må være én enkelt logisk verdi;</p></li>
 <li><p><code>short_name</code> må være unik i begge Datadoc-filene;</p></li>
-<li><p><code>variabler</code> må være en navngitt tekstvektor dersom argumentet
+<li><p><code>variabler</code> må være en navngitt karaktervektor dersom argumentet
 ikke er <code>NULL</code>;</p></li>
 <li><p>samme mottakervariabel kan ikke oppgis flere ganger i
 <code>variabler</code>;</p></li>
 <li><p>alle eksplisitt oppgitte variabler må finnes i de respektive
 Datadoc-filene;</p></li>
-<li><p><code>ekskluder_variabler</code> må være en tekstvektor dersom argumentet
+<li><p><code>ekskluder_variabler</code> må være en karaktervektor dersom argumentet
 ikke er <code>NULL</code>;</p></li>
 <li><p>alle variabler i <code>ekskluder_variabler</code> må finnes i
 mottakerfilen;</p></li>
@@ -185,7 +193,7 @@ mottakerfilen;</p></li>
 og <code>dato_unntak</code>; og</p></li>
 <li><p>datoene i <code>dato_unntak</code> må være gyldige datoer på formatet
 <code>"YYYY-MM-DD"</code>.</p></li>
-</ul><p>Den oppdaterte strukturen skrives til <code>filsti_datadoc_egen</code> med
+</ul><p>Den oppdaterte strukturen skrives til <code>filsti_egen</code> med
 <code><a href="https://jeroen.r-universe.dev/jsonlite/reference/read_json.html" class="external-link">jsonlite::write_json()</a></code>. Den eksisterende filen overskrives.</p>
     </div>
     <div class="section level2">
@@ -199,26 +207,26 @@ angitte variabler.</p></div>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># Kopier metadata og sett perioden til 2025 for alle aktuelle variabler</span></span></span>
 <span class="r-in"><span><span class="fu">copy_metadata</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  filsti_datadoc_egen <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_egen <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2025_v1__DOC.json"</span>,</span></span>
-<span class="r-in"><span>  filsti_datadoc_original <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_original <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2024_v1__DOC.json"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Kopier bare til variabler som ikke allerede har metadata</span></span></span>
 <span class="r-in"><span><span class="fu">copy_metadata</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  filsti_datadoc_egen <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_egen <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2025_v1__DOC.json"</span>,</span></span>
-<span class="r-in"><span>  filsti_datadoc_original <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_original <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2024_v1__DOC.json"</span>,</span></span>
 <span class="r-in"><span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Legg til eksplisitte koblinger mellom ulike kortnavn</span></span></span>
 <span class="r-in"><span><span class="fu">copy_metadata</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  filsti_datadoc_egen <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_egen <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2025_v1__DOC.json"</span>,</span></span>
-<span class="r-in"><span>  filsti_datadoc_original <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_original <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2024_v1__DOC.json"</span>,</span></span>
 <span class="r-in"><span>  variabler <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    kjoenn <span class="op">=</span> <span class="st">"sex"</span>,</span></span>
@@ -228,9 +236,9 @@ angitte variabler.</p></div>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Ikke gjør noen endringer i enkelte variabler</span></span></span>
 <span class="r-in"><span><span class="fu">copy_metadata</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  filsti_datadoc_egen <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_egen <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2025_v1__DOC.json"</span>,</span></span>
-<span class="r-in"><span>  filsti_datadoc_original <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_original <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2024_v1__DOC.json"</span>,</span></span>
 <span class="r-in"><span>  ekskluder_variabler <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="st">"orgnr_frtk"</span>,</span></span>
@@ -255,9 +263,9 @@ angitte variabler.</p></div>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">copy_metadata</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  filsti_datadoc_egen <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_egen <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2025_v1__DOC.json"</span>,</span></span>
-<span class="r-in"><span>  filsti_datadoc_original <span class="op">=</span></span></span>
+<span class="r-in"><span>  filsti_original <span class="op">=</span></span></span>
 <span class="r-in"><span>    <span class="st">"/buckets/data/resultat_p2024_v1__DOC.json"</span>,</span></span>
 <span class="r-in"><span>  dato_unntak <span class="op">=</span> <span class="va">dato_unntak</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>

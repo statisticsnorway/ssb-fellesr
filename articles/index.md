@@ -12,6 +12,8 @@
 
 - [DAPLA jukseark](vignette__DAPLA_jukseark.md):
 
+- [Datadoc og Vardef i R](vignette_datadoc.md):
+
 - [Uttrekk fra Dynarev til R](vignette_dynarev_uttrekk.md):
 
 - [Kjøre shiny og Esquisse i Jupyter](vignette_shiny_ssb.md):

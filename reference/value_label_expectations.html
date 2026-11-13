@@ -11,7 +11,7 @@ som mangler forventede verdietiketter."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,7 @@ som mangler forventede verdietiketter."></head><body>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a></li>
     <li><a class="dropdown-item" href="../articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html">Kjøre R på sl-stata-p4 fra SAS</a></li>
     <li><a class="dropdown-item" href="../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a></li>
+    <li><a class="dropdown-item" href="../articles/vignette_datadoc.html">Datadoc og Vardef i R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_shiny_ssb.html">Kjøre shiny og Esquisse i Jupyter</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_SSB_fargepalett.html">SSB fargepallet fra KLASS</a></li>
@@ -60,7 +61,7 @@ som mangler forventede verdietiketter.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">value_label_expectations</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
 <span>  filsti <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  variabler <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  character_variables <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  missing_only <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -75,13 +76,13 @@ som mangler forventede verdietiketter.</p>
 
 
 <dt id="arg-filsti">filsti<a class="anchor" aria-label="anchor" href="#arg-filsti"></a></dt>
-<dd><p><code>NULL</code> eller en tekststreng med filstien til en DataDoc
+<dd><p><code>NULL</code> eller en tekststreng med filstien til en Datadoc
 JSON-fil. Dersom en filsti oppgis, hentes <code>vardef_id</code> og <code>klass_id</code>
-fra variabelmetadataene i DataDoc-filen. Standardverdien er <code>NULL</code>.</p></dd>
+fra variabelmetadataene i Datadoc-filen. Standardverdien er <code>NULL</code>.</p></dd>
 
 
-<dt id="arg-variables">variables<a class="anchor" aria-label="anchor" href="#arg-variables"></a></dt>
-<dd><p><code>NULL</code> eller en tekstvektor med navn på variabler som
+<dt id="arg-variabler">variabler<a class="anchor" aria-label="anchor" href="#arg-variabler"></a></dt>
+<dd><p><code>NULL</code> eller en karaktervektor med navn på variabler som
 forventes å ha verdietiketter. Variabler som oppgis her, markeres som
 forventet å ha verdietiketter uavhengig av datatype. Standardverdien
 er <code>NULL</code>.</p></dd>
@@ -126,34 +127,34 @@ registrerte verdietiketter.</p></dd>
 
 <dt><code>vardef_id</code></dt>
 <dd><p>ID-en til variabeldefinisjonen hentet fra
-<code>definition_uri</code> i DataDoc-filen. Kolonnen inkluderes bare når
+<code>definition_uri</code> i Datadoc-filen. Kolonnen inkluderes bare når
 <code>filsti</code> er oppgitt.</p></dd>
 
 <dt><code>klass_id</code></dt>
 <dd><p>KLASS-ID-en hentet fra <code>classification_uri</code> i
-DataDoc-filen. Kolonnen inkluderes bare når <code>filsti</code> er oppgitt.</p></dd>
+Datadoc-filen. Kolonnen inkluderes bare når <code>filsti</code> er oppgitt.</p></dd>
 
 
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Forventningen kan baseres på variabeltype og på en eksplisitt angitt
-tekstvektor med variabelnavn. Dersom en DataDoc-fil oppgis, hentes i tillegg
+karaktervektor med variabelnavn. Dersom en Datadoc-fil oppgis, hentes i tillegg
 ID-er for variabeldefinisjoner og KLASS-klassifikasjoner.</p>
 <p>En variabel regnes som å ha verdietiketter dersom
 <code><a href="https://larmarange.github.io/labelled/reference/val_labels.html" class="external-link">labelled::val_labels()</a></code> returnerer minst én etikett.</p>
 <p>Når <code>character_variables = TRUE</code>, forventes alle tekstvariabler å ha
-verdietiketter. Variabler som oppgis eksplisitt i <code>variables</code>, forventes
+verdietiketter. Variabler som oppgis eksplisitt i <code>variabler</code>, forventes
 også å ha verdietiketter, uavhengig av datatype.</p>
-<p>Dersom både <code>character_variables = FALSE</code> og <code>variables = NULL</code>, forventes
+<p>Dersom både <code>character_variables = FALSE</code> og <code>variabler = NULL</code>, forventes
 ingen variabler å ha verdietiketter.</p>
-<p>Når <code>filsti</code> er oppgitt, leses DataDoc-filen med
+<p>Når <code>filsti</code> er oppgitt, leses Datadoc-filen med
 <code><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">jsonlite::fromJSON()</a></code>. Funksjonen bruker <code>short_name</code> til å koble
-metadataene i DataDoc-filen til variablene i <code>data</code>.</p>
+metadataene i Datadoc-filen til variablene i <code>data</code>.</p>
 <p>ID-en i <code>definition_uri</code> og <code>classification_uri</code> hentes fra teksten etter
 siste skråstrek (<code>/</code>) eller kolon (<code>:</code>). En eventuell avsluttende skråstrek
 fjernes før ID-en hentes.</p>
-<p>Dersom et av URI-feltene mangler i DataDoc-filen, settes den tilhørende
+<p>Dersom et av URI-feltene mangler i Datadoc-filen, settes den tilhørende
 ID-en til <code>NA</code>.</p>
 <p>Når <code>missing_only = TRUE</code>, filtreres resultatet slik at bare variabler der
 <code>missing_expected_value_labels</code> er <code>TRUE</code>, returneres.</p>
@@ -192,7 +193,7 @@ verdietiketter.</p></div>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">value_label_expectations</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">data</span>,</span></span>
-<span class="r-in"><span>  variables <span class="op">=</span> <span class="st">"alder"</span></span></span>
+<span class="r-in"><span>  variabler <span class="op">=</span> <span class="st">"alder"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   variable type   should_have_value_la…¹ has_value_labels missing_expected_val…²</span>

@@ -9,38 +9,39 @@ koblinger mellom variabler med ulike kortnavn.
 
 ``` r
 copy_metadata(
-  filsti_datadoc_egen,
-  filsti_datadoc_original,
+  filsti_egen,
+  filsti_original,
   variabler = NULL,
   ekskluder_variabler = NULL,
   overwrite = TRUE,
-  dato_unntak = NULL
+  dato_unntak = NULL,
+  quiet = TRUE
 )
 ```
 
 ## Arguments
 
-- filsti_datadoc_egen:
+- filsti_egen:
 
   En tekststreng med filstien til Datadoc-filen som skal oppdateres.
   Filnavnet må inneholde periode og versjon på formen `_pYYYY_vN`, for
   eksempel `_p2025_v1__DOC.json`.
 
-- filsti_datadoc_original:
+- filsti_original:
 
   En tekststreng med filstien til Datadoc-filen som metadata skal
   kopieres fra.
 
 - variabler:
 
-  `NULL` eller en navngitt tekstvektor med eksplisitte koblinger mellom
-  variabler. Navnet på hvert element angir `short_name` i filen som skal
-  oppdateres, mens verdien angir `short_name` i originalfilen.
+  `NULL` eller en navngitt karaktervektor med eksplisitte koblinger
+  mellom variabler. Navnet på hvert element angir `short_name` i filen
+  som skal oppdateres, mens verdien angir `short_name` i originalfilen.
   Standardverdien er `NULL`.
 
 - ekskluder_variabler:
 
-  `NULL` eller en tekstvektor med `short_name` for variabler i
+  `NULL` eller en karaktervektor med `short_name` for variabler i
   mottakerfilen som ikke skal endres. For disse variablene kopieres
   verken metadata eller gyldighetsperiode. En variabel kan ikke samtidig
   være oppgitt i `dato_unntak`. Standardverdien er `NULL`.
@@ -63,10 +64,14 @@ copy_metadata(
   En variabel kan ikke samtidig være oppgitt i `ekskluder_variabler`.
   Standardverdien er `NULL`.
 
+- quiet:
+
+  Med `TRUE` (standard) skjules statusmeldinger.
+
 ## Value
 
 Den oppdaterte Datadoc-strukturen som en liste. Strukturen skrives
-samtidig tilbake til filen angitt i `filsti_datadoc_egen`.
+samtidig tilbake til filen angitt i `filsti_egen`.
 
 ## Details
 
@@ -74,9 +79,10 @@ Variabler kan ekskluderes fullstendig fra oppdateringen ved hjelp av
 `ekskluder_variabler`. For disse variablene kopieres verken metadata
 eller gyldighetsperiode.
 
-Gyldighetsperioden for øvrige variabler i mottakerfilen settes
-automatisk ut fra perioden i filnavnet. For eksempel gir `_p2025_v1`
-perioden `2025-01-01` til `2025-12-31`. Det kan angis egne
+Variabler som hoppes over med `overwrite = FALSE`, beholdes helt
+uendret, også når det gjelder datoer. Gyldighetsperioden for øvrige
+variabler settes ut fra perioden i filnavnet. For eksempel gir
+`_p2025_v1` perioden `2025-01-01` til `2025-12-31`. Det kan angis egne
 gyldighetsperioder for enkeltvariabler ved hjelp av `dato_unntak`.
 
 Funksjonen finner først alle variabler som har samme `short_name` i de
@@ -92,25 +98,25 @@ over variabler som skal få kopiert metadata. De hoppes også over når
 gyldighetsperioden oppdateres. Disse variablene beholdes derfor uendret
 i mottakerfilen.
 
-For hver øvrige variabel kopieres hele metadataobjektet fra
-originalfilen. Feltet `short_name` erstattes deretter med kortnavnet som
-brukes i filen som oppdateres.
+Kjente dokumentasjonsfelt kopieres fra originalfilen. Felt som finnes i
+kilden, erstattes samlet, også når kildeverdien er `NULL`. Mottakerens
+kortnavn, ID, datatype, dataelementsti og pseudonymiseringsmetadata
+beholdes. Ukjente felt og felt som ikke finnes i kilden, beholdes.
 
 Når `overwrite = FALSE`, regnes en variabel som å ha eksisterende
 metadata dersom feltet `name` ikke er `NULL`. Andre metadatafelt tas
 ikke med i denne vurderingen.
 
-Gyldighetsperioden oppdateres uavhengig av `overwrite`. Dette innebærer
-at også variabler som ikke får kopiert metadata fordi de allerede har
-metadata, får oppdatert feltene `contains_data_from` og
-`contains_data_until`.
+Når `overwrite = FALSE`, beholdes dokumenterte variabler helt uendret,
+inkludert `contains_data_from` og `contains_data_until`. Dette gjelder
+også dersom variabelen er oppgitt i `dato_unntak`. Øvrige variabler får
+oppdatert perioden som beskrevet nedenfor.
 
 Variabler i `ekskluder_variabler` er unntatt fra denne oppdateringen og
 beholdes fullstendig uendret.
 
-Standardperioden hentes fra filnavnet til `filsti_datadoc_egen`. Et
-filnavn som inneholder `_p2025_v1` gir
-`contains_data_from = "2025-01-01"` og
+Standardperioden hentes fra filnavnet til `filsti_egen`. Et filnavn som
+inneholder `_p2025_v1` gir `contains_data_from = "2025-01-01"` og
 `contains_data_until = "2025-12-31"`.
 
 Dersom enkelte variabler har en annen gyldighetsperiode, kan disse
@@ -127,16 +133,16 @@ Følgende kontroller utføres før filen endres:
 
 - `short_name` må være unik i begge Datadoc-filene;
 
-- `variabler` må være en navngitt tekstvektor dersom argumentet ikke er
-  `NULL`;
+- `variabler` må være en navngitt karaktervektor dersom argumentet ikke
+  er `NULL`;
 
 - samme mottakervariabel kan ikke oppgis flere ganger i `variabler`;
 
 - alle eksplisitt oppgitte variabler må finnes i de respektive
   Datadoc-filene;
 
-- `ekskluder_variabler` må være en tekstvektor dersom argumentet ikke er
-  `NULL`;
+- `ekskluder_variabler` må være en karaktervektor dersom argumentet ikke
+  er `NULL`;
 
 - alle variabler i `ekskluder_variabler` må finnes i mottakerfilen;
 
@@ -155,7 +161,7 @@ Følgende kontroller utføres før filen endres:
 - datoene i `dato_unntak` må være gyldige datoer på formatet
   `"YYYY-MM-DD"`.
 
-Den oppdaterte strukturen skrives til `filsti_datadoc_egen` med
+Den oppdaterte strukturen skrives til `filsti_egen` med
 [`jsonlite::write_json()`](https://jeroen.r-universe.dev/jsonlite/reference/read_json.html).
 Den eksisterende filen overskrives.
 
@@ -170,26 +176,26 @@ metadata bare for eksplisitt angitte variabler.
 if (FALSE) { # \dontrun{
 # Kopier metadata og sett perioden til 2025 for alle aktuelle variabler
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json"
 )
 
 # Kopier bare til variabler som ikke allerede har metadata
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json",
   overwrite = FALSE
 )
 
 # Legg til eksplisitte koblinger mellom ulike kortnavn
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json",
   variabler = c(
     kjoenn = "sex",
@@ -199,9 +205,9 @@ copy_metadata(
 
 # Ikke gjør noen endringer i enkelte variabler
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json",
   ekskluder_variabler = c(
     "orgnr_frtk",
@@ -226,9 +232,9 @@ dato_unntak <- data.frame(
 )
 
 copy_metadata(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/data/resultat_p2025_v1__DOC.json",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/data/resultat_p2024_v1__DOC.json",
   dato_unntak = dato_unntak
 )

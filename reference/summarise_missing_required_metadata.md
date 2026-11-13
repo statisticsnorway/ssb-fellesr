@@ -1,4 +1,4 @@
-# Finn variabler som mangler obligatorisk metadata
+# Finn variabler som mangler obligatoriske metadata i en Datadoc-fil
 
 Lager en oversikt over hvilke variabler i en Datadoc-fil som mangler ett
 eller flere obligatoriske metadatafelt.
@@ -63,6 +63,10 @@ metadatafelt for hver variabel:
 - `data_source`
 
 - `temporality_type`
+
+Dette er en utfyllingskontroll av de seks feltene ovenfor, ikke full
+validering mot Datadoc-modellen. Betingede krav kontrolleres ikke. For
+språkposter kontrolleres tekstinnholdet, ikke bare at språk finnes.
 
 Et metadatafelt regnes som manglende dersom verdien er `NULL`, har
 lengde null, er `NA`, eller består av tom tekst eller bare mellomrom.

@@ -6,21 +6,17 @@ Metadata for variabler blir ikke endret.
 ## Usage
 
 ``` r
-copy_metadata_dataset(
-  filsti_datadoc_egen,
-  filsti_datadoc_original,
-  overwrite = FALSE
-)
+copy_metadata_dataset(filsti_egen, filsti_original, overwrite = FALSE)
 ```
 
 ## Arguments
 
-- filsti_datadoc_egen:
+- filsti_egen:
 
   En tekststreng med filsti til Datadoc-filen som skal oppdateres. Kan
   også være filstien til den tilhørende Parquet-filen.
 
-- filsti_datadoc_original:
+- filsti_original:
 
   En tekststreng med filsti til Datadoc-filen metadata skal kopieres
   fra. Kan også være filstien til den tilhørende Parquet-filen.
@@ -35,8 +31,7 @@ copy_metadata_dataset(
 ## Value
 
 Returnerer den oppdaterte Datadoc-strukturen usynlig som en liste.
-Datadoc-filen som er angitt i `filsti_datadoc_egen` oppdateres samtidig
-på disk.
+Datadoc-filen som er angitt i `filsti_egen` oppdateres samtidig på disk.
 
 ## Details
 
@@ -96,15 +91,15 @@ kan identifiseres, gis en advarsel og eksisterende verdi beholdes.
 ``` r
 if (FALSE) { # \dontrun{
 copy_metadata_dataset(
-  filsti_datadoc_egen =
+  filsti_egen =
     "/buckets/produkt/speshelse/klargjorte-data/regnskap/2025/resultatregnskap-klargjort_p2025_v1.parquet",
-  filsti_datadoc_original =
+  filsti_original =
     "/buckets/produkt/speshelse/klargjorte-data/regnskap/2024/resultatregnskap-klargjort_p2024_v3.parquet"
 )
 
 copy_metadata_dataset(
-  filsti_datadoc_egen = "data/resultat_p2025_v2.parquet",
-  filsti_datadoc_original = "data/resultat_p2024_v1.parquet",
+  filsti_egen = "data/resultat_p2025_v2.parquet",
+  filsti_original = "data/resultat_p2024_v1.parquet",
   overwrite = TRUE
 )
 } # }

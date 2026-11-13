@@ -1,4 +1,4 @@
-# Hent variabeldefinisjoner
+# Hent alle variabeldefinisjoner fra Vardef
 
 Henter variabeldefinisjoner fra SSBs tjeneste for variabeldefinisjoner.
 Dersom en dato oppgis, returneres bare definisjoner som er gyldige på
@@ -10,7 +10,7 @@ denne datoen.
 get_all_variable_definitions(
   date = NULL,
   language = "nb",
-  status = "ekstern",
+  status = "auto",
   token = NULL
 )
 ```
@@ -34,8 +34,8 @@ get_all_variable_definitions(
 - status:
 
   En tekststreng som angir om den eksterne eller interne tjenesten skal
-  brukes. Gyldige verdier er `"ekstern"` og `"intern"`. Standardverdien
-  er `"ekstern"`.
+  brukes. Gyldige verdier er `"auto"`, `"ekstern"` og `"intern"`.
+  Standardverdien er `"auto"`.
 
 - token:
 

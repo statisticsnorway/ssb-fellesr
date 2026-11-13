@@ -1,9 +1,8 @@
-# Legg til verdietiketter fra en lokal kodeliste
+# Legg til verdietiketter fra en metadatafil eller metadatatabell
 
-Kobler kolonnenavn i data til variabelkolonnen i kodelisten. Som
-standard brukes `variabel` til koblingen, `varnavn` som underliggende
-verdi og `sporsmaal_text` som verdietikett. Kolonnenavnene kan
-tilpasses. Taggene `<rt>` og `</rt>` fjernes fra etiketten.
+Kobler variabelnavn og svarkoder i metadataene mot datasettet og legger
+til verdietiketter med
+[`labelled::set_value_labels()`](https://larmarange.github.io/labelled/reference/val_labels.html).
 
 ## Usage
 
@@ -12,9 +11,10 @@ add_value_labels_from_file(
   data,
   kodelister,
   quiet = TRUE,
-  variabel_kolonne = "variabel",
-  kode_kolonne = "varnavn",
-  betydning_kolonne = "sporsmaal_text"
+  variabel_kolonne = "varnavn",
+  kode_kolonne = "kode",
+  betydning_kolonne = "tekst",
+  clean_labels = TRUE
 )
 ```
 
@@ -22,56 +22,80 @@ add_value_labels_from_file(
 
 - data:
 
-  En data.frame eller tibble som skal få etiketter.
+  En data.frame eller tibble som skal få verdietiketter.
 
 - kodelister:
 
-  En data.frame eller tibble med kodelistene, eller en tekststreng med
-  filstien til en Parquet-fil i samme format.
+  En data.frame, tibble eller filsti til en Parquet-fil med
+  variabelnavn, svarkoder og tilhørende etiketter.
 
 - quiet:
 
-  Logisk verdi. Hvis FALSE, gis en advarsel når en variabel konverteres
-  til tekst. Standard er TRUE.
+  Med `TRUE` (standard) skjules statusmeldinger. Advarsler om observerte
+  verdier uten etikett og feil vises fortsatt.
 
 - variabel_kolonne:
 
-  Navnet på kolonnen med variabelnavnene som skal matches mot
-  kolonnenavn i `data`. Standard er `"variabel"`.
+  Kolonnen med variabelnavn. Standard er `"varnavn"`.
 
 - kode_kolonne:
 
-  Navnet på kolonnen med svarkodene som skal få verdietiketter. Standard
-  er `"varnavn"`.
+  Kolonnen med svarkoder. Standard er `"kode"`.
 
 - betydning_kolonne:
 
-  Navnet på kolonnen med teksten til hver svarkode. Standard er
-  `"sporsmaal_text"`.
+  Kolonnen med svarkodetekst. Standard er `"tekst"`.
+
+- clean_labels:
+
+  Med `TRUE` (standard) fjernes HTML- og formateringstagger, og
+  mellomrom ryddes opp. Med `FALSE` beholdes taggene, også `<rt>`.
+  Innledende og avsluttende mellomrom trimmes alltid.
 
 ## Value
 
-Datasettet med verdietiketter på de aktuelle variablene.
+Datasettet med verdietiketter på variablene som har treff.
 
 ## Details
 
-Som i add_value_labels() behandles koder som tekst. Ledende nuller
-bevares når kodene er lagret som tekst. Eksisterende verdietiketter
-erstattes for variabler med en gyldig kodeliste. Variabler uten treff og
-rader uten kode eller etikett hoppes over. To ulike etiketter for samme
-variabel og kode gir en feil. Eksisterende kolonneetiketter bevares.
+Datatypen og verdiene i data beholdes. Numeriske variabler får numeriske
+etikettkoder; tekstvariabler beholder tekstkoder og ledende nuller.
+Koder som ikke kan tilpasses variabelens datatype, gir feil. Faktorer,
+datoer, logiske variabler og andre spesialklasser støttes ikke av denne
+funksjonen og må håndteres eksplisitt før etiketter legges på.
+
+Bare variabler med treff behandles. Rader uten kode eller etikett
+ignoreres. Identiske oppslag slås sammen; motstridende etiketter for
+samme kode gir feil. Eksisterende verdietiketter erstattes ved gyldig
+treff. Eksisterende kolonneetiketter beholdes. Observerte verdier uten
+etikett beholdes og gir advarsel, også med `quiet = TRUE`. Vanlige `NA`
+utelates fra kontrollen.
+
+Rensingen beholder tekst mellom tagger, `^BedrNavn` og `<.>`.
+HTML-entiteter som `&amp;` og `&nbsp;` dekodes ikke. Ingen filer
+skrives.
 
 ## Examples
 
 ``` r
-data <- data.frame(nrinnled = c("1", "2"))
+data <- data.frame(nrinnled = c(1L, 2L))
 kodelister <- data.frame(
-  variabel = c("nrinnled", "nrinnled"),
-  varnavn = c("1", "2"),
-  sporsmaal_text = c("intervju", "<rt>Frafall</rt>")
+  varnavn = c("nrinnled", "nrinnled"), kode = c("1", "2"),
+  tekst = c("Intervju", "<rt>Frafall</rt>")
 )
 resultat <- add_value_labels_from_file(data, kodelister)
 labelled::val_labels(resultat$nrinnled)
-#> intervju  Frafall 
-#>      "1"      "2" 
+#> Intervju  Frafall 
+#>        1        2 
+is.integer(resultat$nrinnled)
+#> [1] TRUE
+
+# Det tidligere formatet angis eksplisitt:
+tidligere <- data.frame(variabel = "nrinnled", varnavn = "1",
+                        sporsmaal_text = "Intervju")
+resultat <- add_value_labels_from_file(
+  data[1, , drop = FALSE], tidligere,
+  variabel_kolonne = "variabel", kode_kolonne = "varnavn",
+  betydning_kolonne = "sporsmaal_text"
+)
 ```

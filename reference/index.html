@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a></li>
     <li><a class="dropdown-item" href="../articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html">Kjøre R på sl-stata-p4 fra SAS</a></li>
     <li><a class="dropdown-item" href="../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a></li>
+    <li><a class="dropdown-item" href="../articles/vignette_datadoc.html">Datadoc og Vardef i R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_shiny_ssb.html">Kjøre shiny og Esquisse i Jupyter</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_SSB_fargepalett.html">SSB fargepallet fra KLASS</a></li>
@@ -55,10 +56,17 @@
 
       <dl><dt>
 
+          <code><a href="add_column_labels.html">add_column_labels()</a></code>
+
+        </dt>
+        <dd>Legg til kolonneetiketter fra en Datadoc-fil</dd>
+
+        <dt>
+
           <code><a href="add_column_labels_from_file.html">add_column_labels_from_file()</a></code>
 
         </dt>
-        <dd>av duplikater. Plassholdere som <code>^BedrNavn</code> og teksten <code>&lt;.&gt;</code> beholdes.</dd>
+        <dd>Legg til kolonneetiketter fra en metadatafil eller metadatatabell</dd>
 
         <dt>
 
@@ -69,31 +77,31 @@
 
         <dt>
 
-          <code><a href="add_labels.html">add_labels()</a></code>
-
-        </dt>
-        <dd>Legg til kolonneetiketter fra Datadoc</dd>
-
-        <dt>
-
           <code><a href="add_value_labels.html">add_value_labels()</a></code>
 
         </dt>
-        <dd>Legg til verdietiketter fra KLASS</dd>
+        <dd>Legg til verdietiketter fra en Datadoc-fil</dd>
 
         <dt>
 
           <code><a href="add_value_labels_from_file.html">add_value_labels_from_file()</a></code>
 
         </dt>
-        <dd>Legg til verdietiketter fra en lokal kodeliste</dd>
+        <dd>Legg til verdietiketter fra en metadatafil eller metadatatabell</dd>
+
+        <dt>
+
+          <code><a href="check_variables_in_vardef.html">check_variables_in_vardef()</a></code>
+
+        </dt>
+        <dd>Kontroller om variabler finnes i Vardef</dd>
 
         <dt>
 
           <code><a href="compare_variable_metadata.html">compare_variable_metadata()</a></code>
 
         </dt>
-        <dd>Sammenlign variabelmetadata mellom to DataDoc-filer</dd>
+        <dd>Sammenlign variabelmetadata mellom to Datadoc-filer</dd>
 
         <dt>
 
@@ -114,14 +122,21 @@
           <code><a href="copy_metadata_variable.html">copy_metadata_variable()</a></code>
 
         </dt>
-        <dd>Kopier variabelmetadata mellom DataDoc-filer</dd>
+        <dd>Kopier variabelmetadata mellom Datadoc-filer</dd>
+
+        <dt>
+
+          <code><a href="copy_vardef_to_datadoc.html">copy_vardef_to_datadoc()</a></code>
+
+        </dt>
+        <dd>Kopier metadata fra Vardef til en Datadoc-fil</dd>
 
         <dt>
 
           <code><a href="create_empty_datadoc.html">create_empty_datadoc()</a></code>
 
         </dt>
-        <dd>Opprett et tomt Datadoc-dokument</dd>
+        <dd>Opprett en tom Datadoc-fil</dd>
 
         <dt>
 
@@ -136,6 +151,20 @@
 
         </dt>
         <dd>Lag oversikt over variabler i en Datadoc-fil</dd>
+
+        <dt>
+
+          <code><a href="datadoc_variable_metadata.html">datadoc_variable_metadata()</a></code>
+
+        </dt>
+        <dd>Hent metadata for én variabel fra en Datadoc-fil</dd>
+
+        <dt>
+
+          <code><a href="datadoc_variables_with_classification_uri.html">datadoc_variables_with_classification_uri()</a></code>
+
+        </dt>
+        <dd>Finn variabler med eller uten kodeliste i en Datadoc-fil</dd>
 
         <dt>
 
@@ -219,7 +248,7 @@
           <code><a href="get_all_variable_definitions.html">get_all_variable_definitions()</a></code>
 
         </dt>
-        <dd>Hent variabeldefinisjoner</dd>
+        <dd>Hent alle variabeldefinisjoner fra Vardef</dd>
 
         <dt>
 
@@ -233,14 +262,14 @@
           <code><a href="get_variable_definition_by_id.html">get_variable_definition_by_id()</a></code>
 
         </dt>
-        <dd>Hent variabeldefinisjon etter ID</dd>
+        <dd>Hent variabeldefinisjon fra Vardef etter ID</dd>
 
         <dt>
 
           <code><a href="get_variable_definition_by_shortname.html">get_variable_definition_by_shortname()</a></code>
 
         </dt>
-        <dd>Hent variabeldefinisjon etter kortnavn</dd>
+        <dd>Hent variabeldefinisjon fra Vardef etter kortnavn</dd>
 
         <dt>
 
@@ -262,13 +291,6 @@
 
         </dt>
         <dd>Lag logg for versjonering</dd>
-
-        <dt>
-
-          <code><a href="metadata_variable.html">metadata_variable()</a></code>
-
-        </dt>
-        <dd>Hent metadata for én variabel fra Datadoc</dd>
 
         <dt>
 
@@ -359,7 +381,7 @@
           <code><a href="replace_file_path.html">replace_file_path()</a></code>
 
         </dt>
-        <dd>Erstatt filsti i Datadoc-metadata</dd>
+        <dd>Erstatt filsti i en Datadoc-fil</dd>
 
         <dt>
 
@@ -401,14 +423,14 @@
           <code><a href="set_variable_names_from_labels.html">set_variable_names_from_labels()</a></code>
 
         </dt>
-        <dd>Oppdater variabelnavn og intervjumetadata i DataDoc</dd>
+        <dd>Oppdater variabelnavn og intervjumetadata i en Datadoc-fil</dd>
 
         <dt>
 
           <code><a href="set_version_description.html">set_version_description()</a></code>
 
         </dt>
-        <dd>Sett versjonsbeskrivelse i en DataDoc-fil</dd>
+        <dd>Sett versjonsbeskrivelse i en Datadoc-fil</dd>
 
         <dt>
 
@@ -419,7 +441,7 @@
 
         <dt>
 
-          <code><a href="show_labels_df.html">show_labels_df()</a></code>
+          <code><a href="show_value_labels.html">show_value_labels()</a></code>
 
         </dt>
         <dd>Vis verdietiketter i et datasett</dd>
@@ -527,7 +549,7 @@
           <code><a href="summarise_missing_required_metadata.html">summarise_missing_required_metadata()</a></code>
 
         </dt>
-        <dd>Finn variabler som mangler obligatorisk metadata</dd>
+        <dd>Finn variabler som mangler obligatoriske metadata i en Datadoc-fil</dd>
 
         <dt>
 
@@ -562,21 +584,14 @@
           <code><a href="vardef_get_klass_id.html">vardef_get_klass_id()</a></code>
 
         </dt>
-        <dd>Hent KLASS-ID fra en variabeldefinisjon</dd>
+        <dd>Hent KLASS-ID fra en variabeldefinisjon i Vardef</dd>
 
         <dt>
 
           <code><a href="vardef_url.html">vardef_url()</a></code>
 
         </dt>
-        <dd>Hent URL til tjenesten for variabeldefinisjoner</dd>
-
-        <dt>
-
-          <code><a href="variables_with_classification_uri.html">variables_with_classification_uri()</a></code>
-
-        </dt>
-        <dd>Finn variabler med eller uten kodeliste</dd>
+        <dd>Hent URL til Vardef</dd>
 
         <dt>
 
@@ -587,7 +602,7 @@
 
         <dt>
 
-          <code><a href="vars_without_labels.html">vars_without_labels()</a></code>
+          <code><a href="vars_without_column_labels.html">vars_without_column_labels()</a></code>
 
         </dt>
         <dd>Finn variabler uten kolonneetikett</dd>

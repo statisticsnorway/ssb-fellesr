@@ -1,4 +1,4 @@
-# Hent variabeldefinisjon etter ID
+# Hent variabeldefinisjon fra Vardef etter ID
 
 Henter en variabeldefinisjon fra SSBs tjeneste for variabeldefinisjoner
 basert på variabeldefinisjonens unike ID og en gyldighetsdato.
@@ -9,7 +9,10 @@ basert på variabeldefinisjonens unike ID og en gyldighetsdato.
 get_variable_definition_by_id(
   id,
   date = format(Sys.Date(), "%Y-%m-%d"),
-  language = "nb"
+  language = "nb",
+  status = "auto",
+  token = NULL,
+  quiet = TRUE
 )
 ```
 
@@ -30,6 +33,18 @@ get_variable_definition_by_id(
   En tekststreng med språkkoden som skal brukes for tekstinnholdet i
   responsen. Standardverdien er `"nb"`.
 
+- status:
+
+  `"auto"` (standard), `"ekstern"` eller `"intern"`.
+
+- token:
+
+  Valgfritt Bearer-token til intern tjeneste.
+
+- quiet:
+
+  Med `TRUE` (standard) skjules statusmeldingen ved 404.
+
 ## Value
 
 Et objekt opprettet fra JSON-responsen fra tjenesten. Returtypen
@@ -42,9 +57,9 @@ ID-en legges til URL-en til tjenesten, mens datoen sendes som
 parameteren `date_of_validity`. Språket sendes i HTTP-hodet
 `Accept-Language`.
 
-Dersom tjenesten returnerer HTTP-status 404, vises en melding om at
-variabeldefinisjonen ikke ble funnet. Funksjonen returnerer samtidig
-innholdet i feilresponsen.
+Dersom tjenesten returnerer HTTP-status 404 og `quiet = FALSE`, vises en
+melding om at variabeldefinisjonen ikke ble funnet. Funksjonen
+returnerer da `NULL`.
 
 Andre HTTP-feil fører til at funksjonen stopper med en feilmelding.
 

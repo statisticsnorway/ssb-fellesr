@@ -9,7 +9,7 @@ uten å endre de opprinnelige variablene."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,6 +23,7 @@ uten å endre de opprinnelige variablene."></head><body>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a></li>
     <li><a class="dropdown-item" href="../articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html">Kjøre R på sl-stata-p4 fra SAS</a></li>
     <li><a class="dropdown-item" href="../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a></li>
+    <li><a class="dropdown-item" href="../articles/vignette_datadoc.html">Datadoc og Vardef i R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_shiny_ssb.html">Kjøre shiny og Esquisse i Jupyter</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_SSB_fargepalett.html">SSB fargepallet fra KLASS</a></li>
@@ -54,7 +55,7 @@ uten å endre de opprinnelige variablene.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_labelled_columns</span><span class="op">(</span><span class="va">data</span>, variables <span class="op">=</span> <span class="cn">NULL</span>, postfix <span class="op">=</span> <span class="st">"_labelled"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_labelled_columns</span><span class="op">(</span><span class="va">data</span>, variabler <span class="op">=</span> <span class="cn">NULL</span>, postfix <span class="op">=</span> <span class="st">"_labelled"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -66,7 +67,7 @@ uten å endre de opprinnelige variablene.</p>
 med verdietiketter.</p></dd>
 
 
-<dt id="arg-variables">variables<a class="anchor" aria-label="anchor" href="#arg-variables"></a></dt>
+<dt id="arg-variabler">variabler<a class="anchor" aria-label="anchor" href="#arg-variabler"></a></dt>
 <dd><p>En karaktervektor med navn på variablene det skal
 opprettes nye etikettkolonner for. Alle variablene må finnes i <code>data</code>
 og være merkede variabler som gjenkjennes av <code><a href="https://haven.tidyverse.org/reference/labelled.html" class="external-link">haven::is.labelled()</a></code>.
@@ -89,26 +90,26 @@ faktorverdier.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Funksjonen konverterer de valgte variablene med <code><a href="https://forcats.tidyverse.org/reference/as_factor.html" class="external-link">haven::as_factor()</a></code> og
-<code>levels = "labels"</code>. Dette innebærer at de nye kolonnene inneholder
-verdietikettene, mens de opprinnelige kodene beholdes i de opprinnelige
-variablene.</p>
-<p>Dersom <code>variables = NULL</code>, identifiseres alle merkede variabler i
+<code>levels = "default"</code>. Dette innebærer at de nye kolonnene inneholder
+verdietikettene der de finnes, ellers kodene. De opprinnelige variablene
+beholdes uendret.</p>
+<p>Dersom <code>variabler = NULL</code>, identifiseres alle merkede variabler i
 datasettet ved hjelp av <code><a href="https://haven.tidyverse.org/reference/labelled.html" class="external-link">haven::is.labelled()</a></code>. Dersom ingen merkede
 variabler finnes, returneres datasettet uendret og det gis en advarsel.</p>
 <p>Navnet på hver ny variabel består av det opprinnelige variabelnavnet
 etterfulgt av verdien i <code>postfix</code>. Dersom for eksempel variabelen heter
 <code>kjoenn</code> og <code>postfix = "_labelled"</code>, får den nye variabelen navnet
 <code>kjoenn_labelled</code>.</p>
-<p>Funksjonen gir en feil dersom:</p><ul><li><p><code>variables</code> ikke er <code>NULL</code> eller en karaktervektor med minst ett
+<p>Funksjonen gir en feil dersom:</p><ul><li><p><code>variabler</code> ikke er <code>NULL</code> eller en karaktervektor med minst ett
 variabelnavn.</p></li>
-<li><p>én eller flere av variablene i <code>variables</code> ikke finnes i <code>data</code>.</p></li>
-<li><p>én eller flere av variablene i <code>variables</code> ikke er merkede variabler.</p></li>
+<li><p>én eller flere av variablene i <code>variabler</code> ikke finnes i <code>data</code>.</p></li>
+<li><p>én eller flere av variablene i <code>variabler</code> ikke er merkede variabler.</p></li>
 <li><p>én eller flere av de nye variablene allerede finnes i <code>data</code>.</p></li>
 <li><p><code>postfix</code> ikke er én enkelt tekststreng.</p></li>
-</ul><p>Det gis en advarsel dersom konverteringen introduserer nye
-missing-verdier. Missing-verdier som allerede finnes i de opprinnelige
-variablene utløser ikke advarselen. Nye missing-verdier kan blant annet
-oppstå dersom enkelte verdier ikke har en tilhørende verdietikett.</p>
+</ul><p>Observerte verdier uten etikett gir en advarsel med variabelnavn og
+koder. Disse vises som koder i faktorkolonnen og blir ikke gjort om til
+<code>NA</code>. Vanlige manglende verdier utløser ikke advarselen. Gruppering
+beholdes, og grupperingsvariabler kan også velges.</p>
     </div>
 
     <div class="section level2">
@@ -143,7 +144,7 @@ oppstå dersom enkelte verdier ikke har en tilhørende verdietikett.</p>
 <span class="r-in"><span><span class="co"># Opprett etikettkolonne for én bestemt variabel</span></span></span>
 <span class="r-in"><span><span class="fu">add_labelled_columns</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">data</span>,</span></span>
-<span class="r-in"><span>  variables <span class="op">=</span> <span class="st">"kjoenn"</span></span></span>
+<span class="r-in"><span>  variabler <span class="op">=</span> <span class="st">"kjoenn"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   kjoenn region alder kjoenn_labelled</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1      1     01    30            Mann</span>
@@ -153,7 +154,7 @@ oppstå dersom enkelte verdier ikke har en tilhørende verdietikett.</p>
 <span class="r-in"><span><span class="co"># Opprett etikettkolonner for flere bestemte variabler</span></span></span>
 <span class="r-in"><span><span class="fu">add_labelled_columns</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">data</span>,</span></span>
-<span class="r-in"><span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  variabler <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="st">"kjoenn"</span>,</span></span>
 <span class="r-in"><span>    <span class="st">"region"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
@@ -166,7 +167,7 @@ oppstå dersom enkelte verdier ikke har en tilhørende verdietikett.</p>
 <span class="r-in"><span><span class="co"># Bruk et annet postfiks</span></span></span>
 <span class="r-in"><span><span class="fu">add_labelled_columns</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">data</span>,</span></span>
-<span class="r-in"><span>  variables <span class="op">=</span> <span class="st">"kjoenn"</span>,</span></span>
+<span class="r-in"><span>  variabler <span class="op">=</span> <span class="st">"kjoenn"</span>,</span></span>
 <span class="r-in"><span>  postfix <span class="op">=</span> <span class="st">"_navn"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   kjoenn region alder kjoenn_navn</span>

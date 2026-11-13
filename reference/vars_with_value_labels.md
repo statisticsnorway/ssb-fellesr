@@ -16,9 +16,9 @@ vars_with_value_labels(data)
 
 ## Value
 
-En tekstvektor med navnene på variablene som har minst én verdietikett.
-Dersom ingen variabler har verdietiketter, returneres en tom
-tekstvektor.
+En karaktervektor med navnene på variablene som har minst én
+verdietikett. Dersom ingen variabler har verdietiketter, returneres en
+tom karaktervektor.
 
 ## Details
 
@@ -35,8 +35,8 @@ tas ikke med i vurderingen.
 
 [`labelled::val_labels()`](https://larmarange.github.io/labelled/reference/val_labels.html)
 for å hente verdietiketter og
-[`vars_without_labels()`](vars_without_labels.md) for å finne variabler
-uten kolonneetikett.
+[`vars_without_column_labels()`](vars_without_column_labels.md) for å
+finne variabler uten kolonneetikett.
 
 ## Examples
 

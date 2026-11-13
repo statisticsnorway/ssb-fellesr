@@ -1,4 +1,4 @@
-# Hent URL til tjenesten for variabeldefinisjoner
+# Hent URL til Vardef
 
 Returnerer endepunktet til SSBs tjeneste for variabeldefinisjoner.
 

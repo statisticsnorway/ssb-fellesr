@@ -2,24 +2,26 @@
 
 ## All functions
 
-- [`add_column_labels_from_file()`](add_column_labels_from_file.md) :
+- [`add_column_labels()`](add_column_labels.md) : Legg til
+  kolonneetiketter fra en Datadoc-fil
 
-  av duplikater. Plassholdere som `^BedrNavn` og teksten `<.>` beholdes.
+- [`add_column_labels_from_file()`](add_column_labels_from_file.md) :
+  Legg til kolonneetiketter fra en metadatafil eller metadatatabell
 
 - [`add_labelled_columns()`](add_labelled_columns.md) : Legg til
   kolonner med verdietiketter
 
-- [`add_labels()`](add_labels.md) : Legg til kolonneetiketter fra
-  Datadoc
-
 - [`add_value_labels()`](add_value_labels.md) : Legg til verdietiketter
-  fra KLASS
+  fra en Datadoc-fil
 
 - [`add_value_labels_from_file()`](add_value_labels_from_file.md) : Legg
-  til verdietiketter fra en lokal kodeliste
+  til verdietiketter fra en metadatafil eller metadatatabell
+
+- [`check_variables_in_vardef()`](check_variables_in_vardef.md) :
+  Kontroller om variabler finnes i Vardef
 
 - [`compare_variable_metadata()`](compare_variable_metadata.md) :
-  Sammenlign variabelmetadata mellom to DataDoc-filer
+  Sammenlign variabelmetadata mellom to Datadoc-filer
 
 - [`copy_metadata()`](copy_metadata.md) : Kopier metadata mellom
   Datadoc-filer
@@ -28,16 +30,25 @@
   metadata på datasett-nivå mellom Datadoc-filer
 
 - [`copy_metadata_variable()`](copy_metadata_variable.md) : Kopier
-  variabelmetadata mellom DataDoc-filer
+  variabelmetadata mellom Datadoc-filer
 
-- [`create_empty_datadoc()`](create_empty_datadoc.md) : Opprett et tomt
-  Datadoc-dokument
+- [`copy_vardef_to_datadoc()`](copy_vardef_to_datadoc.md) : Kopier
+  metadata fra Vardef til en Datadoc-fil
+
+- [`create_empty_datadoc()`](create_empty_datadoc.md) : Opprett en tom
+  Datadoc-fil
 
 - [`datadoc_path()`](datadoc_path.md) : Konverter filsti mellom Parquet
   og Datadoc
 
 - [`datadoc_variabeloversikt()`](datadoc_variabeloversikt.md) : Lag
   oversikt over variabler i en Datadoc-fil
+
+- [`datadoc_variable_metadata()`](datadoc_variable_metadata.md) : Hent
+  metadata for én variabel fra en Datadoc-fil
+
+- [`datadoc_variables_with_classification_uri()`](datadoc_variables_with_classification_uri.md)
+  : Finn variabler med eller uten kodeliste i en Datadoc-fil
 
 - [`dynarev_uttrekk()`](dynarev_uttrekk.md) : Uttrekk fra Dynarev til R
 
@@ -72,15 +83,15 @@
   hvilke filer som finnes i en Google Cloud Storage bucket
 
 - [`get_all_variable_definitions()`](get_all_variable_definitions.md) :
-  Hent variabeldefinisjoner
+  Hent alle variabeldefinisjoner fra Vardef
 
 - [`get_format()`](get_format.md) : Laster et SSB-format objekt fra JSON
 
 - [`get_variable_definition_by_id()`](get_variable_definition_by_id.md)
-  : Hent variabeldefinisjon etter ID
+  : Hent variabeldefinisjon fra Vardef etter ID
 
 - [`get_variable_definition_by_shortname()`](get_variable_definition_by_shortname.md)
-  : Hent variabeldefinisjon etter kortnavn
+  : Hent variabeldefinisjon fra Vardef etter kortnavn
 
 - [`initialer_funk()`](initialer_funk.md) : Funksjon for aa hente
   initialene til paalogget bruker
@@ -89,9 +100,6 @@
   filsti
 
 - [`logg_kjoring()`](logg_kjoring.md) : Lag logg for versjonering
-
-- [`metadata_variable()`](metadata_variable.md) : Hent metadata for én
-  variabel fra Datadoc
 
 - [`open_dataset()`](open_dataset.md) : Funksjon for aa laste inn
   "multifile" datasett fra Google Cloud Storage bucket
@@ -130,8 +138,8 @@
 - [`remove_all_labels()`](remove_all_labels.md) : Fjern alle etiketter
   fra et datasett
 
-- [`replace_file_path()`](replace_file_path.md) : Erstatt filsti i
-  Datadoc-metadata
+- [`replace_file_path()`](replace_file_path.md) : Erstatt filsti i en
+  Datadoc-fil
 
 - [`runApp_ssb()`](runApp_ssb.md) : Wrapper function for running shiny
   apps in Jupyter at SSB
@@ -148,16 +156,16 @@
   Project Root
 
 - [`set_variable_names_from_labels()`](set_variable_names_from_labels.md)
-  : Oppdater variabelnavn og intervjumetadata i DataDoc
+  : Oppdater variabelnavn og intervjumetadata i en Datadoc-fil
 
 - [`set_version_description()`](set_version_description.md) : Sett
-  versjonsbeskrivelse i en DataDoc-fil
+  versjonsbeskrivelse i en Datadoc-fil
 
 - [`show_column_labels()`](show_column_labels.md) : Vis kolonneetiketter
   ved utskrift av et datasett
 
-- [`show_labels_df()`](show_labels_df.md) : Vis verdietiketter i et
-  datasett
+- [`show_value_labels()`](show_value_labels.md) : Vis verdietiketter i
+  et datasett
 
 - [`sjekk_endring()`](sjekk_endring.md) : Sjekk for endringer i
   kolonner, datatyper eller verdier mellom siste og nyeste versjon av en
@@ -205,7 +213,7 @@
   Funksjon for aa hente uttaksbeskrivelsen til en statistikkbanktabell
 
 - [`summarise_missing_required_metadata()`](summarise_missing_required_metadata.md)
-  : Finn variabler som mangler obligatorisk metadata
+  : Finn variabler som mangler obligatoriske metadata i en Datadoc-fil
 
 - [`theme_ssb()`](theme_ssb.md) : SSB theme for ggplot
 
@@ -219,19 +227,15 @@
   observerte verdier uten verdietikett
 
 - [`vardef_get_klass_id()`](vardef_get_klass_id.md) : Hent KLASS-ID fra
-  en variabeldefinisjon
+  en variabeldefinisjon i Vardef
 
-- [`vardef_url()`](vardef_url.md) : Hent URL til tjenesten for
-  variabeldefinisjoner
-
-- [`variables_with_classification_uri()`](variables_with_classification_uri.md)
-  : Finn variabler med eller uten kodeliste
+- [`vardef_url()`](vardef_url.md) : Hent URL til Vardef
 
 - [`vars_with_value_labels()`](vars_with_value_labels.md) : Finn
   variabler med verdietiketter
 
-- [`vars_without_labels()`](vars_without_labels.md) : Finn variabler
-  uten kolonneetikett
+- [`vars_without_column_labels()`](vars_without_column_labels.md) : Finn
+  variabler uten kolonneetikett
 
 - [`versjoner_filer()`](versjoner_filer.md) : Versjonere filer
 

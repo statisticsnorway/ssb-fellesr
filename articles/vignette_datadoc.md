@@ -1,0 +1,500 @@
+# Datadoc og Vardef i R
+
+Denne vignetten viser hvordan du bruker Datadoc- og Vardef-funksjonene i
+`fellesr` til å dokumentere datasett og variabler på Dapla i SSB.
+
+Dokumentasjon av data er et krav på Dapla.
+[Datadoc](https://manual.dapla.ssb.no/statistikkere/datadoc.html)
+hjelper deg med å opprette og vedlikeholde metadata i standardiserte
+JSON-filer (`__DOC.json`) som ligger sammen med Parquet-filene.
+[Vardef](https://manual.dapla.ssb.no/statistikkere/datadoc.html#kobling-mot-vardef)
+er SSBs register over variabeldefinisjoner, og
+[KLASS](https://manual.dapla.ssb.no/statistikkere/klass.html) inneholder
+kodelister og klassifikasjoner.
+
+I denne veiledningen følger vi et praktisk og kjørbart eksempel på
+hvordan du oppretter, dokumenterer og bruker et dokumentert datasett:
+
+1.  [**Opprette demodata** for årgang 2024](#opprette-demodata)
+2.  [**Etablere dokumentasjon (Datadoc)** for 2024 og koble mot
+    Vardef](#etablere-dokumentasjon)
+3.  [**Overgang til ny årgang (2025)** ved å opprette nye data og
+    gjenbruke dokumentasjonen fra 2024](#ny-aargang)
+4.  [**Legge på kodelister og etiketter** i R](#koble-kodelister)
+5.  [**Analysere dekningsgrad** og visning av
+    kodelister](#analysere-dekningsgrad)
+
+For å ta i bruk disse funksjonene trenger du `fellesr` versjon \>=
+0.4.6.
+
+------------------------------------------------------------------------
+
+## 1. Opprette demodata for årgang 2024
+
+Først oppretter vi et datasett for årgang 2024. Vi henter kommuner fra
+KLASS (klassifikasjon 131) og kobler på fylkesnummer, helseregion og
+landsdel via korrespondansetabeller i KLASS.
+
+``` r
+
+library(klassR)
+library(tidyverse)
+library(fellesr)
+
+aargang_2024 <- 2024
+arbeidsmappe <- "/buckets/produkt/R/datadoc-demo" # Tilpass til din produkt-bøtte
+
+# Opprett nødvendige undermapper hvis de ikke finnes
+dir.create(glue::glue("{arbeidsmappe}/inndata"), recursive = TRUE, showWarnings = FALSE)
+dir.create(glue::glue("{arbeidsmappe}/klargjorte-data"), recursive = TRUE, showWarnings = FALSE)
+
+demodata_filsti_2024 <- glue::glue("{arbeidsmappe}/klargjorte-data/datadoc-demodata_p{aargang_2024}_v1.parquet")
+
+# 1. Hent kommune og fylkesnummer fra KLASS
+klass_kommune_fylke_2024 <- klassR::get_klass(131, date = glue::glue("{aargang_2024}-01-01")) |> 
+  dplyr::rename(komm_nr = code) |> 
+  dplyr::select(komm_nr) |>
+  dplyr::mutate(fylke_nr = substr(komm_nr, 1, 2))
+
+# 2. Hent helseregion-korrespondanse
+klass_kommune_hr_2024 <- klassR::get_klass(131, correspond = 603, date = glue::glue("{aargang_2024}-01-01")) |> 
+  dplyr::rename(komm_nr = sourceCode, 
+         helseregion = targetCode) |> 
+  dplyr::select(komm_nr, helseregion) |> 
+  dplyr::mutate(helseregion = glue::glue("H{helseregion}"))
+
+# 3. Hent landsdel-korrespondanse
+klass_fylke_landsdel_2024 <- klassR::get_klass(104, correspond = 106, date = glue::glue("{aargang_2024}-01-01")) |> 
+  dplyr::rename(fylke_nr = sourceCode, 
+         landsdel_nr = targetCode) |> 
+  dplyr::select(fylke_nr, landsdel_nr)
+
+# 4. Sett sammen til et regionalt datasett
+demodata_2024 <- klass_kommune_fylke_2024 |> 
+  dplyr::left_join(klass_kommune_hr_2024, by = "komm_nr") |> 
+  dplyr::left_join(klass_fylke_landsdel_2024, by = "fylke_nr")
+
+# 5. Lagre datasettet som Parquet
+arrow::write_parquet(demodata_2024, demodata_filsti_2024)
+```
+
+------------------------------------------------------------------------
+
+## 2. Etablere dokumentasjon (Datadoc) for 2024 og koble mot Vardef
+
+Når Parquet-filen er lagret, oppretter vi en tom Datadoc-fil med
+[`fellesr::create_empty_datadoc()`](../reference/create_empty_datadoc.md).
+Denne skanner Parquet-filen og fyller ut tekniske metadata automatisk.
+
+``` r
+
+# Opprett en tom Datadoc-fil (vil hete datadoc-demodata_p2024_v1__DOC.json)
+fellesr::create_empty_datadoc(
+  filsti = demodata_filsti_2024,
+  name = "Regionale demodata",
+  description = "Regionale demodata sammensatt av kommuner, fylker, helseregioner og landsdeler",
+  version_description = "Første versjon"
+)
+```
+
+### Sjekke om obligatoriske metadata mangler (før Vardef-søk)
+
+Vi sjekker statusen for våre nyopprettede variabler. De vil foreløpig
+mangle mye påkrevd informasjon:
+
+``` r
+
+# Sjekk hvilke variabler som mangler påkrevd dokumentasjon
+mangler <- fellesr::summarise_missing_required_metadata(demodata_filsti_2024, only_incomplete = TRUE)
+print(mangler)
+```
+
+### Berike automatisk fra Vardef og sette kilde/temporalitet
+
+For å fylle ut definisjonene og kodeliste-referansene automatisk, gjør
+vi et oppslag mot Vardef. Vi setter også felles datakilde (`"75"` for
+Delte data fra SSB) og temporalitetstype (`"STATUS"`) samtidig:
+
+``` r
+
+# Slå opp i Vardef, fyll ut offisielle definisjoner og kodeliste-referanser
+fellesr::copy_vardef_to_datadoc(
+  filsti = demodata_filsti_2024,
+  overwrite = TRUE,
+  data_source = "75",
+  temporality_type = "STATUS",
+  quiet = FALSE
+)
+```
+
+### Sjekke manglende metadata etter Vardef-søk
+
+Vi sjekker statusen på nytt. Siden vi beriket fra Vardef og satte kilde
+og temporalitet over, vil variablene nå være tilnærmet ferdig
+dokumentert:
+
+``` r
+
+# Sjekk hvilke variabler som gjenstår å dokumentere
+mangler <- fellesr::summarise_missing_required_metadata(demodata_filsti_2024, only_incomplete = TRUE)
+print(mangler)
+```
+
+------------------------------------------------------------------------
+
+## 3. Overgang til ny årgang (2025) ved å opprette nye data og gjenbruke dokumentasjonen fra 2024
+
+For neste årgang (2025) klargjør vi først Parquet-filen på samme måte:
+
+``` r
+
+aargang_2025 <- 2025
+demodata_filsti_2025 <- glue::glue("{arbeidsmappe}/klargjorte-data/datadoc-demodata_p{aargang_2025}_v1.parquet")
+
+# 1. Hent kommune og fylkesnummer fra KLASS for 2025
+klass_kommune_fylke_2025 <- klassR::get_klass(131, date = glue::glue("{aargang_2025}-01-01")) |> 
+  dplyr::rename(komm_nr = code) |> 
+  dplyr::select(komm_nr) |>
+  dplyr::mutate(fylke_nr = substr(komm_nr, 1, 2))
+
+# 2. Hent helseregion-korrespondanse for 2025
+klass_kommune_hr_2025 <- klassR::get_klass(131, correspond = 603, date = glue::glue("{aargang_2025}-01-01")) |> 
+  dplyr::rename(komm_nr = sourceCode, 
+         helseregion = targetCode) |> 
+  dplyr::select(komm_nr, helseregion) |> 
+  dplyr::mutate(helseregion = glue::glue("H{helseregion}"))
+
+# 3. Hent landsdel-korrespondanse for 2025
+klass_fylke_landsdel_2025 <- klassR::get_klass(104, correspond = 106, date = glue::glue("{aargang_2025}-01-01")) |> 
+  dplyr::rename(fylke_nr = sourceCode, 
+         landsdel_nr = targetCode) |> 
+  dplyr::select(fylke_nr, landsdel_nr)
+
+# 4. Sett sammen til et regionalt datasett for 2025
+demodata_2025 <- klass_kommune_fylke_2025 |> 
+  dplyr::left_join(klass_kommune_hr_2025, by = "komm_nr") |> 
+  dplyr::left_join(klass_fylke_landsdel_2025, by = "fylke_nr")
+
+# 5. Lagre datasettet som Parquet
+arrow::write_parquet(demodata_2025, demodata_filsti_2025)
+```
+
+Nå kan vi opprette en tom Datadoc-fil for 2025-årgangen og kopiere over
+den berikede variabeldokumentasjonen fra 2024-årgangen:
+
+``` r
+
+# 1. Opprett en tom Datadoc-fil for 2025-årgangen
+fellesr::create_empty_datadoc(
+  filsti = demodata_filsti_2025,
+  name = "Regionale demodata",
+  description = "Regionale demodata sammensatt av kommuner, fylker, helseregioner og landsdeler",
+  version_description = "Første versjon"
+)
+
+# 2. Kopier all beriket metadata fra 2024 over til 2025-filen
+# Funksjonen oppdaterer automatisk tidsrom, versjon og gyldighet ut fra filnavnet.
+fellesr::copy_metadata(
+  filsti_egen = demodata_filsti_2025,
+  filsti_original = demodata_filsti_2024,
+  quiet = FALSE,
+  overwrite = TRUE
+)
+```
+
+Til slutt verifiserer vi at 2025-dokumentasjonen ble komplett utfylt ved
+kopieringen:
+
+``` r
+
+# Sjekk hvilke variabler som mangler påkrevd dokumentasjon for 2025
+mangler <- fellesr::summarise_missing_required_metadata(demodata_filsti_2025, only_incomplete = TRUE)
+print(mangler)
+```
+
+------------------------------------------------------------------------
+
+## 4. Legge på kodelister og etiketter i R
+
+Siden Datadoc-filen vår nå inneholder offisielle referanser og
+kodelister, kan vi bruke denne dokumentasjonen til å berike datasettet
+vårt i R med verdi- og kolonneetiketter.
+
+``` r
+
+# 1. Les rådataene for 2025
+data_2025 <- arrow::read_parquet(demodata_filsti_2025)
+
+# 2. Koble på verdietiketter fra KLASS og kolonneetiketter fra Datadoc-filen med piping
+data_med_labels <- data_2025 |> 
+  fellesr::add_value_labels(filsti = demodata_filsti_2025) |> 
+  fellesr::add_column_labels(filsti = demodata_filsti_2025)
+
+# 3. Se på resultatet i konsollen (kolonneetikettene vises under kolonnenavnene)
+data_med_labels |> 
+  head()
+#> # A tibble: 6 × 4
+#>   komm_nr          fylke_nr      helseregion               landsdel_nr          
+#>   Kommunenummer    Fylkesnummer  Helseregion               Landsdelsnummer      
+#> 1 0301 [Oslo]      03 [Oslo]     H12 [Helseregion Sør-Øst] 1 [Oslo og Akershus] 
+#> 2 1101 [Eigersund] 11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland]
+#> 3 1103 [Stavanger] 11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland]
+#> 4 1106 [Haugesund] 11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland]
+#> 5 1108 [Sandnes]   11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland]
+#> 6 1111 [Sokndal]   11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland]
+```
+
+*Merk: Når du skriver ut et merket datasett i tibble-format, vises
+kolonneetikettene (f.eks. `Kommunenummer`) under kolonnenavnene, og for
+verdier som har en tilhørende etikett i KLASS, vises både koden og
+etiketten i hakeparentes (f.eks. `0301 [Oslo]`).*
+
+### Legge på etiketter fra en lokal metadatafil eller tabell
+
+Dersom du har metadata (som kodelister og spørsmålstekster) lagret i en
+lokal fil (f.eks. en Parquet-fil) eller en data frame, kan du bruke
+[`fellesr::add_column_labels_from_file()`](../reference/add_column_labels_from_file.md)
+og
+[`fellesr::add_value_labels_from_file()`](../reference/add_value_labels_from_file.md)
+til å berike datasettet.
+
+Her oppretter vi et enkelt eksempeldatasett med intervjuvariabler
+(`resultat`, `kjoenn`, `tob1`) der vi også har koblet på de regionale
+variablene `komm_nr`, `fylke_nr` og `landsdel_nr`. I den tilhørende
+metadatatabellen har vi lagt inn egne beskrivelser og koder for
+intervjuvariablene samt for `landsdel_nr`, mens `komm_nr` og `fylke_nr`
+ikke ligger i metadatatabellen:
+
+``` r
+
+# 1. Opprett et lite eksempeldatasett med intervjuvariabler og regionale variabler
+eksempel_data <- tibble::tibble(
+  resultat = c(1, 2, 1),
+  kjoenn = c("1", "2", "2"),
+  tob1 = c(1, 2, 8),
+  komm_nr = c("0301", "1101", "1103"),
+  fylke_nr = c("03", "11", "11"),
+  landsdel_nr = c("1", "3", "3")
+)
+
+# 2. Opprett en lokal metadatatabell med kolonne- og verdibeskrivelser
+# Merk at landsdel_nr finnes her med egne koder/etiketter, mens komm_nr og fylke_nr er utelatt
+eksempel_metadata <- tibble::tibble(
+  varnavn = c(
+    "resultat", "resultat",
+    "kjoenn", "kjoenn",
+    "tob1", "tob1", "tob1", "tob1",
+    "landsdel_nr", "landsdel_nr"
+  ),
+  sporsmaal_text = c(
+    "Svarstatus på IO", "Svarstatus på IO",
+    "Kjønn", "Kjønn",
+    "Hender det at du røyker?", "Hender det at du røyker?", "Hender det at du røyker?", "Hender det at du røyker?",
+    "Landsdel (egen inndeling)", "Landsdel (egen inndeling)"
+  ),
+  kode = c("1", "2", "1", "2", "1", "2", "8", "9", "1", "3"),
+  tekst = c(
+    "Intervju", "Frafall",
+    "Mann", "Kvinne",
+    "Ja", "Nei", "Ønsker ikke å svare", "Vet ikke",
+    "Oslo/Akershus", "Agder/Rogaland"
+  )
+)
+```
+
+Når dataene og metadatatabellen er opprettet, kan vi koble metadataene
+på datasettet ved hjelp av
+[`fellesr::add_column_labels_from_file()`](../reference/add_column_labels_from_file.md)
+og
+[`fellesr::add_value_labels_from_file()`](../reference/add_value_labels_from_file.md):
+
+``` r
+
+# 3. Legg på kolonneetiketter fra metadatatabellen
+eksempel_data <- eksempel_data |> 
+  fellesr::add_column_labels_from_file(
+    kodelister = eksempel_metadata,
+    variabel_kolonne = "varnavn",
+    betydning_kolonne = "sporsmaal_text"
+  )
+
+# 4. Legg på verdietiketter fra metadatatabellen
+eksempel_data <- eksempel_data |> 
+  fellesr::add_value_labels_from_file(
+    kodelister = eksempel_metadata,
+    variabel_kolonne = "varnavn",
+    kode_kolonne = "kode",
+    betydning_kolonne = "tekst"
+  )
+
+# 5. Se på det berikede datasettet (komm_nr og fylke_nr mangler foreløpig etiketter)
+head(eksempel_data)
+#> # A tibble: 3 × 6
+#>   resultat         kjoenn     tob1                     komm_nr fylke_nr landsdel_nr              
+#>   Svarstatus på IO Kjønn      Hender det at du røyker? <chr>   <chr>    Landsdel (egen inndeling)
+#> 1 1 [Intervju]     1 [Mann]   1 [Ja]                   0301    03       1 [Oslo/Akershus]        
+#> 2 2 [Frafall]      2 [Kvinne] 2 [Nei]                  1101    11       3 [Agder/Rogaland]       
+#> 3 1 [Intervju]     2 [Kvinne] 8 [Ønsker ikke å svare]  1103    11       3 [Agder/Rogaland]       
+```
+
+### Dokumentere intervjudata og hente resterende metadata fra eksisterende Datadoc-filer
+
+Når vi skal dokumentere `eksempel_data` i en Datadoc-fil, kan vi først
+fylle inn metadata fra den lokale metadatatabellen ved hjelp av
+[`fellesr::set_variable_names_from_labels()`](../reference/set_variable_names_from_labels.md).
+Deretter kan vi hente dokumentasjonen for de resterende variablene
+(`komm_nr` og `fylke_nr`) fra Datadoc-filen vi lagde tidligere
+(`demodata_filsti_2025`) ved hjelp av
+[`fellesr::copy_metadata()`](../reference/copy_metadata.md).
+
+Ved å sette `overwrite = FALSE` i
+[`fellesr::copy_metadata()`](../reference/copy_metadata.md), sørger vi
+for at variabler som allerede har fått dokumentasjon fra
+metadatatabellen (herunder `landsdel_nr`), beholdes uendret, slik at kun
+de udokumenterte variablene (`komm_nr` og `fylke_nr`) kopieres inn:
+
+``` r
+
+intervju_filsti_2025 <- glue::glue("{arbeidsmappe}/klargjorte-data/intervju-demodata_p{aargang_2025}_v1.parquet")
+
+# 1. Lagre intervjudatasettet som Parquet og opprett en tom Datadoc-fil
+arrow::write_parquet(eksempel_data, intervju_filsti_2025)
+
+fellesr::create_empty_datadoc(
+  filsti = intervju_filsti_2025,
+  name = "Intervjudata demodata",
+  description = "Eksempel på intervjudata kombinert med regionale variabler",
+  version_description = "Første versjon"
+)
+
+# 2. Fyll inn variabelnavn og standard intervjumetadata fra den lokale metadatatabellen
+fellesr::set_variable_names_from_labels(
+  filsti = intervju_filsti_2025,
+  metadata = eksempel_metadata,
+  variabel_kolonne = "varnavn",
+  betydning_kolonne = "sporsmaal_text",
+  quiet = FALSE
+)
+#> Oppdaterte 4 av 4 matchende variabler.
+
+# 3. Hent dokumentasjon for de resterende variablene (komm_nr og fylke_nr) fra eksisterende Datadoc-fil
+# Med overwrite = FALSE hoppes landsdel_nr over siden den allerede er dokumentert fra metadatatabellen
+fellesr::copy_metadata(
+  filsti_egen = intervju_filsti_2025,
+  filsti_original = demodata_filsti_2025,
+  overwrite = FALSE,
+  quiet = FALSE
+)
+#> Kopierte metadata for 2 variabeler.
+#> Hoppet over 1 variabel som allerede hadde metadata: landsdel_nr.
+#> Oppdaterte gyldighetsperiode for 2 variabeler til 2025-01-01–2025-12-31.
+```
+
+Dette trinnet med `fellesr::copy_metadata(..., overwrite = FALSE)` kan
+gjentas flere ganger etter hverandre mot ulike Datadoc-filer. Dermed kan
+du enkelt samle inn eksisterende dokumentasjon fra flere kildedatasett
+der du har koblet på variabler som du selv ikke har laget eller endret.
+
+------------------------------------------------------------------------
+
+## 5. Analysere dekningsgrad og visning av kodelister
+
+Når dataene har fått etiketter, har du enkle verktøy for å sjekke
+datakvalitet og vise verdiene.
+
+### Sjekke dekningsgrad for kodelister
+
+Med
+[`fellesr::value_label_coverage()`](../reference/value_label_coverage.md)
+får du full oversikt over dekningsgraden til kodene dine mot de
+offisielle kodelistene i KLASS:
+
+``` r
+
+# Beregn hvor stor andel av kodene som har treff i kodelisten
+dekning <- fellesr::value_label_coverage(data_med_labels)
+print(dekning)
+```
+
+### Vise merkelapper i stedet for koder i analyser og figurer
+
+Når du skal lage tabeller eller figurer, kan du konvertere kolonnene til
+vanlige R-faktorer med
+[`fellesr::show_value_labels()`](../reference/show_value_labels.md). Da
+vises stedsnavnene direkte i stedet for kodene:
+
+``` r
+
+# Konverterer labelled-kolonner til faktorer for analyser og plotting
+visnings_df <- data_med_labels |> 
+  fellesr::show_value_labels()
+head(visnings_df)
+#> # A tibble: 6 × 4
+#>   komm_nr   fylke_nr helseregion          landsdel_nr        
+#>   <fct>     <fct>    <fct>                <fct>              
+#> 1 Oslo      Oslo     Helseregion Sør-Øst  Oslo og Akershus   
+#> 2 Eigersund Rogaland Helseregion Vest     Agder og Rogaland  
+#> 3 Stavanger Rogaland Helseregion Vest     Agder og Rogaland  
+#> 4 Haugesund Rogaland Helseregion Vest     Agder og Rogaland  
+#> 5 Sandnes   Rogaland Helseregion Vest     Agder og Rogaland  
+#> 6 Sokndal   Rogaland Helseregion Vest     Agder og Rogaland  
+
+# Bytt tilbake til rene koder
+visnings_df <- data_med_labels |> 
+  fellesr::show_value_labels(labels = FALSE)
+head(visnings_df)
+#> # A tibble: 6 × 4
+#>   komm_nr fylke_nr helseregion landsdel_nr
+#>   <chr>   <chr>    <chr>       <chr>      
+#> 1 0301    03       H12         1          
+#> 2 1101    11       H03         3          
+#> 3 1103    11       H03         3          
+#> 4 1106    11       H03         3          
+#> 5 1108    11       H03         3          
+#> 6 1111    11       H03         3          
+```
+
+### Beholde koder og opprette egne etikett-kolonner
+
+Dersom du ønsker å beholde de opprinnelige kolonnene med koder (f.eks.
+`komm_nr`), men opprette helt nye kolonner ved siden av som inneholder
+stedsnavnene, kan du bruke
+[`fellesr::add_labelled_columns()`](../reference/add_labelled_columns.md).
+Denne oppretter nye faktorkolonner med postfikset `_labelled` som
+standard, eller et valgfritt postfiks via argumentet `postfix` (f.eks.
+`postfix = "_navn"`):
+
+``` r
+
+# Oppretter nye kolonner med postfiks _navn (f.eks. komm_nr_navn)
+data_med_nye_kolonner <- data_med_labels |> 
+  fellesr::add_labelled_columns(variabler = c("komm_nr", "fylke_nr"), 
+                       postfix = "_navn")
+
+# De opprinnelige kolonnene forblir uendret
+head(data_med_nye_kolonner)
+#> # A tibble: 6 × 6
+#>   komm_nr          fylke_nr      helseregion               landsdel_nr           komm_nr_navn fylke_nr_navn
+#>   Kommunenummer    Fylkesnummer  Helseregion               Landsdelsnummer       <fct>        <fct>        
+#> 1 0301 [Oslo]      03 [Oslo]     H12 [Helseregion Sør-Øst] 1 [Oslo og Akershus]  Oslo         Oslo         
+#> 2 1101 [Eigersund] 11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland] Eigersund    Rogaland     
+#> 3 1103 [Stavanger] 11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland] Stavanger    Rogaland     
+#> 4 1106 [Haugesund] 11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland] Haugesund    Rogaland     
+#> 5 1108 [Sandnes]   11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland] Sandnes      Rogaland     
+#> 6 1111 [Sokndal]   11 [Rogaland] H03 [Helseregion Vest]    3 [Agder og Rogaland] Sokndal      Rogaland 
+```
+
+Skulle du trenge å fjerne alle etiketter igjen, kan du bruke
+[`fellesr::remove_all_labels()`](../reference/remove_all_labels.md):
+
+``` r
+
+# Fjerner alle verdi- og kolonneetiketter
+rent_df <- data_med_nye_kolonner |> 
+  fellesr::remove_all_labels()
+```
+
+------------------------------------------------------------------------
+
+*Dette dokumentet har blitt bearbeidet og strukturert ved hjelp av
+OpenCode med språkmodellen **Gemini 4 Argon**.*

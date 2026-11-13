@@ -9,7 +9,7 @@ Datadoc JSON-filen."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">fellesr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,6 +23,7 @@ Datadoc JSON-filen."></head><body>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/web_only/bygge-en-r-tilleggspakke.html">Hvordan å bygge en R-pakke</a></li>
     <li><a class="dropdown-item" href="../articles/web_only/kjre-r-p-sl-stata-p3-fra-sas.html">Kjøre R på sl-stata-p4 fra SAS</a></li>
     <li><a class="dropdown-item" href="../articles/vignette__DAPLA_jukseark.html">DAPLA jukseark</a></li>
+    <li><a class="dropdown-item" href="../articles/vignette_datadoc.html">Datadoc og Vardef i R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_dynarev_uttrekk.html">Uttrekk fra Dynarev til R</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_shiny_ssb.html">Kjøre shiny og Esquisse i Jupyter</a></li>
     <li><a class="dropdown-item" href="../articles/vignette_SSB_fargepalett.html">SSB fargepallet fra KLASS</a></li>
@@ -62,7 +63,7 @@ Datadoc JSON-filen.</p>
 
 
 <dl><dt id="arg-filsti">filsti<a class="anchor" aria-label="anchor" href="#arg-filsti"></a></dt>
-<dd><p>En tekststreng eller tekstvektor med filstien til én eller
+<dd><p>En tekststreng eller karaktervektor med filstien til én eller
 flere Parquet- eller Datadoc-filer.</p></dd>
 
 
@@ -80,28 +81,30 @@ Standardverdien er <code>TRUE</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>En tekststreng eller tekstvektor med den konverterte filstien.</p>
+    <p>En tekststreng eller karaktervektor med den konverterte filstien.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Standardoppførselen er å konvertere fra <code>.parquet</code> til <code>__DOC.json</code>.
 Ved å sette <code>to = "parquet"</code> konverteres en Datadoc-fil tilbake til
-den tilhørende Parquet-filstien.</p>
+den tilhørende Parquet-filstien. Filstier som allerede har ønsket
+format, returneres uendret. Ved <code>to = "json"</code> godtas også andre
+JSON-filnavn enn <code>__DOC.json</code>.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">datadoc_path</span><span class="op">(</span><span class="st">"/buckets/data/personell_v1.parquet"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Følgende fil finnes ikke:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> - /buckets/data/personell_v1__DOC.json</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Følgende filer finnes ikke:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> /buckets/data/personell_v1__DOC.json</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/buckets/data/personell_v1__DOC.json"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">datadoc_path</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"/buckets/data/personell_v1__DOC.json"</span>,</span></span>
 <span class="r-in"><span>  to <span class="op">=</span> <span class="st">"parquet"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Følgende fil finnes ikke:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> - /buckets/data/personell_v1.parquet</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Følgende filer finnes ikke:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> /buckets/data/personell_v1.parquet</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/buckets/data/personell_v1.parquet"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
