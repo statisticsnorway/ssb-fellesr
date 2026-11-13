@@ -2,15 +2,15 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{replace_file_path}
 \alias{replace_file_path}
-\title{Erstatt filsti i Datadoc-metadata}
+\title{Erstatt filsti i en Datadoc-fil}
 \usage{
-replace_file_path(filsti_datadoc, file_path)
+replace_file_path(filsti, ny_filsti)
 }
 \arguments{
-\item{filsti_datadoc}{Tekststreng. Filsti til Datadoc JSON-filen som skal
+\item{filsti}{Tekststreng. Filsti til Datadoc JSON-filen som skal
 oppdateres.}
 
-\item{file_path}{Tekststreng. Ny filsti som skal lagres i
+\item{ny_filsti}{Tekststreng. Ny filsti som skal lagres i
 \code{datadoc$dataset$file_path}.}
 }
 \value{
@@ -25,15 +25,15 @@ Funksjonen leser inn en eksisterende Datadoc JSON-fil, erstatter verdien i
 \code{datadoc$dataset$file_path} og skriver de oppdaterte metadataene tilbake til
 den samme JSON-filen.
 
-Datadoc JSON-filen angitt i \code{filsti_datadoc} overskrives med den oppdaterte
+Datadoc JSON-filen angitt i \code{filsti} overskrives med den oppdaterte
 versjonen. Den eksisterende verdien i \code{datadoc$dataset$file_path} erstattes
-med verdien angitt i \code{file_path}.
+med verdien angitt i \code{ny_filsti}.
 }
 \examples{
 \dontrun{
 replace_file_path(
-  filsti_datadoc = "data/eksempel__DOC.json",
-  file_path = "data/eksempel.parquet"
+  filsti = "data/eksempel__DOC.json",
+  ny_filsti = "data/eksempel.parquet"
 )
 }
 

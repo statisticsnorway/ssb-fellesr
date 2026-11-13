@@ -2,12 +2,12 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{get_all_variable_definitions}
 \alias{get_all_variable_definitions}
-\title{Hent variabeldefinisjoner}
+\title{Hent alle variabeldefinisjoner fra Vardef}
 \usage{
 get_all_variable_definitions(
   date = NULL,
   language = "nb",
-  status = "ekstern",
+  status = "auto",
   token = NULL
 )
 }
@@ -23,8 +23,8 @@ tekstinnholdet i responsen. Gyldige verdier er \code{"nb"}, \code{"nn"} og
 \code{"en"}. Standardverdien er \code{"nb"}.}
 
 \item{status}{En tekststreng som angir om den eksterne eller interne
-tjenesten skal brukes. Gyldige verdier er \code{"ekstern"} og \code{"intern"}.
-Standardverdien er \code{"ekstern"}.}
+tjenesten skal brukes. Gyldige verdier er \code{"auto"}, \code{"ekstern"} og
+\code{"intern"}. Standardverdien er \code{"auto"}.}
 
 \item{token}{Et eventuelt bearer-token ved bruk av den interne
 tjenesten. Standardverdien er \code{NULL}.}

@@ -10,9 +10,9 @@ vars_with_value_labels(data)
 \item{data}{Et datasett som skal undersøkes for verdietiketter.}
 }
 \value{
-En tekstvektor med navnene på variablene som har minst én
+En karaktervektor med navnene på variablene som har minst én
 verdietikett. Dersom ingen variabler har verdietiketter, returneres
-en tom tekstvektor.
+en tom karaktervektor.
 }
 \description{
 Finner variabler i et datasett som har én eller flere
@@ -43,5 +43,5 @@ vars_with_value_labels(data)
 }
 \seealso{
 \code{\link[labelled:val_labels]{labelled::val_labels()}} for å hente verdietiketter og
-\code{\link[=vars_without_labels]{vars_without_labels()}} for å finne variabler uten kolonneetikett.
+\code{\link[=vars_without_column_labels]{vars_without_column_labels()}} for å finne variabler uten kolonneetikett.
 }

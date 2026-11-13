@@ -2,75 +2,47 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{add_value_labels}
 \alias{add_value_labels}
-\title{Legg til verdietiketter fra KLASS}
+\title{Legg til verdietiketter fra en Datadoc-fil}
 \usage{
-add_value_labels(data, filsti, language = "nb", quiet = TRUE)
+add_value_labels(
+  data,
+  filsti,
+  language = "nb",
+  quiet = TRUE,
+  clean_labels = TRUE
+)
 }
 \arguments{
-\item{data}{Et datasett, for eksempel en \code{data.frame} eller tibble,
-som skal få lagt til verdietiketter.}
+\item{data}{En data.frame eller tibble med numeriske eller tekstbaserte koder.}
 
-\item{filsti}{En tekststreng med filsti til DataDoc-filen eller den
-tilhørende datafilen.}
+\item{filsti}{Filsti til Datadoc-filen eller den tilhørende Parquet-filen.}
 
-\item{language}{En tekststreng som angir språk som skal brukes ved
-henting av metadata. Standard er \code{"nb"}.}
+\item{language}{Språkkode: \code{"nb"} (standard), \code{"nn"} eller \code{"en"}.}
 
-\item{quiet}{Logisk verdi. Dersom \code{TRUE}, undertrykkes alle advarsler
-som oppstår under kjøringen. Standard er \code{FALSE}.}
+\item{quiet}{Med \code{TRUE} (standard) skjules statusmeldinger. Advarsler om
+manglende etiketter eller mislykkede oppslag og feil vises fortsatt.}
+
+\item{clean_labels}{Med \code{TRUE} (standard) fjernes HTML- og
+formateringstagger fra etikettene og mellomrom ryddes opp.}
 }
 \value{
-Datasettet \code{data} med verdietiketter lagt til for variabler
-der en gyldig klassifikasjon ble funnet. Variabler kan bli
-konvertert til \code{character} dersom de opprinnelig har en annen
-datatype enn kodene fra KLASS.
+Datasettet med verdietiketter på variabler med treff.
 }
 \description{
-Legger til verdietiketter på variabler i et datasett basert på
-klassifikasjoner registrert i DataDoc eller Vardef.
+Henter kodelister som er referert fra Datadoc eller Vardef. En direkte
+KLASS-referanse i Datadoc har forrang. Språk og datoperiode brukes ved
+oppslag; dagens dato brukes hvis sluttdato mangler.
 }
 \details{
-For hver variabel hentes KLASS-ID fra DataDoc dersom denne finnes.
-Dersom KLASS-ID ikke er registrert i DataDoc, brukes eventuell
-klassifikasjon fra Vardef. KLASS-ID fra DataDoc har dermed forrang.
-
-Kodelisten hentes fra KLASS ved hjelp av
-\code{\link[klassR:get_klass]{klassR::get_klass()}}. Dersom \code{contains_data_until} er registrert
-i DataDoc, brukes denne datoen ved henting av kodelisten.
-
-Variabler som ikke finnes i \code{data}, som mangler en gyldig KLASS-ID,
-eller der kodelisten ikke kan hentes, hoppes over med en advarsel.
-
-Kodene fra KLASS behandles som tekst. Dersom en variabel i \code{data}
-ikke er av typen \code{character}, konverteres den til \code{character} før
-verdietikettene legges til. Dette gir som standard en advarsel.
-
-Ved å sette \code{quiet = TRUE} undertrykkes alle advarsler som oppstår
-under kjøringen av funksjonen. Feil (\code{error}) undertrykkes ikke.
-
-Funksjonen bruker \code{\link[=variables_with_classification_uri]{variables_with_classification_uri()}} til å finne
-variabler med tilknyttede klassifikasjoner.
-
-Dersom både DataDoc og Vardef inneholder en klassifikasjon for samme
-variabel, brukes klassifikasjonen fra DataDoc.
-
-Verdietikettene legges til med \code{\link[labelled:set_value_labels]{labelled::set_value_labels()}}, der
-navnene fra KLASS brukes som etiketter og kodene som underliggende
-verdier.
+Datatypen, verdiene og kolonneetikettene beholdes. Kodene i
+kodelisten tilpasses variabelens datatype; uforenlige koder gir feil.
+Numeriske variabler får numeriske verdietikettkoder. Tekstkoder beholder
+ledende nuller. Eksisterende verdietiketter erstattes ved gyldig treff.
+Observerte verdier uten etikett beholdes og gir advarsel, også med
+\code{quiet = TRUE}. Vanlige manglende verdier (\code{NA}) utelates fra kontrollen.
 }
 \examples{
 \dontrun{
-data_med_labels <- add_value_labels(
-  data = data,
-  filsti = "data__DOC.json"
-)
-
-# Undertrykk advarsler
-data_med_labels <- add_value_labels(
-  data = data,
-  filsti = "data__DOC.json",
-  quiet = TRUE
-)
+resultat <- add_value_labels(data, "data__DOC.json")
 }
-
 }

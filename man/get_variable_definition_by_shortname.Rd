@@ -2,12 +2,15 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{get_variable_definition_by_shortname}
 \alias{get_variable_definition_by_shortname}
-\title{Hent variabeldefinisjon etter kortnavn}
+\title{Hent variabeldefinisjon fra Vardef etter kortnavn}
 \usage{
 get_variable_definition_by_shortname(
   short_name,
   date = format(Sys.Date(), "\%Y-\%m-\%d"),
-  language = "nb"
+  language = "nb",
+  status = "auto",
+  quiet = TRUE,
+  token = NULL
 )
 }
 \arguments{
@@ -20,6 +23,12 @@ dagens dato.}
 
 \item{language}{En tekststreng med språkkoden som skal brukes for
 tekstinnholdet i responsen. Standardverdien er \code{"nb"}.}
+
+\item{status}{\code{"auto"} (standard), \code{"ekstern"} eller \code{"intern"}.}
+
+\item{quiet}{Med \code{TRUE} (standard) skjules statusmeldingen ved 404.}
+
+\item{token}{Valgfritt Bearer-token til intern tjeneste.}
 }
 \value{
 Et objekt opprettet fra JSON-responsen fra tjenesten.

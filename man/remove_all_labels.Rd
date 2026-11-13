@@ -28,7 +28,8 @@ For variabler av typen \code{haven_labelled_spss} vil brukerdefinerte
 manglende verdier som standard omgjøres til vanlige \code{NA}-verdier når
 verdietikettene fjernes.
 
-Andre metadataattributter, som formater og kolonnebredder, fjernes ikke.
+Visningsetiketten i \code{pillar} fjernes også. Andre metadataattributter,
+som formater og kolonnebredder, beholdes.
 }
 \examples{
 data <- data.frame(

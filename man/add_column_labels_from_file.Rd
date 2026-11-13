@@ -2,39 +2,107 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{add_column_labels_from_file}
 \alias{add_column_labels_from_file}
-\title{av duplikater. Plassholdere som \verb{^BedrNavn} og teksten \verb{<.>} beholdes.}
+\title{Legg til kolonneetiketter fra en metadatafil eller metadatatabell}
 \usage{
 add_column_labels_from_file(
   data,
   kodelister,
   variabel_kolonne = "varnavn",
   betydning_kolonne = "sporsmaal_text",
-  clean_labels = FALSE
+  clean_labels = TRUE,
+  show_labels = TRUE
 )
 }
+\arguments{
+\item{data}{En data.frame eller tibble som skal få kolonneetiketter.}
+
+\item{kodelister}{En data.frame eller tibble med variabelnavn og
+kolonneetiketter, eller en tekststreng med filstien til en
+Parquet-fil med disse opplysningene.}
+
+\item{variabel_kolonne}{En tekststreng med navnet på kolonnen i
+\code{kodelister} som inneholder variabelnavnene. Disse kobles mot
+kolonnenavnene i \code{data}. Standard er \code{"varnavn"}.}
+
+\item{betydning_kolonne}{En tekststreng med navnet på kolonnen i
+\code{kodelister} som inneholder kolonneetikettene, for eksempel
+spørsmålsteksten. Standard er \code{"sporsmaal_text"}.}
+
+\item{clean_labels}{Logisk verdi. Standard er \code{TRUE}.
+Med \code{TRUE} fjernes HTML- og formateringstagger fra kolonneetikettene,
+og mellomrom ryddes opp. Teksten mellom taggene beholdes.}
+
+\item{show_labels}{En logisk verdi som angir om kolonneetikettene også skal
+vises ved utskrift av datasettet. Når verdien er \code{TRUE}, behandles
+datasettet med \code{\link[=show_column_labels]{show_column_labels()}}. Standardverdien er \code{TRUE}.}
+}
 \value{
-Datasettet med kolonneetiketter. Verdier, datatyper og
-verdietiketter beholdes.
+Datasettet med kolonneetiketter på variablene som har treff.
 }
 \description{
-av duplikater. Plassholdere som \verb{^BedrNavn} og teksten \verb{<.>} beholdes.
+Kobler variabelnavn i metadataene mot kolonnenavn i datasettet og legger
+til beskrivende kolonneetiketter med \code{labelled::var_label()}.
+Som standard brukes \code{varnavn} til koblingen og \code{sporsmaal_text}
+som kolonneetikett.
+}
+\details{
+Bare de to angitte kolonnene i \code{kodelister} kreves. Funksjonen kan
+derfor også brukes for variabler uten svarkoder.
+
+Variabelnavnene i metadataene trimmes for innledende og avsluttende
+mellomrom før kobling. Koblingen skiller mellom store og små bokstaver.
+Variabler i metadataene som ikke finnes i \code{data}, ignoreres.
+Kolonner uten treff eller med manglende eller tom etikett beholder
+eventuell eksisterende kolonneetikett.
+
+Innledende og avsluttende mellomrom fjernes fra etikettene uavhengig
+av \code{clean_labels}. Ved treff med en ikke-tom etikett erstattes en
+eventuell eksisterende kolonneetikett.
+
+Med \code{clean_labels = TRUE} erstattes HTML- og formateringstagger som
+\verb{<br>}, \verb{<gt>}, \verb{<nt>} og \verb{<rt>} med mellomrom. Gjentatte mellomrom,
+tabulatorer og linjeskift samles til ett mellomrom. Mellomrom foran
+tegnsetting fjernes, men mellomrom foran tre prikker beholdes.
+Intervjuinstruksjoner og annen tekst mellom taggene beholdes.
+Plassholdere som \verb{^BedrNavn} og teksten \verb{<.>} beholdes også.
+HTML-entiteter som \verb{&amp;} og \verb{&nbsp;} dekodes ikke.
+
+Gjentatte, identiske etiketter for samme variabel er tillatt.
+Ulike, ikke-tomme etiketter for samme variabel gir en feil.
+Kontroll av duplikater skjer etter trimming og eventuell rensing.
+
+Funksjonen endrer bare kolonneetikettene. Kolonnenavn, verdier,
+datatyper og verdietiketter beholdes. Ingen filer skrives.
 }
 \examples{
 data <- data.frame(nrinnled = c("1", "2"))
-kodelister <- data.frame(varnavn = "nrinnled", sporsmaal_text = "Status på IO")
+kodelister <- data.frame(
+  varnavn = "nrinnled",
+  sporsmaal_text = "Status på IO"
+)
+
 resultat <- add_column_labels_from_file(data, kodelister)
 labelled::var_label(resultat$nrinnled)
 
 # Fjern HTML fra kolonneetikettene:
 kodelister$sporsmaal_text <- "Status<br><gt>på IO</gt>"
-resultat <- add_column_labels_from_file(data, kodelister, clean_labels = TRUE)
+resultat <- add_column_labels_from_file(
+  data,
+  kodelister,
+  clean_labels = TRUE
+)
 labelled::var_label(resultat$nrinnled) # "Status på IO"
 
-# Det tidligere formatet:
-kodelister <- data.frame(variabel = "nrinnled", variable_text = "Status på IO")
+# Bruk andre kolonnenavn i metadataene:
+kodelister <- data.frame(
+  variabel = "nrinnled",
+  variable_text = "Status på IO"
+)
 resultat <- add_column_labels_from_file(
-  data, kodelister,
+  data,
+  kodelister,
   variabel_kolonne = "variabel",
   betydning_kolonne = "variable_text"
 )
+
 }

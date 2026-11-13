@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{summarise_missing_required_metadata}
 \alias{summarise_missing_required_metadata}
-\title{Finn variabler som mangler obligatorisk metadata}
+\title{Finn variabler som mangler obligatoriske metadata i en Datadoc-fil}
 \usage{
 summarise_missing_required_metadata(filsti, only_incomplete = TRUE)
 }
@@ -45,6 +45,10 @@ metadatafelt for hver variabel:
 \item \code{data_source}
 \item \code{temporality_type}
 }
+
+Dette er en utfyllingskontroll av de seks feltene ovenfor, ikke full
+validering mot Datadoc-modellen. Betingede krav kontrolleres ikke.
+For språkposter kontrolleres tekstinnholdet, ikke bare at språk finnes.
 
 Et metadatafelt regnes som manglende dersom verdien er \code{NULL}, har
 lengde null, er \code{NA}, eller består av tom tekst eller bare mellomrom.

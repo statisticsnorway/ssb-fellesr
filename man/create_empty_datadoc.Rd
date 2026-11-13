@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{create_empty_datadoc}
 \alias{create_empty_datadoc}
-\title{Opprett et tomt Datadoc-dokument}
+\title{Opprett en tom Datadoc-fil}
 \usage{
 create_empty_datadoc(
   filsti,
@@ -10,8 +10,8 @@ create_empty_datadoc(
   name = NULL,
   description = NULL,
   version_description = NULL,
-  language_code = "nb",
-  quiet = FALSE
+  language = "nb",
+  quiet = TRUE
 )
 }
 \arguments{
@@ -33,10 +33,10 @@ Gjelder bare datasettnivå. Standard er \code{NULL}.}
 \item{version_description}{En tekststreng med beskrivelse av denne
 versjonen av datasettet. Gjelder bare datasettnivå. Standard er \code{NULL}.}
 
-\item{language_code}{En tekststreng med språkkoden for tekstfeltene,
+\item{language}{En tekststreng med språkkoden for tekstfeltene,
 for eksempel \code{"nb"}, \code{"nn"} eller \code{"en"}. Standard er \code{"nb"}.}
 
-\item{quiet}{Logisk verdi. Standard er \code{FALSE}. Med \code{TRUE} skjules
+\item{quiet}{Logisk verdi. Standard er \code{TRUE}. Med \code{TRUE} skjules
 meldinger, advarsler og konsollutskrifter fra R og Python under
 kjøringen. Feil som stopper kjøringen, vises fortsatt.}
 }
@@ -102,7 +102,7 @@ create_empty_datadoc(
   name = "Røyk, alkohol og andre rusmidler 2026",
   description = "Klargjorte data fra undersøkelsen i 2026.",
   version_description = "Første klargjorte versjon.",
-  language_code = "nb",
+  language = "nb",
   quiet = TRUE
 )
 }

@@ -2,96 +2,109 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{copy_metadata_variable}
 \alias{copy_metadata_variable}
-\title{Kopier variabelmetadata mellom DataDoc-filer}
+\title{Kopier variabelmetadata mellom Datadoc-filer}
 \usage{
-copy_metadata_variable(filsti_datadoc_egen, filsti_datadoc_original, variabler)
+copy_metadata_variable(
+  filsti_egen,
+  filsti_original,
+  variabler,
+  overwrite = TRUE,
+  quiet = TRUE
+)
 }
 \arguments{
-\item{filsti_datadoc_egen}{En tekststreng med filstien til DataDoc-filen
+\item{filsti_egen}{En tekststreng med filstien til Datadoc-filen
 som skal oppdateres, eller til den tilhørende Parquet-filen.
 Filstien må slutte på \code{.json} eller \code{.parquet}.}
 
-\item{filsti_datadoc_original}{En tekststreng med filstien til DataDoc-filen
+\item{filsti_original}{En tekststreng med filstien til Datadoc-filen
 som metadataene skal kopieres fra, eller til den tilhørende
 Parquet-filen. Filstien må slutte på \code{.json} eller \code{.parquet}.}
 
-\item{variabler}{En tekstvektor som angir hvilke variabler metadata skal
+\item{variabler}{En karaktervektor som angir hvilke variabler metadata skal
 kopieres for. En unavngitt verdi tolkes som at variabelen har samme
 \code{short_name} i begge filer. I en navngitt vektor angir navnet
 \code{short_name} i filen som skal oppdateres, mens verdien angir
 \code{short_name} i originalfilen.}
+
+\item{overwrite}{Med \code{TRUE} (standard) erstattes dokumentasjonsfeltene.
+Med \code{FALSE} hoppes hele variabelen over når \code{name} ikke er \code{NULL}.}
+
+\item{quiet}{Med \code{TRUE} (standard) skjules statusmeldinger.}
 }
 \value{
-Den oppdaterte DataDoc-strukturen som en liste. Den oppdaterte
-strukturen skrives samtidig til DataDoc-filen som svarer til
-\code{filsti_datadoc_egen}.
+Den oppdaterte Datadoc-strukturen som en liste. Den oppdaterte
+strukturen skrives samtidig til Datadoc-filen som svarer til
+\code{filsti_egen}.
 }
 \description{
 Kopierer metadata for én eller flere variabler fra en original
-DataDoc-fil til en annen DataDoc-fil.
+Datadoc-fil til en annen Datadoc-fil.
 }
 \details{
-Filstiene kan oppgis enten som filstier til DataDoc-filer med
+Filstiene kan oppgis enten som filstier til Datadoc-filer med
 filendelsen \code{.json}, eller som filstier til Parquet-filer med
 filendelsen \code{.parquet}. Parquet-filstier konverteres automatisk til
-tilhørende DataDoc-filstier med \code{\link[=datadoc_path]{datadoc_path()}}.
+tilhørende Datadoc-filstier med \code{\link[=datadoc_path]{datadoc_path()}}.
 
-Hele metadataobjektet for hver valgt variabel erstattes. Variabelens
-\code{short_name} beholdes imidlertid slik det er angitt i DataDoc-filen
-som metadataene kopieres til.
+Dokumentasjonsfeltene for hver valgt variabel kopieres. Mottakerens
+\code{short_name}, ID, datatype, dataelementsti og pseudonymiseringsmetadata
+beholdes. Ukjente felt beholdes fra mottakeren.
 
 Dersom en filsti slutter på \code{.parquet}, erstattes filendelsen med
 \verb{__DOC.json} ved hjelp av \code{\link[=datadoc_path]{datadoc_path()}}. Filstier som allerede
 slutter på \code{.json}, brukes uendret.
 
-De endelige JSON-filstiene skrives ut før filene leses. Funksjonen
-stopper med en feilmelding dersom én eller begge DataDoc-filene ikke
+Med \code{quiet = FALSE} skrives JSON-filstiene ut før filene leses. Funksjonen
+stopper med en feilmelding dersom én eller begge Datadoc-filene ikke
 finnes. Alle manglende filer oppgis i samme feilmelding.
 
-Begge DataDoc-filene leses med \code{\link[jsonlite:fromJSON]{jsonlite::fromJSON()}} med
+Begge Datadoc-filene leses med \code{\link[jsonlite:fromJSON]{jsonlite::fromJSON()}} med
 \code{simplifyVector = FALSE}.
 
-For hver valgt variabel kopieres hele elementet fra
-\code{datadoc$variables} i originalfilen til den tilsvarende variabelen i
-filen som skal oppdateres. Feltet \code{short_name} erstattes deretter med
-variabelnavnet som brukes i mottakerfilen.
+Kjente dokumentasjonsfelt kopieres samlet for hver valgt variabel.
+\code{overwrite = FALSE} gjør at hele variabelen hoppes over når mottakerens
+\code{name} ikke er \code{NULL}. Andre felt brukes ikke til å avgjøre dette.
+Med \code{overwrite = TRUE} erstattes dokumentasjonsfeltene som finnes i
+kilden, også når kildeverdien er \code{NULL}. Felt som ikke finnes i kilden,
+beholdes fra mottakeren. Tekniske felt overskrives aldri.
 
 Følgende kontroller utføres før filen endres:
 
 \itemize{
 \item filstiene må være ikke-tomme tekststrenger som slutter på
 \code{.json} eller \code{.parquet};
-\item begge DataDoc-filene må finnes;
-\item \code{variabler} må være en ikke-tom tekstvektor;
+\item begge Datadoc-filene må finnes;
+\item \code{variabler} må være en ikke-tom karaktervektor;
 \item samme variabel i mottakerfilen kan ikke oppgis flere ganger;
-\item \code{short_name} må være unik i begge DataDoc-filene; og
+\item \code{short_name} må være unik i begge Datadoc-filene; og
 \item alle oppgitte variabler må finnes i de respektive filene.
 }
 
-Den oppdaterte DataDoc-strukturen skrives tilbake med
-\code{\link[jsonlite:write_json]{jsonlite::write_json()}}. Den eksisterende DataDoc-filen som svarer
-til \code{filsti_datadoc_egen}, overskrives.
+Den oppdaterte Datadoc-strukturen skrives tilbake med
+\code{\link[jsonlite:write_json]{jsonlite::write_json()}}. Den eksisterende Datadoc-filen som svarer
+til \code{filsti_egen}, overskrives.
 }
 \examples{
 \dontrun{
 # Oppgi Parquet-filstier
 copy_metadata_variable(
-  filsti_datadoc_egen = "/buckets/data/egen_v1.parquet",
-  filsti_datadoc_original = "/buckets/data/original_v1.parquet",
+  filsti_egen = "/buckets/data/egen_v1.parquet",
+  filsti_original = "/buckets/data/original_v1.parquet",
   variabler = c("kjoenn", "alder")
 )
 
-# Oppgi DataDoc-filstier
+# Oppgi Datadoc-filstier
 copy_metadata_variable(
-  filsti_datadoc_egen = "/buckets/data/egen__DOC.json",
-  filsti_datadoc_original = "/buckets/data/original__DOC.json",
+  filsti_egen = "/buckets/data/egen__DOC.json",
+  filsti_original = "/buckets/data/original__DOC.json",
   variabler = c(kjoenn = "sex")
 )
 
-# Kombiner Parquet- og DataDoc-filsti
+# Kombiner Parquet- og Datadoc-filsti
 copy_metadata_variable(
-  filsti_datadoc_egen = "/buckets/data/egen.parquet",
-  filsti_datadoc_original = "/buckets/data/original__DOC.json",
+  filsti_egen = "/buckets/data/egen.parquet",
+  filsti_original = "/buckets/data/original__DOC.json",
   variabler = c(
     kjoenn = "sex",
     "alder"
@@ -101,7 +114,7 @@ copy_metadata_variable(
 
 }
 \seealso{
-\code{\link[=datadoc_path]{datadoc_path()}} for å opprette en DataDoc-filsti fra en
-Parquet-filsti, \code{\link[jsonlite:fromJSON]{jsonlite::fromJSON()}} for å lese DataDoc-filene og
+\code{\link[=datadoc_path]{datadoc_path()}} for å opprette en Datadoc-filsti fra en
+Parquet-filsti, \code{\link[jsonlite:fromJSON]{jsonlite::fromJSON()}} for å lese Datadoc-filene og
 \code{\link[jsonlite:write_json]{jsonlite::write_json()}} for å skrive den oppdaterte filen.
 }

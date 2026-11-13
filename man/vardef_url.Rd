@@ -2,7 +2,7 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{vardef_url}
 \alias{vardef_url}
-\title{Hent URL til tjenesten for variabeldefinisjoner}
+\title{Hent URL til Vardef}
 \usage{
 vardef_url(status = "ekstern")
 }

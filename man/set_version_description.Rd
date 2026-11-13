@@ -2,66 +2,67 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{set_version_description}
 \alias{set_version_description}
-\title{Sett versjonsbeskrivelse i en DataDoc-fil}
+\title{Sett versjonsbeskrivelse i en Datadoc-fil}
 \usage{
 set_version_description(
-  filsti_datadoc,
+  filsti,
   version_description,
-  language_code = "nb",
+  language = "nb",
   overwrite = FALSE
 )
 }
 \arguments{
-\item{filsti_datadoc}{Tekststreng. Filsti til DataDoc-filen som skal
+\item{filsti}{Tekststreng. Filsti til Datadoc-filen som skal
 oppdateres.}
 
 \item{version_description}{Tekststreng. Versjonsbeskrivelsen som skal
 lagres.}
 
-\item{language_code}{Tekststreng. Språkkode for versjonsbeskrivelsen.
+\item{language}{Tekststreng. Språkkode for versjonsbeskrivelsen.
 Standard er \code{"nb"}.}
 
 \item{overwrite}{Logisk verdi. Angir om en eksisterende
 versjonsbeskrivelse skal overskrives. Standard er \code{FALSE}.}
 }
 \value{
-Returnerer det oppdaterte DataDoc-objektet usynlig. Dersom en eksisterende
+Returnerer det oppdaterte Datadoc-objektet usynlig. Dersom en eksisterende
 versjonsbeskrivelse ikke overskrives, returneres det uendrede
-DataDoc-objektet usynlig.
+Datadoc-objektet usynlig.
 }
 \description{
 Legger til eller oppdaterer versjonsbeskrivelsen for et datasett i en
-DataDoc-fil. Versjonsbeskrivelsen lagres med tilhørende språkkode.
+Datadoc-fil. Versjonsbeskrivelsen lagres med tilhørende språkkode.
 }
 \details{
-Funksjonen leser DataDoc-filen, oppdaterer
+Funksjonen leser Datadoc-filen, oppdaterer
 \code{datadoc.dataset.version_description} og skriver den oppdaterte
 dokumentasjonen tilbake til samme fil.
 
 Versjonsbeskrivelsen lagres som en liste med \code{languageCode} og
 \code{languageText}.
 
-Dersom \code{version_description} allerede er utfylt og \code{overwrite = FALSE},
+Bare teksten på valgt språk vurderes og oppdateres; andre språk beholdes.
+Dersom teksten på valgt språk allerede er utfylt og \code{overwrite = FALSE},
 blir filen ikke endret, og funksjonen gir en advarsel. Sett
 \code{overwrite = TRUE} for å erstatte en eksisterende versjonsbeskrivelse.
 }
 \examples{
 \dontrun{
 set_version_description(
-  filsti_datadoc = "data/datasett__DOC.json",
+  filsti = "data/datasett__DOC.json",
   version_description = "Oppdaterte tall for 2026."
 )
 
 set_version_description(
-  filsti_datadoc = "data/datasett__DOC.json",
+  filsti = "data/datasett__DOC.json",
   version_description = "Reviderte tall for 2026.",
   overwrite = TRUE
 )
 
 set_version_description(
-  filsti_datadoc = "data/dataset__DOC.json",
+  filsti = "data/dataset__DOC.json",
   version_description = "Updated figures for 2026.",
-  language_code = "en"
+  language = "en"
 )
 }
 

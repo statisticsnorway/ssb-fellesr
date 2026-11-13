@@ -7,7 +7,7 @@
 datadoc_path(filsti, to = c("json", "parquet"), warn_if_missing = TRUE)
 }
 \arguments{
-\item{filsti}{En tekststreng eller tekstvektor med filstien til én eller
+\item{filsti}{En tekststreng eller karaktervektor med filstien til én eller
 flere Parquet- eller Datadoc-filer.}
 
 \item{to}{En tekststreng som angir hvilket filformat filstien skal
@@ -19,7 +19,7 @@ advarsel dersom filen den konverterte filstien peker til, ikke finnes.
 Standardverdien er \code{TRUE}.}
 }
 \value{
-En tekststreng eller tekstvektor med den konverterte filstien.
+En tekststreng eller karaktervektor med den konverterte filstien.
 }
 \description{
 Konverterer en filsti mellom en Parquet-fil og den tilhørende
@@ -28,7 +28,9 @@ Datadoc JSON-filen.
 \details{
 Standardoppførselen er å konvertere fra \code{.parquet} til \verb{__DOC.json}.
 Ved å sette \code{to = "parquet"} konverteres en Datadoc-fil tilbake til
-den tilhørende Parquet-filstien.
+den tilhørende Parquet-filstien. Filstier som allerede har ønsket
+format, returneres uendret. Ved \code{to = "json"} godtas også andre
+JSON-filnavn enn \verb{__DOC.json}.
 }
 \examples{
 datadoc_path("/buckets/data/personell_v1.parquet")

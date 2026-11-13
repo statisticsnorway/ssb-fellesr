@@ -2,58 +2,77 @@
 % Please edit documentation in R/datadoc_funksjoner.R
 \name{add_value_labels_from_file}
 \alias{add_value_labels_from_file}
-\title{Legg til verdietiketter fra en lokal kodeliste}
+\title{Legg til verdietiketter fra en metadatafil eller metadatatabell}
 \usage{
 add_value_labels_from_file(
   data,
   kodelister,
   quiet = TRUE,
-  variabel_kolonne = "variabel",
-  kode_kolonne = "varnavn",
-  betydning_kolonne = "sporsmaal_text"
+  variabel_kolonne = "varnavn",
+  kode_kolonne = "kode",
+  betydning_kolonne = "tekst",
+  clean_labels = TRUE
 )
 }
 \arguments{
-\item{data}{En data.frame eller tibble som skal få etiketter.}
+\item{data}{En data.frame eller tibble som skal få verdietiketter.}
 
-\item{kodelister}{En data.frame eller tibble med kodelistene, eller en
-tekststreng med filstien til en Parquet-fil i samme format.}
+\item{kodelister}{En data.frame, tibble eller filsti til en Parquet-fil
+med variabelnavn, svarkoder og tilhørende etiketter.}
 
-\item{quiet}{Logisk verdi. Hvis FALSE, gis en advarsel når en variabel
-konverteres til tekst. Standard er TRUE.}
+\item{quiet}{Med \code{TRUE} (standard) skjules statusmeldinger. Advarsler om
+observerte verdier uten etikett og feil vises fortsatt.}
 
-\item{variabel_kolonne}{Navnet på kolonnen med variabelnavnene som skal
-matches mot kolonnenavn i \code{data}. Standard er \code{"variabel"}.}
+\item{variabel_kolonne}{Kolonnen med variabelnavn. Standard er \code{"varnavn"}.}
 
-\item{kode_kolonne}{Navnet på kolonnen med svarkodene som skal få
-verdietiketter. Standard er \code{"varnavn"}.}
+\item{kode_kolonne}{Kolonnen med svarkoder. Standard er \code{"kode"}.}
 
-\item{betydning_kolonne}{Navnet på kolonnen med teksten til hver
-svarkode. Standard er \code{"sporsmaal_text"}.}
+\item{betydning_kolonne}{Kolonnen med svarkodetekst. Standard er \code{"tekst"}.}
+
+\item{clean_labels}{Med \code{TRUE} (standard) fjernes HTML- og
+formateringstagger, og mellomrom ryddes opp. Med \code{FALSE} beholdes
+taggene, også \verb{<rt>}. Innledende og avsluttende mellomrom trimmes alltid.}
 }
 \value{
-Datasettet med verdietiketter på de aktuelle variablene.
+Datasettet med verdietiketter på variablene som har treff.
 }
 \description{
-Kobler kolonnenavn i data til variabelkolonnen i kodelisten. Som standard
-brukes \code{variabel} til koblingen, \code{varnavn} som underliggende verdi og
-\code{sporsmaal_text} som verdietikett. Kolonnenavnene kan tilpasses.
-Taggene \verb{<rt>} og \verb{</rt>} fjernes fra etiketten.
+Kobler variabelnavn og svarkoder i metadataene mot datasettet og legger
+til verdietiketter med \code{labelled::set_value_labels()}.
 }
 \details{
-Som i add_value_labels() behandles koder som tekst. Ledende
-nuller bevares når kodene er lagret som tekst. Eksisterende verdietiketter
-erstattes for variabler med en gyldig kodeliste. Variabler uten treff og
-rader uten kode eller etikett hoppes over. To ulike etiketter for samme
-variabel og kode gir en feil. Eksisterende kolonneetiketter bevares.
+Datatypen og verdiene i data beholdes. Numeriske variabler får
+numeriske etikettkoder; tekstvariabler beholder tekstkoder og ledende
+nuller. Koder som ikke kan tilpasses variabelens datatype, gir feil.
+Faktorer, datoer, logiske variabler og andre spesialklasser støttes ikke
+av denne funksjonen og må håndteres eksplisitt før etiketter legges på.
+
+Bare variabler med treff behandles. Rader uten kode eller etikett
+ignoreres. Identiske oppslag slås sammen; motstridende etiketter for
+samme kode gir feil. Eksisterende verdietiketter erstattes ved gyldig
+treff. Eksisterende kolonneetiketter beholdes. Observerte verdier uten
+etikett beholdes og gir advarsel, også med \code{quiet = TRUE}. Vanlige \code{NA}
+utelates fra kontrollen.
+
+Rensingen beholder tekst mellom tagger, \verb{^BedrNavn} og \verb{<.>}.
+HTML-entiteter som \verb{&amp;} og \verb{&nbsp;} dekodes ikke. Ingen filer skrives.
 }
 \examples{
-data <- data.frame(nrinnled = c("1", "2"))
+data <- data.frame(nrinnled = c(1L, 2L))
 kodelister <- data.frame(
-  variabel = c("nrinnled", "nrinnled"),
-  varnavn = c("1", "2"),
-  sporsmaal_text = c("intervju", "<rt>Frafall</rt>")
+  varnavn = c("nrinnled", "nrinnled"), kode = c("1", "2"),
+  tekst = c("Intervju", "<rt>Frafall</rt>")
 )
 resultat <- add_value_labels_from_file(data, kodelister)
 labelled::val_labels(resultat$nrinnled)
+is.integer(resultat$nrinnled)
+
+# Det tidligere formatet angis eksplisitt:
+tidligere <- data.frame(variabel = "nrinnled", varnavn = "1",
+                        sporsmaal_text = "Intervju")
+resultat <- add_value_labels_from_file(
+  data[1, , drop = FALSE], tidligere,
+  variabel_kolonne = "variabel", kode_kolonne = "varnavn",
+  betydning_kolonne = "sporsmaal_text"
+)
 }
